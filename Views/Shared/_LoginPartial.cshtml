@@ -1,0 +1,15 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+        <button type="submit" class="btn btn-link">Çýkýþ Yap</button>
+    </form>
+}
+else
+{
+    <a asp-area="Identity" asp-page="/Account/Login">Giriþ</a>
+    <a asp-area="Identity" asp-page="/Account/Register">Kaydol</a>
+}

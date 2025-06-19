@@ -1,0 +1,414 @@
+﻿@page
+@model LoginModel
+
+@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Log in";
+}
+
+<div class="login-container">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <img src="https://via.placeholder.com/50x50" alt="Logo" class="login-logo">
+                <h1>Hoş Geldiniz</h1>
+                <p>Hesabınıza giriş yapın</p>
+            </div>
+
+            <form id="account" method="post" class="login-form">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-icon">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="E-posta adresiniz" />
+                    </div>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-icon">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Şifreniz" />
+                    </div>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-options">
+                    <label asp-for="Input.RememberMe" class="checkbox-label">
+                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                        <span class="checkmark"></span>
+                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                    </label>
+                    <a id="forgot-password" asp-page="./ForgotPassword" class="forgot-password">Şifremi Unuttum</a>
+                </div>
+
+                <button id="login-submit" type="submit" class="login-button">Giriş Yap</button>
+
+                <div class="login-divider">
+                    <span>veya</span>
+                </div>
+
+                @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                {
+                    <div class="social-login">
+                        @foreach (var provider in Model.ExternalLogins!)
+                        {
+                            <button type="submit" class="social-button @provider.Name.ToLower()" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                <i class="fab fa-@provider.Name.ToLower()"></i> @provider.DisplayName ile Giriş
+                            </button>
+                        }
+                    </div>
+                }
+
+                <div class="register-link">
+                    Hesabınız yok mu? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Kayıt Olun</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <p>© @DateTime.Now.Year Şirket Adı. Tüm hakları saklıdır.</p>
+            <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">E-posta onayını yeniden gönder</a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --danger-color: #ff3333;
+            --border-radius: 8px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .login-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .login-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            margin-bottom: 20px;
+            border-radius: 50%;
+        }
+
+        .login-header h1 {
+            color: var(--dark-color);
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group-icon {
+            position: absolute;
+            left: 15px;
+            color: #6c757d;
+            z-index: 1;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+                background-color: white;
+                outline: none;
+            }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #495057;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .form-check-input {
+            margin-right: 8px;
+            opacity: 0;
+            position: absolute;
+        }
+
+        .checkmark {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            margin-right: 8px;
+            position: relative;
+            background-color: white;
+        }
+
+        .form-check-input:checked + .checkmark {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+            .form-check-input:checked + .checkmark:after {
+                content: "";
+                position: absolute;
+                left: 6px;
+                top: 2px;
+                width: 5px;
+                height: 10px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+            .forgot-password:hover {
+                color: var(--secondary-color);
+                text-decoration: underline;
+            }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+            .login-button:hover {
+                background-color: var(--secondary-color);
+                transform: translateY(-2px);
+            }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+            .login-divider::before,
+            .login-divider::after {
+                content: "";
+                flex: 1;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .login-divider::before {
+                margin-right: 10px;
+            }
+
+            .login-divider::after {
+                margin-left: 10px;
+            }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .social-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #e0e0e0;
+            background-color: white;
+            color: var(--dark-color);
+        }
+
+            .social-button i {
+                margin-right: 10px;
+                font-size: 18px;
+            }
+
+            .social-button.google {
+                border-color: #db4437;
+                color: #db4437;
+            }
+
+                .social-button.google:hover {
+                    background-color: #db4437;
+                    color: white;
+                }
+
+            .social-button.facebook {
+                border-color: #4267B2;
+                color: #4267B2;
+            }
+
+                .social-button.facebook:hover {
+                    background-color: #4267B2;
+                    color: white;
+                }
+
+            .social-button.microsoft {
+                border-color: #7FBA00;
+                color: #7FBA00;
+            }
+
+                .social-button.microsoft:hover {
+                    background-color: #7FBA00;
+                    color: white;
+                }
+
+        .register-link {
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+            .register-link a {
+                color: var(--primary-color);
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s;
+            }
+
+                .register-link a:hover {
+                    color: var(--secondary-color);
+                    text-decoration: underline;
+                }
+
+        .login-footer {
+            text-align: center;
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+            .login-footer a {
+                color: var(--primary-color);
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+                .login-footer a:hover {
+                    color: var(--secondary-color);
+                    text-decoration: underline;
+                }
+
+        .text-danger {
+            color: var(--danger-color);
+            font-size: 13px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        @@media (max-width: 576px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+
+            .login-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
