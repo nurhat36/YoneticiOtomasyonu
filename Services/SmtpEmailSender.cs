@@ -16,7 +16,7 @@ namespace YoneticiOtomasyonu.Services
             _smtpSettings = smtpSettings.Value;
         }
 
-        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public async System.Threading.Tasks.Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             var mail = new MailMessage();
             mail.From = new MailAddress(_smtpSettings.UserName);
