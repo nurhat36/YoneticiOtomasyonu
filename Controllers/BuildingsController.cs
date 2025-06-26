@@ -54,16 +54,37 @@ namespace YoneticiOtomasyonu.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Address,Type,FloorCount,UnitCount,CreatedAt,Description,ImageUrl")] Building building)
+        public async Task<IActionResult> Create([Bind("Id,Name,Address,Type,FloorCount,UnitCount,CreatedAt,Description")] Building building, IFormFile imageFile)
         {
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                // wwwroot/uploads klasörüne kaydedilecek
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/BuildsImage");
+                Directory.CreateDirectory(uploadsFolder); // klasör yoksa oluþtur
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                // Veritabanýnda sadece yol saklanacak
+                building.ImageUrl = "/BuildsImage/" + uniqueFileName;
+            }
+
             if (!ModelState.IsValid)
             {
                 _context.Add(building);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(building);
         }
+
+
 
         // GET: Buildings/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -86,14 +107,38 @@ namespace YoneticiOtomasyonu.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Type,FloorCount,UnitCount,CreatedAt,Description,ImageUrl")] Building building)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,Type,FloorCount,UnitCount,CreatedAt,Description,ImageUrl")] Building building, IFormFile imageFile)
         {
             if (id != building.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                // Yeni resim geldi, uploads klasörüne kaydet
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/BuildsImage");
+                Directory.CreateDirectory(uploadsFolder); // klasör yoksa oluþtur
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                // Yeni resmin yolunu ata
+                building.ImageUrl = "/BuildsImage/" + uniqueFileName;
+            }
+            else
+            {
+                // Yeni resim yüklenmemiþse eski resim yolunu koru
+                var existing = await _context.Buildings.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
+                building.ImageUrl = existing?.ImageUrl;
+            }
+
+            if (!ModelState.IsValid)
             {
                 try
                 {
@@ -113,8 +158,10 @@ namespace YoneticiOtomasyonu.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             return View(building);
         }
+
 
         // GET: Buildings/Delete/5
         public async Task<IActionResult> Delete(int? id)

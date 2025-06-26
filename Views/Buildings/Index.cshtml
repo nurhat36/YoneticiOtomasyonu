@@ -1,77 +1,187 @@
 @model IEnumerable<YoneticiOtomasyonu.Models.Building>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Building Management";
+    Layout = "_Layout";
 }
 
-<h1>Index</h1>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Building Management</h1>
+        <a asp-action="Create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Add New Building
+        </a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Type)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FloorCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UnitCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FloorCount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UnitCount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageUrl)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Building List</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <a class="dropdown-item" asp-action="Create"><i class="fas fa-plus mr-2"></i>Add New</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-file-export mr-2"></i>Export Data</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Address)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Type)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.FloorCount)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.UnitCount)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.CreatedAt)
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" class="rounded-circle mr-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Building Image">
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-circle mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #4e73df; color: white;">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                        }
+                                        <strong>@Html.DisplayFor(modelItem => item.Name)</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Address)
+                                </td>
+                                <td>
+                                    <span class="badge badge-pill
+                                          @(item.Type == "Residential" ? "badge-primary" :
+                                            item.Type == "Commercial" ? "badge-success" :
+                                            item.Type == "Industrial" ? "badge-warning" : "badge-secondary")">
+                                        @Html.DisplayFor(modelItem => item.Type)
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="font-weight-bold">@Html.DisplayFor(modelItem => item.FloorCount)</span>
+                                </td>
+                                <td>
+                                    <span class="font-weight-bold">@Html.DisplayFor(modelItem => item.UnitCount)</span>
+                                </td>
+                                <td>
+                                    @item.CreatedAt.ToString("dd MMM yyyy")
+                                </td>
+                                <td>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                            <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">
+                                                <i class="fas fa-eye mr-2"></i>View Details
+                                            </a>
+                                            <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">
+                                                <i class="fas fa-edit mr-2"></i>Edit
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">
+                                                <i class="fas fa-trash-alt mr-2"></i>Delete
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link href="~/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <style>
+        .card {
+            border: none;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .table thead th {
+            border-bottom: 1px solid #e3e6f0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05rem;
+            padding: 1rem;
+            text-transform: uppercase;
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 0.75rem;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            font-size: 0.75em;
+            font-weight: 600;
+            padding: 0.35em 0.65em;
+        }
+
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+            .btn-primary:hover {
+                background-color: #2e59d9;
+                border-color: #2653d4;
+            }
+    </style>
 }
-    </tbody>
-</table>
+
+@section Scripts {
+    <script src="~/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                responsive: true,
+                "language": {
+                    "lengthMenu": "Show _MENU_ entries per page",
+                    "zeroRecords": "No buildings found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No buildings available",
+                    "infoFiltered": "(filtered from _MAX_ total buildings)"
+                }
+            });
+        });
+    </script>
+}

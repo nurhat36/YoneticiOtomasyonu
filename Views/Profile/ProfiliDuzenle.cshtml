@@ -6,7 +6,7 @@
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-lg-10">
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">Profil Bilgilerini Düzenle</h3>
@@ -31,24 +31,123 @@
                                 </div>
                             </div>
 
-                            <!-- Bilgi Giriş Alanları -->
+                            <!-- Temel Bilgiler -->
                             <div class="col-md-8">
-                                <div class="form-group">
-                                    <label asp-for="UserName" class="form-label">Kullanıcı Adı</label>
-                                    <input asp-for="UserName" class="form-control" required>
-                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="UserName" class="form-label">Kullanıcı Adı*</label>
+                                            <input asp-for="UserName" class="form-control" required>
+                                            <span asp-validation-for="UserName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Email" class="form-label">E-posta*</label>
+                                            <input asp-for="Email" class="form-control" required>
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="FullName" class="form-label">Tam Ad*</label>
+                                            <input asp-for="FullName" class="form-control" required>
+                                            <span asp-validation-for="FullName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="TCKN" class="form-label">T.C. Kimlik No</label>
+                                            <input asp-for="TCKN" class="form-control">
+                                            <span asp-validation-for="TCKN" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="PhoneNumber" class="form-label">Telefon*</label>
+                                            <input asp-for="PhoneNumber" class="form-control" required>
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="PhoneNumber2" class="form-label">İkinci Telefon</label>
+                                            <input asp-for="PhoneNumber2" class="form-control">
+                                            <span asp-validation-for="PhoneNumber2" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label asp-for="Email" class="form-label">E-posta</label>
-                                    <input asp-for="Email" class="form-control" required>
-                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                    <label asp-for="Address" class="form-label">Adres</label>
+                                    <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <!-- Ek Bilgiler -->
+                                <h5 class="mb-3">Ek Bilgiler</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="BirthDate" class="form-label">Doğum Tarihi</label>
+                                            <input asp-for="BirthDate" type="date" class="form-control">
+                                            <span asp-validation-for="BirthDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="BloodType" class="form-label">Kan Grubu</label>
+                                            <select asp-for="BloodType" class="form-control">
+                                                <option value="">Seçiniz</option>
+                                                <option value="A+">A Rh+</option>
+                                                <option value="A-">A Rh-</option>
+                                                <option value="B+">B Rh+</option>
+                                                <option value="B-">B Rh-</option>
+                                                <option value="AB+">AB Rh+</option>
+                                                <option value="AB-">AB Rh-</option>
+                                                <option value="0+">0 Rh+</option>
+                                                <option value="0-">0 Rh-</option>
+                                            </select>
+                                            <span asp-validation-for="BloodType" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label asp-for="RoleInBuilding" class="form-label">Binadaki Rolü</label>
+                                            <select asp-for="RoleInBuilding" class="form-control">
+                                                <option value="">Seçiniz</option>
+                                                <option value="Yönetici">Yönetici</option>
+                                                <option value="Kiracı">Kiracı</option>
+                                                <option value="Görevli">Görevli</option>
+                                                <option value="Site Sakini">Site Sakini</option>
+                                            </select>
+                                            <span asp-validation-for="RoleInBuilding" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="EmergencyContact" class="form-label">Acil Durum İletişim</label>
+                                            <input asp-for="EmergencyContact" class="form-control">
+                                            <span asp-validation-for="EmergencyContact" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label asp-for="PhoneNumber" class="form-label">Telefon</label>
-                                    <input asp-for="PhoneNumber" class="form-control">
-                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    <label asp-for="Notes" class="form-label">Notlar</label>
+                                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                                    <span asp-validation-for="Notes" class="text-danger"></span>
                                 </div>
 
                                 <div class="form-group mt-4">
@@ -88,6 +187,10 @@
         .needs-validation .form-control.is-invalid {
             border-color: #dc3545;
         }
+
+        hr {
+            border-top: 1px solid rgba(0,0,0,.1);
+        }
     </style>
 }
 
@@ -111,6 +214,20 @@
                 reader.readAsDataURL(file);
                 document.querySelector('.custom-file-label').textContent = file.name;
             }
+        });
+
+        // TCKN maskesi
+        document.getElementById('TCKN')?.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);
+        });
+
+        // Telefon numarası formatlama
+        document.getElementById('PhoneNumber')?.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        document.getElementById('PhoneNumber2')?.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
         });
     </script>
 }

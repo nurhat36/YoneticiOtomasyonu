@@ -56,7 +56,13 @@
             @Html.DisplayNameFor(model => model.ImageUrl)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="form-group">
+                    <label>Mevcut Resim:</label><br />
+                    <img src="@Model.ImageUrl" alt="Bina Resmi" style="max-width: 200px; border: 1px solid #ccc;" />
+                </div>
+            }
         </dd>
     </dl>
 </div>
