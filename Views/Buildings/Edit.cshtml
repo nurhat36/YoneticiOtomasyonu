@@ -1,85 +1,186 @@
-@model YoneticiOtomasyonu.Models.Building
+@model YoneticiOtomasyonu.Models.ViewModels.BuildingViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Bina Düzenle";
+    Layout = "_Layout";
 }
 
-<h1>Edit</h1>
+<div class="container py-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">@ViewData["Title"]</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CurrentImageUrl" />
 
-<h4>Building</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <!-- enctype eklendi -->
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="ImageUrl" /> <!-- Eski resim yolunu korumak için -->
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control" />
-                <span asp-validation-for="Address" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Type" class="control-label"></label>
-                <input asp-for="Type" class="form-control" />
-                <span asp-validation-for="Type" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FloorCount" class="control-label"></label>
-                <input asp-for="FloorCount" class="form-control" />
-                <span asp-validation-for="FloorCount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UnitCount" class="control-label"></label>
-                <input asp-for="UnitCount" class="form-control" />
-                <span asp-validation-for="UnitCount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Bina Temel Bilgileri -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" required />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
 
-            <!-- Yeni resim seç -->
-            <div class="form-group">
-                <label class="control-label">Yeni Resim Seç (Opsiyonel)</label>
-                <input type="file" name="imageFile" class="form-control" />
-            </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Address" class="form-label"></label>
+                            <textarea asp-for="Address" class="form-control" rows="3" required></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
 
-            <!-- Mevcut resmi göster -->
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <div class="form-group">
-                    <label>Mevcut Resim:</label><br />
-                    <img src="@Model.ImageUrl" alt="Bina Resmi" style="max-width: 200px; border: 1px solid #ccc;" />
+                        <div class="form-group mb-3">
+                            <label asp-for="Type" class="form-label"></label>
+                            <select asp-for="Type" class="form-select" required>
+                                <option value="">Bina Türü Seçiniz</option>
+                                <option value="Apartman">Apartman</option>
+                                <option value="Site">Site</option>
+                                <option value="Ýþ Merkezi">Ýþ Merkezi</option>
+                                <option value="Rezidans">Rezidans</option>
+                                <option value="Okul">Okul</option>
+                                <option value="Yurt">Yurt</option>
+                            </select>
+                            <span asp-validation-for="Type" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- Bina Özellikleri -->
+                        <div class="form-group mb-3">
+                            <label asp-for="FloorCount" class="form-label"></label>
+                            <input asp-for="FloorCount" class="form-control" type="number" min="1" max="100" required />
+                            <span asp-validation-for="FloorCount" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="UnitCount" class="form-label"></label>
+                            <input asp-for="UnitCount" class="form-control" type="number" min="1" max="1000" required />
+                            <span asp-validation-for="UnitCount" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- Bina Resmi -->
+                        <div class="form-group mb-3">
+                            <label class="form-label">Bina Resmi</label>
+                            <div class="d-flex flex-column">
+                                @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
+                                {
+                                    <div class="mb-2">
+                                        <img src="@Model.CurrentImageUrl" class="img-thumbnail" style="max-width: 200px;" alt="Mevcut Bina Resmi">
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" id="removeImage" name="removeImage">
+                                            <label class="form-check-label text-danger" for="removeImage">
+                                                Resmi kaldýr
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                                <input asp-for="ImageFile" class="form-control" accept="image/*" />
+                                <small class="form-text text-muted">JPEG, PNG veya GIF formatýnda yükleyin (Max 5MB)</small>
+                                <span asp-validation-for="ImageFile" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            }
 
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-2"></i>Kaydet
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                        <i class="fas fa-times me-2"></i>Ýptal
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Styles {
+    <style>
+        .needs-validation .form-control:invalid,
+        .needs-validation .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .card {
+            border-radius: 0.5rem;
+        }
+
+        .img-thumbnail {
+            max-height: 200px;
+            object-fit: cover;
+        }
+    </style>
+}
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Client-side validation
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.getElementsByClassName('needs-validation');
+                Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+        // Image file validation
+        document.getElementById('ImageFile').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            const removeCheckbox = document.getElementById('removeImage');
+
+            if (file) {
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    e.target.setCustomValidity('Dosya boyutu 5MB\'dan büyük olamaz');
+                    return;
+                }
+
+                // Check file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    e.target.setCustomValidity('Sadece JPEG, PNG veya GIF formatýnda dosya yükleyebilirsiniz');
+                    return;
+                }
+
+                // If new image selected, uncheck remove checkbox
+                if (removeCheckbox) {
+                    removeCheckbox.checked = false;
+                }
+
+                e.target.setCustomValidity('');
+            }
+        });
+
+        // Handle remove image checkbox
+        const removeCheckbox = document.getElementById('removeImage');
+        if (removeCheckbox) {
+            removeCheckbox.addEventListener('change', function () {
+                const fileInput = document.getElementById('ImageFile');
+                if (this.checked) {
+                    fileInput.value = '';
+                }
+            });
+        }
+    </script>
 }

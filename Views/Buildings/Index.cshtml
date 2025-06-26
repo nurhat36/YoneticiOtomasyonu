@@ -1,28 +1,29 @@
-@model IEnumerable<YoneticiOtomasyonu.Models.Building>
+@model IEnumerable<YoneticiOtomasyonu.Models.ViewModels.BuildingWithRoleViewModel>
 
 @{
-    ViewData["Title"] = "Building Management";
+    ViewData["Title"] = "Bina Yönetimi";
     Layout = "_Layout";
 }
 
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Building Management</h1>
+        <h1 class="h3 mb-0 text-gray-800">Bina Yönetimi</h1>
         <a asp-action="Create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-plus fa-sm text-white-50"></i> Add New Building
+            <i class="fas fa-plus fa-sm text-white-50"></i> Yeni Bina Ekle
         </a>
     </div>
 
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Building List</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Bina Listesi</h6>
             <div class="dropdown no-arrow">
                 <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item" asp-action="Create"><i class="fas fa-plus mr-2"></i>Add New</a>
-                    <a class="dropdown-item" href="#"><i class="fas fa-file-export mr-2"></i>Export Data</a>
+                    <a class="dropdown-item" asp-action="Create"><i class="fas fa-plus mr-2"></i>Yeni Ekle</a>
+                    <a class="dropdown-item" href="#" id="exportData"><i class="fas fa-file-export mr-2"></i>Dýþa Aktar</a>
+                    <a class="dropdown-item" asp-action="MyBuildings"><i class="fas fa-building mr-2"></i>Binalarým</a>
                 </div>
             </div>
         </div>
@@ -31,25 +32,14 @@
                 <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-light">
                         <tr>
-                            <th>
-                                @Html.DisplayNameFor(model => model.Name)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.Address)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.Type)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.FloorCount)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.UnitCount)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.CreatedAt)
-                            </th>
-                            <th>Actions</th>
+                            <th>Bina Adý</th>
+                            <th>Adres</th>
+                            <th>Tür</th>
+                            <th>Kat Sayýsý</th>
+                            <th>Birim Sayýsý</th>
+                            <th>Oluþturulma Tarihi</th>
+                            <th>Rolüm</th>
+                            <th>Ýþlemler</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,9 +48,9 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        @if (!string.IsNullOrEmpty(item.Building.ImageUrl))
                                         {
-                                            <img src="@item.ImageUrl" class="rounded-circle mr-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Building Image">
+                                            <img src="@item.Building.ImageUrl" class="rounded-circle mr-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Bina Görseli">
                                         }
                                         else
                                         {
@@ -68,28 +58,29 @@
                                                 <i class="fas fa-building"></i>
                                             </div>
                                         }
-                                        <strong>@Html.DisplayFor(modelItem => item.Name)</strong>
+                                        <strong>@item.Building.Name</strong>
                                     </div>
                                 </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Address)
-                                </td>
+                                <td>@item.Building.Address</td>
                                 <td>
                                     <span class="badge badge-pill
-                                          @(item.Type == "Residential" ? "badge-primary" :
-                                            item.Type == "Commercial" ? "badge-success" :
-                                            item.Type == "Industrial" ? "badge-warning" : "badge-secondary")">
-                                        @Html.DisplayFor(modelItem => item.Type)
+                                          @(item.Building.Type == "Apartman" ? "badge-primary" :
+                                            item.Building.Type == "Site" ? "badge-success" :
+                                            item.Building.Type == "Ýþ Merkezi" ? "badge-info" :
+                                            item.Building.Type == "Rezidans" ? "badge-warning" : "badge-secondary")">
+                                        @item.Building.Type
                                     </span>
                                 </td>
+                                <td class="font-weight-bold">@item.Building.FloorCount</td>
+                                <td class="font-weight-bold">@item.Building.UnitCount</td>
+                                <td>@item.Building.CreatedAt.ToString("dd/MM/yyyy")</td>
                                 <td>
-                                    <span class="font-weight-bold">@Html.DisplayFor(modelItem => item.FloorCount)</span>
-                                </td>
-                                <td>
-                                    <span class="font-weight-bold">@Html.DisplayFor(modelItem => item.UnitCount)</span>
-                                </td>
-                                <td>
-                                    @item.CreatedAt.ToString("dd MMM yyyy")
+                                    <span class="badge
+                                        @(item.Role == "Yönetici" ? "badge-success" :
+                                          item.Role == "Kiracý" ? "badge-primary" :
+                                          item.Role == "Görevli" ? "badge-info" : "badge-secondary")">
+                                        @item.Role
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="dropdown no-arrow">
@@ -97,16 +88,28 @@
                                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                                            <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">
-                                                <i class="fas fa-eye mr-2"></i>View Details
+                                            <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Building.Id">
+                                                <i class="fas fa-eye mr-2"></i>Detaylarý Görüntüle
                                             </a>
-                                            <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">
-                                                <i class="fas fa-edit mr-2"></i>Edit
+
+                                            @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
+                                            {
+                                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Building.Id">
+                                                    <i class="fas fa-edit mr-2"></i>Düzenle
+                                                </a>
+                                            }
+
+                                            <a class="dropdown-item" asp-action="ManageUsers" asp-route-buildingId="@item.Building.Id">
+                                                <i class="fas fa-users mr-2"></i>Kullanýcýlarý Yönet
                                             </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">
-                                                <i class="fas fa-trash-alt mr-2"></i>Delete
-                                            </a>
+
+                                            @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
+                                            {
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Building.Id">
+                                                    <i class="fas fa-trash-alt mr-2"></i>Sil
+                                                </a>
+                                            }
                                         </div>
                                     </div>
                                 </td>
@@ -121,7 +124,7 @@
 
 @section Styles {
     <link href="~/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <style>
         .card {
             border: none;
@@ -134,8 +137,8 @@
             font-size: 0.75rem;
             font-weight: 700;
             letter-spacing: 0.05rem;
-            padding: 1rem;
             text-transform: uppercase;
+            padding: 1rem;
         }
 
         .table td {
@@ -164,6 +167,12 @@
                 background-color: #2e59d9;
                 border-color: #2653d4;
             }
+
+        .role-badge {
+            min-width: 70px;
+            display: inline-block;
+            text-align: center;
+        }
     </style>
 }
 
@@ -171,16 +180,30 @@
     <script src="~/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="~/vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#dataTable').DataTable({
                 responsive: true,
                 "language": {
-                    "lengthMenu": "Show _MENU_ entries per page",
-                    "zeroRecords": "No buildings found",
-                    "info": "Showing page _PAGE_ of _PAGES_",
-                    "infoEmpty": "No buildings available",
-                    "infoFiltered": "(filtered from _MAX_ total buildings)"
-                }
+                    "lengthMenu": "Sayfa baþýna _MENU_ kayýt göster",
+                    "zeroRecords": "Kayýt bulunamadý",
+                    "info": "Sayfa _PAGE_ / _PAGES_",
+                    "infoEmpty": "Kayýt bulunamadý",
+                    "infoFiltered": "(_MAX_ kayýt içerisinden filtrelendi)",
+                    "search": "Ara:",
+                    "paginate": {
+                        "previous": "Önceki",
+                        "next": "Sonraki"
+                    }
+                },
+                dom: '<"top"lf>rt<"bottom"ip><"clear">'
+            });
+
+            // Export data functionality
+            $('#exportData').click(function (e) {
+                e.preventDefault();
+                // You can implement export functionality here
+                alert('Dýþa aktarma iþlemi baþlatýldý');
+                // Example: window.location.href = '/Buildings/Export';
             });
         });
     </script>

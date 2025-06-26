@@ -33,7 +33,9 @@ namespace YoneticiOtomasyonu.Controllers
 
             // UserProfile bilgilerini getir
             var userProfile = await _context.UserProfiles
-                .FirstOrDefaultAsync(up => up.IdentityUserId == user.Id);
+               .Include(up => up.BuildingRoles)
+               .ThenInclude(br => br.Building)
+               .FirstOrDefaultAsync(up => up.IdentityUserId == user.Id);
 
             var model = new ProfileEditViewModel
             {
@@ -52,7 +54,14 @@ namespace YoneticiOtomasyonu.Controllers
                 RoleInBuilding = userProfile?.RoleInBuilding,
                 BirthDate = userProfile?.BirthDate,
                 BloodType = userProfile?.BloodType,
-                Notes = userProfile?.Notes
+                Notes = userProfile?.Notes,
+                BuildingRoles = userProfile.BuildingRoles.Select(br => new BuildingRoleViewModel
+                {
+                    BuildingId = br.BuildingId,
+                    BuildingName = br.Building.Name,
+                    Role = br.Role,
+                    IsPrimary = br.IsPrimary
+                }).ToList()
             };
 
             return View(model);

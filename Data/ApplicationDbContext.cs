@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
+using YoneticiOtomasyonu.Models;
 using YoneticiOtomasyonu.Models;
 
 namespace YoneticiOtomasyonu.Data
@@ -24,6 +26,7 @@ namespace YoneticiOtomasyonu.Data
         public DbSet<Document> Documents { get; set; }
         public DbSet<Meeting> Meetings { get; set; }
         public DbSet<MeetingAttendance> MeetingAttendances { get; set; }
+        public DbSet<UserBuildingRole> UserBuildingRoles { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -106,6 +109,25 @@ namespace YoneticiOtomasyonu.Data
             builder.Entity<WorkTask>()
                 .Property(t => t.Priority)
                 .HasDefaultValue("Orta");
+            builder.Entity<Building>()
+                .HasMany(b => b.UserRoles)
+                .WithOne(ubr => ubr.Building)
+                .HasForeignKey(ubr => ubr.BuildingId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Building creator ilişkisi
+            builder.Entity<Building>()
+                .HasOne(b => b.CreatorUser)
+                .WithMany()
+                .HasForeignKey(b => b.CreatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // UserBuildingRole atayan kullanıcı ilişkisi
+            builder.Entity<UserBuildingRole>()
+                .HasOne(ubr => ubr.AssignedByUser)
+                .WithMany()
+                .HasForeignKey(ubr => ubr.AssignedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Tablo isimlendirmeleri
             builder.Entity<Building>().ToTable("Buildings");

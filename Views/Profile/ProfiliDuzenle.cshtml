@@ -133,6 +133,41 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="card mt-4">
+                                    <div class="card-header">
+                                        <h5>Bina Rollerim</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Bina Adı</th>
+                                                    <th>Rolüm</th>
+                                                    <th>Ana Bina</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var role in Model.BuildingRoles)
+                                                {
+                                                    <tr>
+                                                        <td>@role.BuildingName</td>
+                                                        <td>@role.Role</td>
+                                                        <td>
+                                                            @if (role.IsPrimary)
+                                                            {
+                                                                <span class="badge bg-success">Evet</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge bg-secondary">Hayır</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
 
                                 <div class="row">
                                     <div class="col-md-6">

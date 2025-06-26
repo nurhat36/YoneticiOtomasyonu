@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YoneticiOtomasyonu.Data;
 
@@ -11,9 +12,11 @@ using YoneticiOtomasyonu.Data;
 namespace YoneticiOtomasyonu.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250626214757_InitialCreate3")]
+    partial class InitialCreate3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,19 +284,13 @@ namespace YoneticiOtomasyonu.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatorUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("FloorCount")
                         .HasColumnType("int");
@@ -303,8 +300,7 @@ namespace YoneticiOtomasyonu.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -314,8 +310,6 @@ namespace YoneticiOtomasyonu.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatorUserId");
 
                     b.ToTable("Buildings", (string)null);
                 });
@@ -653,7 +647,7 @@ namespace YoneticiOtomasyonu.Migrations
 
                     b.Property<string>("AssignedByUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("AssignmentDate")
                         .HasColumnType("datetime2");
@@ -666,21 +660,18 @@ namespace YoneticiOtomasyonu.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserProfileId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedByUserId");
-
                     b.HasIndex("BuildingId");
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("UserBuildingRoles");
+                    b.ToTable("UserBuildingRole");
                 });
 
             modelBuilder.Entity("YoneticiOtomasyonu.Models.UserProfile", b =>
@@ -862,17 +853,6 @@ namespace YoneticiOtomasyonu.Migrations
                     b.Navigation("Building");
                 });
 
-            modelBuilder.Entity("YoneticiOtomasyonu.Models.Building", b =>
-                {
-                    b.HasOne("YoneticiOtomasyonu.Models.ApplicationUser", "CreatorUser")
-                        .WithMany()
-                        .HasForeignKey("CreatorUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatorUser");
-                });
-
             modelBuilder.Entity("YoneticiOtomasyonu.Models.Complaint", b =>
                 {
                     b.HasOne("YoneticiOtomasyonu.Models.ApplicationUser", "AssignedTo")
@@ -1030,12 +1010,6 @@ namespace YoneticiOtomasyonu.Migrations
 
             modelBuilder.Entity("YoneticiOtomasyonu.Models.UserBuildingRole", b =>
                 {
-                    b.HasOne("YoneticiOtomasyonu.Models.ApplicationUser", "AssignedByUser")
-                        .WithMany()
-                        .HasForeignKey("AssignedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("YoneticiOtomasyonu.Models.Building", "Building")
                         .WithMany("UserRoles")
                         .HasForeignKey("BuildingId")
@@ -1047,8 +1021,6 @@ namespace YoneticiOtomasyonu.Migrations
                         .HasForeignKey("UserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AssignedByUser");
 
                     b.Navigation("Building");
 

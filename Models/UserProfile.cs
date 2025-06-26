@@ -16,5 +16,6 @@
         public DateTime? BirthDate { get; set; } // Doğum tarihi (opsiyonel)
         public string? BloodType { get; set; } // Kan grubu (opsiyonel)
         public string? Notes { get; set; } // Ek notlar (opsiyonel)
+        public ICollection<UserBuildingRole> BuildingRoles { get; set; }
     }
 }
