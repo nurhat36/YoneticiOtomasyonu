@@ -38,7 +38,9 @@ namespace YoneticiOtomasyonu.Data
                     Email = adminEmail,
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
-                    SecurityStamp = Guid.NewGuid().ToString()
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    PhoneNumber = "5551234567", // Sample phone number
+                    ProfileImageUrl = "/uploads/profile-images/6663f122-be96-4dbb-81b1-53e38824ed6c_20250626212920.jpg" // Default profile image URL
                 };
 
                 var createUser = await userManager.CreateAsync(adminUser, "Admin123!"); // Strong password
