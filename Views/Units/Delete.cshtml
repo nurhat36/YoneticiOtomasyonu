@@ -1,0 +1,44 @@
+﻿@model YoneticiOtomasyonu.Models.Unit
+
+@{
+    ViewData["Title"] = "Birim Sil";
+}
+
+<h2>Birim Sil</h2>
+<hr />
+
+<div class="alert alert-warning">
+    <strong>Uyarı!</strong> Bu birimi silmek istediğinizden emin misiniz?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Numara</dt>
+    <dd class="col-sm-9">@Model.Number</dd>
+
+    <dt class="col-sm-3">Tür</dt>
+    <dd class="col-sm-9">@Model.Type</dd>
+
+    <dt class="col-sm-3">Kat</dt>
+    <dd class="col-sm-9">@(Model.Floor == 0 ? "Zemin" : $"{Model.Floor}. Kat")</dd>
+
+    <dt class="col-sm-3">Alan</dt>
+    <dd class="col-sm-9">@Model.Area m²</dd>
+
+    <dt class="col-sm-3">Durum</dt>
+    <dd class="col-sm-9">
+        @if (Model.IsOccupied)
+        {
+            <span class="badge bg-danger">Dolu</span>
+        }
+        else
+        {
+            <span class="badge bg-success">Boş</span>
+        }
+    </dd>
+</dl>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="List" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary">İptal</a>
+</form>

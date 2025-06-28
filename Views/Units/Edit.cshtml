@@ -1,0 +1,90 @@
+﻿@model YoneticiOtomasyonu.Models.ViewModels.UnitViewModel
+
+@{
+    ViewData["Title"] = "Birim Düzenle";
+}
+
+<h2>Birim Düzenle</h2>
+<hr />
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="BuildingId" />
+
+    <div class="form-group mb-3">
+        <label asp-for="Number" class="form-label">Numara</label>
+        <input asp-for="Number" class="form-control" />
+        <span asp-validation-for="Number" class="text-danger small"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Type" class="form-label">Tür</label>
+        <input asp-for="Type" class="form-control" />
+        <span asp-validation-for="Type" class="text-danger small"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Floor" class="form-label">Kat</label>
+        <select asp-for="Floor" class="form-select" asp-items="Model.FloorList">
+            <option value="">-- Kat Seçiniz --</option>
+        </select>
+        <span asp-validation-for="Floor" class="text-danger small"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Area" class="form-label">Alan (m²)</label>
+        <input asp-for="Area" class="form-control" type="number" step="0.01" />
+        <span asp-validation-for="Area" class="text-danger small"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsOccupied" class="form-check-input" type="checkbox" id="occupiedCheckbox" />
+        <label class="form-check-label" for="occupiedCheckbox">Dolu</label>
+    </div>
+
+    <div class="form-group mb-3" id="residentSelectContainer" style="display: none;">
+    <label asp-for="ResidentId" class="form-label">Kalan Kullanıcı Seç</label>
+        <select id="residentSelect" name="ResidentId" class="form-select">
+            <option value="">-- Seçiniz --</option>
+            @foreach (var user in Model.Residents)
+            {
+                var isSelected = Model.ResidentId == user.Id;
+                <option value="@user.Id" data-image="@user.ProfileImageUrl" selected="@isSelected">@user.UserName</option>
+            }
+        </select>
+    <span asp-validation-for="ResidentId" class="text-danger small"></span>
+</div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Description" class="form-label">Açıklama</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a asp-action="List" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary">Geri</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            function toggleResidentSelect() {
+                if ($("#occupiedCheckbox").is(":checked")) {
+                    $("#residentSelectContainer").show();
+                } else {
+                    $("#residentSelectContainer").hide();
+                    $("#residentSelect").val("");
+                }
+            }
+
+            toggleResidentSelect();
+
+            $("#occupiedCheckbox").change(function () {
+                toggleResidentSelect();
+            });
+        });
+    </script>
+}

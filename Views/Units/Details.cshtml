@@ -1,0 +1,46 @@
+﻿@model YoneticiOtomasyonu.Models.Unit
+
+@{
+    ViewData["Title"] = "Birim Detayları";
+}
+
+<h2>Birim Detayları</h2>
+<hr />
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Number</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@Model.Type</h6>
+        <p class="card-text"><strong>Kat:</strong> @(Model.Floor == 0 ? "Zemin" : $"{Model.Floor}. Kat")</p>
+        <p class="card-text"><strong>Alan:</strong> @Model.Area m²</p>
+        <p class="card-text">
+            <strong>Durum:</strong>
+            @if (Model.IsOccupied)
+            {
+                <span class="badge bg-danger">Dolu</span>
+            }
+            else
+            {
+                <span class="badge bg-success">Boş</span>
+            }
+        </p>
+        <p class="card-text"><strong>Açıklama:</strong> @Model.Description</p>
+        <p class="card-text"><strong>Bina:</strong> @Model.Building?.Name</p>
+        <p class="card-text">
+            <strong>Kalan Kullanıcı:</strong>
+            @if (Model.Resident != null)
+            {
+                <div class="d-flex align-items-center">
+                    <img src="@Model.Resident.ProfileImageUrl" alt="Profil" style="width:40px; height:40px; object-fit:cover; border-radius:50%; margin-right:10px;" />
+                    <span>@Model.Resident.UserName</span>
+                </div>
+            }
+            else
+            {
+                <span>-</span>
+            }
+        </p>
+    </div>
+</div>
+
+<a asp-action="List" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary mt-3">Geri</a>
