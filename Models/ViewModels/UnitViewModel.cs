@@ -1,4 +1,6 @@
-﻿namespace YoneticiOtomasyonu.Models.ViewModels
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace YoneticiOtomasyonu.Models.ViewModels
 {
     public class UnitViewModel
     {
@@ -21,8 +23,11 @@
         public string? ResidentId { get; set; } // Seçilen kullanıcı ID
 
         public List<ApplicationUser>? Residents { get; set; } // Kullanıcı listesini buraya alacağız
-        
+        public List<SelectListItem>? FloorList { get; set; }
+
+
+
 
     }
-    
+
 }

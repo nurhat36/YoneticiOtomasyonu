@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using YoneticiOtomasyonu.Data;
 using YoneticiOtomasyonu.Models;
@@ -20,15 +21,29 @@ namespace YoneticiOtomasyonu.Controllers
         // GET: Units/Add?buildingId=5
         public async Task<IActionResult> Add(int buildingId)
         {
+            var building = await _context.Buildings.FindAsync(buildingId);
+            if (building == null) return NotFound();
+
             var users = await _context.Users.ToListAsync();
+
+            // 🔥 Buraya ekleyeceğiz!
+            var floors = Enumerable.Range(0, building.FloorCount + 1)
+                .Select(f => new SelectListItem
+                {
+                    Value = f.ToString(),
+                    Text = f == 0 ? "Zemin" : $"{f}. Kat"
+                }).ToList();
 
             var model = new UnitViewModel
             {
                 BuildingId = buildingId,
-                Residents = users
+                Residents = users,
+                FloorList = floors
             };
+
             return View(model);
         }
+
 
 
         // POST: Units/Add
