@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace YoneticiOtomasyonu.Controllers
     public class UnitsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UnitsController(ApplicationDbContext context)
+        public UnitsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Units/Add?buildingId=5
@@ -72,6 +75,26 @@ namespace YoneticiOtomasyonu.Controllers
 
             _context.Units.Add(unit);
             await _context.SaveChangesAsync();
+            if (model.IsOccupied && !string.IsNullOrEmpty(model.ResidentId))
+            {
+                var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(up => up.IdentityUserId == model.ResidentId);
+                if (userProfile != null && !string.IsNullOrEmpty(model.SelectedRole))
+                {
+                    var newRole = new UserBuildingRole
+                    {
+                        UserProfileId = userProfile.Id,
+                        BuildingId = model.BuildingId,
+                        Role = model.SelectedRole,
+                        IsPrimary = false,
+                        AssignmentDate = DateTime.Now,
+                        AssignedByUserId = _userManager.GetUserId(User)
+                    };
+
+                    _context.UserBuildingRoles.Add(newRole);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
 
             TempData["Success"] = "Birim başarıyla eklendi";
             return RedirectToAction("Details", "Buildings", new { id = model.BuildingId });
@@ -84,17 +107,40 @@ namespace YoneticiOtomasyonu.Controllers
 
             if (building == null) return NotFound();
 
-            // Her unit’in resident bilgisi de gelsin
+            // Unit'leri resident (ApplicationUser) bilgisiyle al
             var units = await _context.Units
                 .Include(u => u.Resident)
                 .Where(u => u.BuildingId == buildingId)
                 .ToListAsync();
+
+            // Her resident için UserProfile ve UserBuildingRole al
+            foreach (var unit in units.Where(u => u.Resident != null))
+            {
+                var userProfile = await _context.UserProfiles
+                    .FirstOrDefaultAsync(p => p.IdentityUserId == unit.Resident.Id);
+
+                if (userProfile != null)
+                {
+                    var role = await _context.UserBuildingRoles
+                        .Where(r => r.UserProfileId == userProfile.Id && r.BuildingId == buildingId)
+                        .Select(r => r.Role)
+                        .FirstOrDefaultAsync();
+
+                    // Sonuç olarak role'ü Resident nesnesine (örneğin Temp alan) ekleyebilirsin
+                    // Veya ViewBag üzerinden gönderebilirsin, ya da ViewModel oluşturabilirsin
+                    // Hızlı çözüm için Resident nesnesinin Tag property’sini kullanabilirsin (dynamic property yok, ama geçici hack olarak ViewBag kullanırız)
+
+                    // Burada geçici bir çözüm: unit'e CustomRole property ekleyelim
+                    unit.Description += $" [Rol: {role}]"; // örnek
+                }
+            }
 
             ViewBag.BuildingName = building.Name;
             ViewBag.BuildingId = buildingId;
 
             return View(units);
         }
+
         public async Task<IActionResult> Details(int id)
         {
             var unit = await _context.Units
@@ -116,7 +162,7 @@ namespace YoneticiOtomasyonu.Controllers
 
             var building = await _context.Buildings.FindAsync(unit.BuildingId);
 
-            // Kat listesi oluştur
+            // Kat listesi
             var floors = Enumerable.Range(0, building.FloorCount + 1)
                 .Select(f => new SelectListItem
                 {
@@ -125,6 +171,12 @@ namespace YoneticiOtomasyonu.Controllers
                 }).ToList();
 
             var users = await _context.Users.ToListAsync();
+
+            // Seçilen kullanıcının mevcut rolünü bulalım
+            var userRole = await _context.UserBuildingRoles
+                .Where(r => r.BuildingId == unit.BuildingId && r.UserProfile.IdentityUserId == unit.ResidentId)
+                .Select(r => r.Role)
+                .FirstOrDefaultAsync();
 
             var model = new UnitViewModel
             {
@@ -138,11 +190,13 @@ namespace YoneticiOtomasyonu.Controllers
                 BuildingId = unit.BuildingId,
                 ResidentId = unit.ResidentId,
                 Residents = users,
-                FloorList = floors
+                FloorList = floors,
+                SelectedRole = userRole // 👈 Mevcut rolü ekledik
             };
 
             return View(model);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UnitViewModel model)
@@ -151,6 +205,15 @@ namespace YoneticiOtomasyonu.Controllers
 
             if (!ModelState.IsValid)
             {
+                // Kat listesi ve kullanıcıları tekrar doldur
+                var building = await _context.Buildings.FindAsync(model.BuildingId);
+                model.FloorList = Enumerable.Range(0, building.FloorCount + 1)
+                    .Select(f => new SelectListItem
+                    {
+                        Value = f.ToString(),
+                        Text = f == 0 ? "Zemin" : $"{f}. Kat"
+                    }).ToList();
+                model.Residents = await _context.Users.ToListAsync();
                 return View(model);
             }
 
@@ -163,14 +226,48 @@ namespace YoneticiOtomasyonu.Controllers
             unit.Area = model.Area;
             unit.IsOccupied = model.IsOccupied;
             unit.Description = model.Description;
-            unit.ResidentId = model.ResidentId;
+            unit.ResidentId = model.IsOccupied ? model.ResidentId : null;
 
             _context.Update(unit);
-            await _context.SaveChangesAsync();
 
+            // Kullanıcı-rol tablosunu güncelle
+            if (model.IsOccupied && !string.IsNullOrEmpty(model.ResidentId) && !string.IsNullOrEmpty(model.SelectedRole))
+            {
+                var userProfile = await _context.UserProfiles
+                    .FirstOrDefaultAsync(up => up.IdentityUserId == model.ResidentId);
+
+                if (userProfile != null)
+                {
+                    var existingRole = await _context.UserBuildingRoles
+                        .FirstOrDefaultAsync(r => r.BuildingId == model.BuildingId && r.UserProfileId == userProfile.Id);
+
+                    if (existingRole != null)
+                    {
+                        existingRole.Role = model.SelectedRole;
+                        existingRole.AssignmentDate = DateTime.Now;
+                        _context.UserBuildingRoles.Update(existingRole);
+                    }
+                    else
+                    {
+                        var newRole = new UserBuildingRole
+                        {
+                            UserProfileId = userProfile.Id,
+                            BuildingId = model.BuildingId,
+                            Role = model.SelectedRole,
+                            IsPrimary = false,
+                            AssignmentDate = DateTime.Now,
+                            AssignedByUserId = _userManager.GetUserId(User)
+                        };
+                        _context.UserBuildingRoles.Add(newRole);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
             TempData["Success"] = "Birim başarıyla güncellendi.";
             return RedirectToAction("List", new { buildingId = model.BuildingId });
         }
+
         public async Task<IActionResult> Delete(int id)
         {
             var unit = await _context.Units

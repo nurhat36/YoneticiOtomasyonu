@@ -43,7 +43,7 @@
     </div>
 
     <div class="form-group mb-3" id="residentSelectContainer" style="display: none;">
-    <label asp-for="ResidentId" class="form-label">Kalan Kullanıcı Seç</label>
+        <label asp-for="ResidentId" class="form-label">Kalan Kullanıcı Seç</label>
         <select id="residentSelect" name="ResidentId" class="form-select">
             <option value="">-- Seçiniz --</option>
             @foreach (var user in Model.Residents)
@@ -52,8 +52,17 @@
                 <option value="@user.Id" data-image="@user.ProfileImageUrl" selected="@isSelected">@user.UserName</option>
             }
         </select>
-    <span asp-validation-for="ResidentId" class="text-danger small"></span>
-</div>
+        <span asp-validation-for="ResidentId" class="text-danger small"></span>
+
+        <label class="form-label mt-3">Rol Seç</label>
+        <select id="roleSelect" name="SelectedRole" class="form-select">
+            <option value="">-- Rol Seçiniz --</option>
+            <option value="Site Sakini" selected="@(Model.SelectedRole == "Site Sakini")">Site Sakini</option>
+            <option value="Kiracı" selected="@(Model.SelectedRole == "Kiracı")">Kiracı</option>
+            <option value="Yönetici" selected="@(Model.SelectedRole == "Yönetici")">Yönetici</option>
+            <option value="Görevli" selected="@(Model.SelectedRole == "Görevli")">Görevli</option>
+        </select>
+    </div>
 
     <div class="form-group mb-3">
         <label asp-for="Description" class="form-label">Açıklama</label>

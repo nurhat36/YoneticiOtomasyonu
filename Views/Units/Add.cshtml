@@ -64,7 +64,6 @@
                         <div class="mb-3" id="residentSelectContainer" style="display: none;">
                             <label asp-for="ResidentId" class="form-label fw-bold mb-2">Kalan Kullanıcı</label>
                             <div class="position-relative">
-                                <!-- Yeni eklenen wrapper div -->
                                 <select id="residentSelect" name="ResidentId" class="form-select rounded shadow-sm">
                                     <option value="">-- Kullanıcı Seçiniz --</option>
                                     @foreach (var user in Model.Residents)
@@ -74,7 +73,18 @@
                                 </select>
                             </div>
                             <span asp-validation-for="ResidentId" class="text-danger small mt-1 d-block"></span>
+
+                            <label class="form-label fw-bold mt-3">Rol Seç</label>
+                            <select id="roleSelect" name="SelectedRole" class="form-select rounded shadow-sm">
+                                <option value="">-- Rol Seçiniz --</option>
+                                <option value="Site Sakini">Site Sakini</option>
+                                <option value="Kiracı">Kiracı</option>
+                                <option value="Yönetici">Yönetici</option>
+                                <option value="Görevli">Görevli</option>
+                            </select>
+                            <span asp-validation-for="SelectedRole" class="text-danger small mt-1 d-block"></span>
                         </div>
+
                     </div>
                 </div>
 

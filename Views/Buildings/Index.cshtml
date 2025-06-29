@@ -50,16 +50,24 @@
                                     <div class="d-flex align-items-center">
                                         @if (!string.IsNullOrEmpty(item.Building.ImageUrl))
                                         {
-                                            <img src="@item.Building.ImageUrl" class="rounded-circle mr-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Bina Görseli">
+                                            <img src="@item.Building.ImageUrl" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Bina Görseli">
                                         }
                                         else
                                         {
-                                            <div class="rounded-circle mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #4e73df; color: white;">
+                                            <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #4e73df; color: white;">
                                                 <i class="fas fa-building"></i>
                                             </div>
                                         }
-                                        <strong>@item.Building.Name</strong>
+
+                                        <strong>
+                                            @item.Building.Name
+                                            @if (!string.IsNullOrEmpty(item.Building.Block))
+                                            {
+                                                <span>(@item.Building.Block)</span>
+                                            }
+                                        </strong>
                                     </div>
+
                                 </td>
                                 <td>@item.Building.Address</td>
                                 <td>

@@ -18,6 +18,9 @@ namespace YoneticiOtomasyonu.Models
         [Required(ErrorMessage = "Bina türü seçilmelidir.")]
         public string Type { get; set; } // Apartman, İş Merkezi, Site, Rezidans vb.
 
+        public string? Block { get; set; } // Blok bilgisi, opsiyonel (null olabilir)
+
+
         [Range(1, 100, ErrorMessage = "Kat sayısı 1-100 arasında olmalıdır.")]
         public int FloorCount { get; set; }
 

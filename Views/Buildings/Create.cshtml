@@ -46,6 +46,12 @@
                     <div class="col-md-6">
                         <!-- Bina Özellikleri -->
                         <div class="form-group mb-3">
+                            <label asp-for="Block" class="form-label">Blok</label>
+                            <input asp-for="Block" class="form-control" placeholder="Ör: A Blok" />
+                            <span asp-validation-for="Block" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
                             <label asp-for="FloorCount" class="form-label"></label>
                             <input asp-for="FloorCount" class="form-control" type="number" min="1" max="100" required />
                             <span asp-validation-for="FloorCount" class="text-danger"></span>

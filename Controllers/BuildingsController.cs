@@ -124,6 +124,7 @@ namespace YoneticiOtomasyonu.Controllers
                     Name = model.Name,
                     Address = model.Address,
                     Type = model.Type,
+                    Block = model.Block,
                     FloorCount = model.FloorCount,
                     UnitCount = model.UnitCount,
                     Description = model.Description,
@@ -161,6 +162,8 @@ namespace YoneticiOtomasyonu.Controllers
                 Id = building.Id,
                 Name = building.Name,
                 Address = building.Address,
+                Block = building.Block,
+
                 Type = building.Type,
                 FloorCount = building.FloorCount,
                 UnitCount = building.UnitCount,
@@ -220,6 +223,8 @@ namespace YoneticiOtomasyonu.Controllers
                     building.Name = model.Name;
                     building.Address = model.Address;
                     building.Type = model.Type;
+                    building.Block = model.Block;
+
                     building.FloorCount = model.FloorCount;
                     building.UnitCount = model.UnitCount;
                     building.Description = model.Description;

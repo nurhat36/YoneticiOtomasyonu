@@ -24,6 +24,7 @@ namespace YoneticiOtomasyonu.Models.ViewModels
 
         public List<ApplicationUser>? Residents { get; set; } // Kullanıcı listesini buraya alacağız
         public List<SelectListItem>? FloorList { get; set; }
+        public string? SelectedRole { get; set; }
 
 
 

@@ -41,15 +41,23 @@
                 <td>
                     @if (unit.Resident != null)
                     {
+                        var roleText = unit.Description.Contains("[Rol:") ? unit.Description.Split("[Rol:")[1].TrimEnd(']') : "";
                         <div class="d-flex align-items-center">
                             <img src="@unit.Resident.ProfileImageUrl" alt="Profil" style="width:30px; height:30px; object-fit:cover; border-radius:50%; margin-right:5px;" />
-                            <span>@unit.Resident.UserName</span>
+                            <div>
+                                <div>@unit.Resident.UserName</div>
+                                @if (!string.IsNullOrEmpty(roleText))
+                                {
+                                    <small class="text-muted">@roleText</small>
+                                }
+                            </div>
                         </div>
                     }
                     else
                     {
                         <span>-</span>
                     }
+
                 </td>
                 <td>@unit.Description</td>
                 <td>

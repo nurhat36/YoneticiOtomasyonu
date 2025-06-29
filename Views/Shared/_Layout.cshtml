@@ -71,14 +71,14 @@
                                     <li><hr class="dropdown-divider" /></li>
 
                                     <li>
-                                        <form method="post" asp-area="Identity" asp-page="/Account/Logout" id="logoutForm" class="d-inline">
+                                        <form method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" id="logoutForm" class="d-inline">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="dropdown-item bg-transparent border-0 w-100 text-start" style="cursor:pointer;">
                                                 <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
                                             </button>
                                         </form>
-
                                     </li>
+
                                 </ul>
                             </li>
                         }

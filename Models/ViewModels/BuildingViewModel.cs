@@ -21,6 +21,9 @@ namespace YoneticiOtomasyonu.Models.ViewModels
         [Display(Name = "Bina Türü")]
         public string Type { get; set; }
 
+        public string? Block { get; set; }
+
+
         [Required(ErrorMessage = "Kat sayısı zorunludur.")]
         [Range(1, 100, ErrorMessage = "Kat sayısı 1-100 arasında olmalıdır.")]
         [Display(Name = "Kat Sayısı")]
