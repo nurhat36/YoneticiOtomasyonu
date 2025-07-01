@@ -262,7 +262,7 @@ namespace YoneticiOtomasyonu.Controllers
             return View(building);
         }
 
-        // POST: Buildings/Delete/5
+        // POST: Buildings/Delete/5 rfgbdabdfb
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "BuildingAdmin")]
