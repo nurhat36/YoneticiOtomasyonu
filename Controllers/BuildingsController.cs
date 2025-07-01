@@ -296,6 +296,7 @@ namespace YoneticiOtomasyonu.Controllers
             }
         }
 
+
         private async Task<bool> BuildingExists(int id)
         {
             return await _context.Buildings.AnyAsync(e => e.Id == id);
