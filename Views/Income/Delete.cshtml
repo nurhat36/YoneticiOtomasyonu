@@ -1,0 +1,18 @@
+﻿@model YoneticiOtomasyonu.Models.Income
+
+@{
+    ViewData["Title"] = "Gelir Sil";
+}
+
+<h1>Gelir Sil</h1>
+
+<div>
+    <h4>@Model.Type - @Model.Amount TL</h4>
+    <p>@Model.Description</p>
+</div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>

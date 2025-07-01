@@ -1,0 +1,62 @@
+﻿@model YoneticiOtomasyonu.Models.Expense
+
+@{
+    ViewData["Title"] = "Yeni Gider";
+}
+
+<h1>Yeni Gider</h1>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="BuildingId" />
+
+    <div class="form-group">
+        <label asp-for="Type"></label>
+        <input asp-for="Type" class="form-control" />
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Amount"></label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Date"></label>
+        <input asp-for="Date" type="date" class="form-control" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PaymentMethod"></label>
+        <input asp-for="PaymentMethod" class="form-control" />
+        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReceiptNumber"></label>
+        <input asp-for="ReceiptNumber" class="form-control" />
+        <span asp-validation-for="ReceiptNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReceiptImageUrl"></label>
+        <input asp-for="ReceiptImageUrl" class="form-control" />
+        <span asp-validation-for="ReceiptImageUrl" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Kaydet</button>
+    <a asp-action="Index" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary">İptal</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

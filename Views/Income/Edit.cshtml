@@ -1,0 +1,92 @@
+﻿@model YoneticiOtomasyonu.Models.Income
+
+@{
+    ViewData["Title"] = "Gelir Düzenle";
+    var buildingId = (int)ViewBag.BuildingId;
+}
+
+<h1>Gelir Düzenle</h1>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" name="buildingId" value="@buildingId" />
+
+    <div class="form-group">
+        <label asp-for="Type"></label>
+        <input asp-for="Type" class="form-control" />
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Amount"></label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Date"></label>
+        <input asp-for="Date" type="date" class="form-control" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PaymentMethod"></label>
+        <input asp-for="PaymentMethod" class="form-control" />
+        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="UnitId">Birim</label>
+        <select asp-for="UnitId" class="form-control" asp-items="ViewBag.UnitId" id="unitSelect">
+            <option value="">Seçiniz</option>
+        </select>
+        <span asp-validation-for="UnitId" class="text-danger"></span>
+    </div>
+
+    <div id="residentInfo" style="display:none; margin-top:15px;">
+        <strong>Birime Kayıtlı Kullanıcı:</strong>
+        <div id="residentName"></div>
+        <img id="residentImage" src="" alt="Profil Resmi" style="width:100px; height:100px; border-radius:50%; object-fit:cover;" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Güncelle</button>
+    <a asp-action="Index" asp-route-buildingId="@buildingId" class="btn btn-secondary">İptal</a>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function loadResidentInfo(unitId) {
+                if (unitId) {
+                    $.get('/Income/GetResidentInfo', { unitId: unitId }, function (data) {
+                        if (data && data.name) {
+                            $('#residentName').text(data.name);
+                            $('#residentImage').attr('src', data.profileImage);
+                            $('#residentInfo').show();
+                        } else {
+                            $('#residentInfo').hide();
+                        }
+                    });
+                } else {
+                    $('#residentInfo').hide();
+                }
+            }
+
+            // Sayfa yüklendiğinde seçili birim varsa bilgileri göster
+            var selectedUnitId = $('#unitSelect').val();
+            loadResidentInfo(selectedUnitId);
+
+            // Birim değiştiğinde kullanıcı bilgilerini yenile
+            $('#unitSelect').change(function () {
+                var unitId = $(this).val();
+                loadResidentInfo(unitId);
+            });
+        });
+    </script>
+}

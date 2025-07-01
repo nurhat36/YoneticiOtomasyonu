@@ -1,0 +1,61 @@
+﻿@model IEnumerable<YoneticiOtomasyonu.Models.Expense>
+
+@{
+    ViewData["Title"] = "Gider Listesi";
+}
+
+<h1>Gider Listesi</h1>
+
+<p>
+    <a asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-primary">Yeni Gider Ekle</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Tür</th>
+            <th>Miktar (TL)</th>
+            <th>Tarih</th>
+            <th>Açıklama</th>
+            <th>Ödeme Yöntemi</th>
+            <th>Fiş No</th>
+            <th>Fiş Resmi</th>
+            <th>Kaydeden</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Type</td>
+                <td>@item.Amount</td>
+                <td>@item.Date.ToShortDateString()</td>
+                <td>@item.Description</td>
+                <td>@item.PaymentMethod</td>
+                <td>@item.ReceiptNumber</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ReceiptImageUrl))
+                    {
+                        <a href="@item.ReceiptImageUrl" target="_blank">
+                            <img src="@item.ReceiptImageUrl" style="width:40px; height:40px; object-fit:cover;" />
+                        </a>
+                    }
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.RecordedBy?.ProfileImageUrl))
+                    {
+                        <img src="@item.RecordedBy.ProfileImageUrl" style="width:30px; height:30px; border-radius:50%; object-fit:cover; margin-right:5px;" />
+                    }
+                    @item.RecordedBy?.UserName
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detay</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
