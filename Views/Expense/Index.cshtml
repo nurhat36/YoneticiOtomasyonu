@@ -37,11 +37,31 @@
                 <td>
                     @if (!string.IsNullOrEmpty(item.ReceiptImageUrl))
                     {
-                        <a href="@item.ReceiptImageUrl" target="_blank">
-                            <img src="@item.ReceiptImageUrl" style="width:40px; height:40px; object-fit:cover;" />
-                        </a>
+                        var fileExtension = System.IO.Path.GetExtension(item.ReceiptImageUrl).ToLower();
+
+                        // Eğer resim formatındaysa (jpg, jpeg, png, gif, webp vs.)
+                        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+
+                        if (imageExtensions.Contains(fileExtension))
+                        {
+                            <a href="@item.ReceiptImageUrl" target="_blank">
+                                <img src="@item.ReceiptImageUrl" style="width:40px; height:40px; object-fit:cover;" title="Resmi büyüt" />
+                            </a>
+                        }
+                        else
+                        {
+                            // Eğer başka bir döküman (PDF, doc vs.)
+                            <a href="@item.ReceiptImageUrl" target="_blank" title="Dosyayı aç">
+                                <i class="fas fa-file-alt fa-2x"></i>
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <span>-</span>
                     }
                 </td>
+
                 <td>
                     @if (!string.IsNullOrEmpty(item.RecordedBy?.ProfileImageUrl))
                     {
