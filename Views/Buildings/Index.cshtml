@@ -116,6 +116,9 @@
                                             <a class="dropdown-item" asp-action="Index" asp-controller="Expense" asp-route-buildingId="@item.Building.Id">
                                                 <i class="fas fa-coins mr-2"></i>Giderler
                                             </a>
+                                            <a class="dropdown-item" asp-action="Index" asp-controller="Complaint" asp-route-buildingId="@item.Building.Id">
+                                                <i class="fas fa-coins mr-2"></i>þikayetler
+                                            </a>
 
 
                                             @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))

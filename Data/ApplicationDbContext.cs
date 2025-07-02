@@ -21,6 +21,7 @@ namespace YoneticiOtomasyonu.Data
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Complaint> Complaints { get; set; }
         public DbSet<WorkTask> WorkTasks { get; set; }
+        public DbSet<ComplaintImage> ComplaintImages { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Document> Documents { get; set; }
@@ -31,6 +32,12 @@ namespace YoneticiOtomasyonu.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<ComplaintImage>()
+    .HasOne(ci => ci.Complaint)
+    .WithMany(c => c.Images)
+    .HasForeignKey(ci => ci.ComplaintId)
+    .OnDelete(DeleteBehavior.Cascade);
+
 
             // WorkTask ilişkileri
             builder.Entity<WorkTask>()

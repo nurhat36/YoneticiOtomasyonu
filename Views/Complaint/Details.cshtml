@@ -1,0 +1,69 @@
+﻿@model YoneticiOtomasyonu.Models.Complaint
+
+@{
+    ViewData["Title"] = "Şikayet Detayı";
+    var statusOptions = ViewBag.StatusOptions as List<string>;
+    var userList = ViewBag.Users as IEnumerable<YoneticiOtomasyonu.Models.ApplicationUser>;
+}
+
+<h2>@Model.Title</h2>
+
+<p><strong>Birim:</strong> @Model.Unit?.Number</p>
+<p><strong>Açıklama:</strong> @Model.Description</p>
+<p><strong>Durum:</strong> @Model.Status</p>
+<p><strong>Kullanıcı:</strong> @Model.Complainant?.UserName</p>
+<p><strong>Oluşturulma:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+
+@if (Model.Images != null && Model.Images.Any())
+{
+    foreach (var img in Model.Images)
+    {
+        <img src="@img.ImageUrl" style="max-width:200px; margin-right:10px;" alt="Şikayet resmi" />
+    }
+}
+else
+{
+    <p>Resim yok.</p>
+}
+
+
+
+@if (!string.IsNullOrEmpty(Model.Response))
+{
+    <p><strong>Yönetici Cevabı:</strong> @Model.Response</p>
+    <p><strong>Cevap Tarihi:</strong> @Model.ResponseDate?.ToString("dd.MM.yyyy HH:mm")</p>
+}
+
+<hr />
+
+<h4>Yönetici İşlemleri</h4>
+<form asp-action="Respond" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <div class="form-group">
+        <label>Cevap</label>
+        <textarea name="response" class="form-control" rows="3">@Model.Response</textarea>
+    </div>
+
+    <div class="form-group">
+    <label>Durum</label>
+        <select name="status" class="form-control" asp-items="ViewBag.StatusList"></select>
+
+</div>
+
+
+    <div class="form-group">
+        <label>Atanacak Personel (opsiyonel)</label>
+        <select name="assignedToId" class="form-control">
+            <option value="">Seçiniz</option>
+            @foreach (var user in ViewBag.Users as List<YoneticiOtomasyonu.Models.ApplicationUser>)
+            {
+                var selected = Model.AssignedToId == user.Id ? "selected" : "";
+                <option value="@user.Id" selected="@selected">@user.UserName</option>
+            }
+        </select>
+    </div>
+
+
+    <button type="submit" class="btn btn-success">Kaydet</button>
+</form>

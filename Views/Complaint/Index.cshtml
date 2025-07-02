@@ -1,0 +1,42 @@
+﻿@model IEnumerable<YoneticiOtomasyonu.Models.Complaint>
+
+@{
+    ViewData["Title"] = "Şikayet Listesi";
+}
+
+<h2>Şikayetler</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Yeni Şikayet Ekle</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Başlık</th>
+            <th>Birim</th>
+            <th>Kullanıcı</th>
+            <th>Durum</th>
+            <th>Atanan</th>
+            <th>Tarih</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Unit?.Number</td>
+                <td>@item.Complainant?.UserName</td>
+                <td>@item.Status</td>
+                <td>@item.AssignedTo?.UserName</td>
+                <td>@item.CreatedAt.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detay</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

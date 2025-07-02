@@ -7,7 +7,8 @@
         public string Description { get; set; } // Şikayet detayı
         public DateTime CreatedAt { get; set; } = DateTime.Now; // Oluşturulma tarihi
         public string Status { get; set; } = "Beklemede"; // Durum: Beklemede, Atandı, Çözüldü, Reddedildi
-        public string? ImageUrl { get; set; } // Şikayet resmi URL (opsiyonel)
+        public ICollection<ComplaintImage> Images { get; set; } = new List<ComplaintImage>();
+
         public string? Response { get; set; } // Yönetici cevabı (opsiyonel)
         public DateTime? ResponseDate { get; set; } // Cevaplanma tarihi (opsiyonel)
 
