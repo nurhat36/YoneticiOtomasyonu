@@ -74,8 +74,15 @@ namespace YoneticiOtomasyonu.Controllers
             if (userProfile == null) return NotFound();
 
             ViewBag.UserRole = await _buildingService.GetUserRoleInBuildingAsync(userProfile.Id, building.Id);
+
+            // Yöneticileri getir
+            ViewBag.Managers = await _buildingService.GetBuildingManagersAsync(building.Id);
+
             return View(building);
         }
+
+        // GET: Buildings/DetailsPartial/5 (AJAX için)
+
 
         // GET: Buildings/Create
         public IActionResult Create()
@@ -163,7 +170,6 @@ namespace YoneticiOtomasyonu.Controllers
                 Name = building.Name,
                 Address = building.Address,
                 Block = building.Block,
-
                 Type = building.Type,
                 FloorCount = building.FloorCount,
                 UnitCount = building.UnitCount,
@@ -224,7 +230,6 @@ namespace YoneticiOtomasyonu.Controllers
                     building.Address = model.Address;
                     building.Type = model.Type;
                     building.Block = model.Block;
-
                     building.FloorCount = model.FloorCount;
                     building.UnitCount = model.UnitCount;
                     building.Description = model.Description;
@@ -262,7 +267,7 @@ namespace YoneticiOtomasyonu.Controllers
             return View(building);
         }
 
-        // POST: Buildings/Delete/5 rfgbdabdfb
+        // POST: Buildings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "BuildingAdmin")]
@@ -295,7 +300,6 @@ namespace YoneticiOtomasyonu.Controllers
                 return RedirectToAction(nameof(Delete), new { id });
             }
         }
-
 
         private async Task<bool> BuildingExists(int id)
         {

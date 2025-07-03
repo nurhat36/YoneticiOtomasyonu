@@ -1,228 +1,267 @@
 @model IEnumerable<YoneticiOtomasyonu.Models.ViewModels.BuildingWithRoleViewModel>
 
-@{
+    @{
     ViewData["Title"] = "Bina Yönetimi";
     Layout = "_Layout";
-}
+    }
 
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Bina Yönetimi</h1>
-        <a asp-action="Create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-plus fa-sm text-white-50"></i> Yeni Bina Ekle
-        </a>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Bina Listesi</h6>
-            <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Bina Yönetimi</h1>
+            <div>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus mr-2"></i> Yeni Bina Ekle
                 </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item" asp-action="Create"><i class="fas fa-plus mr-2"></i>Yeni Ekle</a>
-                    <a class="dropdown-item" href="#" id="exportData"><i class="fas fa-file-export mr-2"></i>Dýþa Aktar</a>
-                    <a class="dropdown-item" asp-action="MyBuildings"><i class="fas fa-building mr-2"></i>Binalarým</a>
+               
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var item in Model)
+        {
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                <div class="card building-card h-100 shadow-sm border-0">
+                    <div class="card-img-container position-relative">
+                        @if (!string.IsNullOrEmpty(item.Building.ImageUrl))
+                        {
+                        <img src="@item.Building.ImageUrl" class="card-img-top" alt="@item.Building.Name">
+                        }
+                        else
+                        {
+                        <div class="card-img-top bg-gradient-primary d-flex align-items-center justify-content-center">
+                            <i class="fas fa-building fa-4x text-white"></i>
+                        </div>
+                        }
+                        <div class="building-badge">
+                            <span class="badge
+                                @(item.Role == "Yönetici" ? "bg-success" :
+                                  item.Role == "Kiracý" ? "bg-primary" :
+                                  item.Role == "Görevli" ? "bg-info" : "bg-secondary")">
+                                @item.Role
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">
+                                @item.Building.Name
+                                @if (!string.IsNullOrEmpty(item.Building.Block))
+                                {
+                                <span class="text-muted">(@item.Building.Block)</span>
+                                }
+                            </h5>
+                            <span class="badge
+                                @(item.Building.Type == "Apartman" ? "bg-primary" :
+                                  item.Building.Type == "Site" ? "bg-success" :
+                                  item.Building.Type == "Ýþ Merkezi" ? "bg-info" :
+                                  item.Building.Type == "Rezidans" ? "bg-warning" : "bg-secondary")">
+                                @item.Building.Type
+                            </span>
+                        </div>
+                        <p class="card-text text-muted small mb-3">
+                            <i class="fas fa-map-marker-alt mr-1"></i> @item.Building.Address
+                        </p>
+
+                        <div class="building-stats d-flex justify-content-between border-top pt-3">
+                            <div class="text-center">
+                                <div class="stat-value">@item.Building.FloorCount</div>
+                                <div class="stat-label">Kat</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value">@item.Building.UnitCount</div>
+                                <div class="stat-label">Birim</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-value">@item.Building.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                <div class="stat-label">Oluþturulma</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <a asp-action="Details" asp-route-id="@item.Building.Id" class="btn btn-sm btn-outline-primary">
+                            Detaylarý Gör
+                        </a>
+
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-icon" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuButton">
+                                @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
+                                {
+                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Building.Id">
+                                    <i class="fas fa-edit mr-2"></i>Düzenle
+                                </a>
+                                }
+
+                                <a class="dropdown-item" asp-action="List" asp-controller="Units" asp-route-buildingId="@item.Building.Id">
+                                    <i class="fas fa-building mr-2"></i>Birimleri Gör
+                                </a>
+                                <a class="dropdown-item" asp-action="Index" asp-controller="Income" asp-route-buildingId="@item.Building.Id">
+                                    <i class="fas fa-coins mr-2"></i>Gelirler
+                                </a>
+                                <a class="dropdown-item" asp-action="Index" asp-controller="Expense" asp-route-buildingId="@item.Building.Id">
+                                    <i class="fas fa-coins mr-2"></i>Giderler
+                                </a>
+                                <a class="dropdown-item" asp-action="Index" asp-controller="Complaint" asp-route-buildingId="@item.Building.Id">
+                                    <i class="fas fa-exclamation-circle mr-2"></i>Þikayetler
+                                </a>
+
+                                @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
+                                {
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Building.Id">
+                                    <i class="fas fa-trash-alt mr-2"></i>Sil
+                                </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        }
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Bina Adý</th>
-                            <th>Adres</th>
-                            <th>Tür</th>
-                            <th>Kat Sayýsý</th>
-                            <th>Birim Sayýsý</th>
-                            <th>Oluþturulma Tarihi</th>
-                            <th>Rolüm</th>
-                            <th>Ýþlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        @if (!string.IsNullOrEmpty(item.Building.ImageUrl))
-                                        {
-                                            <img src="@item.Building.ImageUrl" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Bina Görseli">
-                                        }
-                                        else
-                                        {
-                                            <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #4e73df; color: white;">
-                                                <i class="fas fa-building"></i>
-                                            </div>
-                                        }
 
-                                        <strong>
-                                            @item.Building.Name
-                                            @if (!string.IsNullOrEmpty(item.Building.Block))
-                                            {
-                                                <span>(@item.Building.Block)</span>
-                                            }
-                                        </strong>
-                                    </div>
-
-                                </td>
-                                <td>@item.Building.Address</td>
-                                <td>
-                                    <span class="badge badge-pill
-                                          @(item.Building.Type == "Apartman" ? "badge-primary" :
-                                            item.Building.Type == "Site" ? "badge-success" :
-                                            item.Building.Type == "Ýþ Merkezi" ? "badge-info" :
-                                            item.Building.Type == "Rezidans" ? "badge-warning" : "badge-secondary")">
-                                        @item.Building.Type
-                                    </span>
-                                </td>
-                                <td class="font-weight-bold">@item.Building.FloorCount</td>
-                                <td class="font-weight-bold">@item.Building.UnitCount</td>
-                                <td>@item.Building.CreatedAt.ToString("dd/MM/yyyy")</td>
-                                <td>
-                                    <span class="badge
-                                        @(item.Role == "Yönetici" ? "badge-success" :
-                                          item.Role == "Kiracý" ? "badge-primary" :
-                                          item.Role == "Görevli" ? "badge-info" : "badge-secondary")">
-                                        @item.Role
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                                            <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Building.Id">
-                                                <i class="fas fa-eye mr-2"></i>Detaylarý Görüntüle
-                                            </a>
-
-                                            @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
-                                            {
-                                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Building.Id">
-                                                    <i class="fas fa-edit mr-2"></i>Düzenle
-                                                </a>
-                                            }
-
-                                            <a class="dropdown-item" asp-action="List" asp-controller="Units" asp-route-buildingId="@item.Building.Id">
-                                                <i class="fas fa-building mr-2"></i>Birimleri Gör
-                                            </a>
-                                            <a class="dropdown-item" asp-action="Index" asp-controller="Income" asp-route-buildingId="@item.Building.Id">
-                                                <i class="fas fa-coins mr-2"></i>Gelirler
-                                            </a>
-                                            <a class="dropdown-item" asp-action="Index" asp-controller="Expense" asp-route-buildingId="@item.Building.Id">
-                                                <i class="fas fa-coins mr-2"></i>Giderler
-                                            </a>
-                                            <a class="dropdown-item" asp-action="Index" asp-controller="Complaint" asp-route-buildingId="@item.Building.Id">
-                                                <i class="fas fa-coins mr-2"></i>þikayetler
-                                            </a>
-
-
-                                            @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
-                                            {
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Building.Id">
-                                                    <i class="fas fa-trash-alt mr-2"></i>Sil
-                                                </a>
-                                            }
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+        @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-building fa-4x text-gray-400 mb-3"></i>
+            <h4 class="text-gray-500">Henüz bir bina eklenmemiþ</h4>
+            <p class="text-muted">Yeni bir bina eklemek için aþaðýdaki butonu kullanabilirsiniz</p>
+            <a asp-action="Create" class="btn btn-primary mt-3">
+                <i class="fas fa-plus mr-2"></i> Yeni Bina Ekle
+            </a>
         </div>
+    }
     </div>
-</div>
 
-@section Styles {
-    <link href="~/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <style>
-        .card {
-            border: none;
-            border-radius: 0.35rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-
-        .table thead th {
-            border-bottom: 1px solid #e3e6f0;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.05rem;
-            text-transform: uppercase;
-            padding: 1rem;
-        }
-
-        .table td {
-            vertical-align: middle;
-            padding: 0.75rem;
-        }
-
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            font-size: 0.85rem;
-        }
-
-        .badge {
-            font-size: 0.75em;
-            font-weight: 600;
-            padding: 0.35em 0.65em;
-        }
-
-        .btn-primary {
-            background-color: #4e73df;
-            border-color: #4e73df;
-        }
-
-            .btn-primary:hover {
-                background-color: #2e59d9;
-                border-color: #2653d4;
+    @section Styles {
+        <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+        <style>
+            .building-card {
+                transition: all 0.3s ease;
+                border-radius: 10px;
+                overflow: hidden;
             }
 
-        .role-badge {
-            min-width: 70px;
-            display: inline-block;
-            text-align: center;
+                .building-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                }
+
+            .card-img-container {
+                height: 180px;
+                overflow: hidden;
+            }
+
+                .card-img-container img {
+                    object-fit: cover;
+                    width: 100%;
+                    height: 100%;
+                    transition: transform 0.5s ease;
+                }
+
+            .building-card:hover .card-img-container img {
+                transform: scale(1.05);
+            }
+
+            .card-img-top.bg-gradient-primary {
+                background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+                height: 180px;
+            }
+
+            .building-badge {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+            }
+
+                .building-badge .badge {
+                    font-size: 12px;
+                    font-weight: 600;
+                    padding: 5px 10px;
+                    border-radius: 20px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                }
+
+            .card-title {
+                font-weight: 600;
+                color: #2e3d4f;
+            }
+
+            .building-stats {
+                font-size: 0.9rem;
+            }
+
+            .stat-value {
+                font-weight: 700;
+                color: #4e73df;
+                font-size: 1.1rem;
+            }
+
+            .stat-label {
+                color: #6c757d;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+            }
+
+            .btn-icon {
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                color: #6c757d;
+                transition: all 0.2s;
+            }
+
+                .btn-icon:hover {
+                    background-color: #f8f9fa;
+                    color: #4e73df;
+                }
+
+            .dropdown-menu {
+                border: none;
+                box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.1);
+                border-radius: 8px;
+                padding: 0.5rem 0;
+            }
+
+            .dropdown-item {
+                padding: 0.5rem 1.5rem;
+                font-size: 0.85rem;
+                transition: all 0.2s;
+            }
+
+                .dropdown-item:hover {
+                    background-color: #f8f9fa;
+                    color: #4e73df;
+                }
+
+            .dropdown-divider {
+                margin: 0.25rem 0;
+            }
+
+            .empty-state {
+                background-color: #f8f9fa;
+                border-radius: 10px;
+                padding: 3rem;
+            }
+        </style>
+    }
+
+    @section Scripts {
+        <script>
+    $(document).ready(function() {
+    $('.building-card').on('click', function(e) {
+        if (!$(e.target).closest('.dropdown, .btn').length) {
+            const detailsLink = $(this).find('a[href*="Details"]').first();
+            if (detailsLink.length) {
+                window.location.href = detailsLink.attr('href');
+            }
         }
-    </style>
-}
-
-@section Scripts {
-    <script src="~/vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="~/vendor/datatables/dataTables.bootstrap4.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#dataTable').DataTable({
-                responsive: true,
-                "language": {
-                    "lengthMenu": "Sayfa baþýna _MENU_ kayýt göster",
-                    "zeroRecords": "Kayýt bulunamadý",
-                    "info": "Sayfa _PAGE_ / _PAGES_",
-                    "infoEmpty": "Kayýt bulunamadý",
-                    "infoFiltered": "(_MAX_ kayýt içerisinden filtrelendi)",
-                    "search": "Ara:",
-                    "paginate": {
-                        "previous": "Önceki",
-                        "next": "Sonraki"
-                    }
-                },
-                dom: '<"top"lf>rt<"bottom"ip><"clear">'
-            });
-
-            // Export data functionality
-            $('#exportData').click(function (e) {
-                e.preventDefault();
-                // You can implement export functionality here
-                alert('Dýþa aktarma iþlemi baþlatýldý');
-                // Example: window.location.href = '/Buildings/Export';
-            });
-        });
-    </script>
-}
+    }).css('cursor', 'pointer');
+});
+        </script>
+    }

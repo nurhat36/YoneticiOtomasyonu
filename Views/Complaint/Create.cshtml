@@ -1,43 +1,283 @@
 ﻿@model YoneticiOtomasyonu.Models.Complaint
 
 @{
-    ViewData["Title"] = "Yeni Şikayet";
+    ViewData["Title"] = "Yeni Şikayet Oluştur";
 }
 
-<h2>Yeni Şikayet Oluştur</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white py-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-megaphone-fill fs-3 me-3"></i>
+                        <h2 class="h4 mb-0">Yeni Şikayet Oluştur</h2>
+                    </div>
+                </div>
 
-<form asp-action="Create" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label asp-for="Title"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+                <div class="card-body p-5">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <!-- Başlık Alanı -->
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">Şikayet Başlığı</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-card-heading"></i>
+                                </span>
+                                <input asp-for="Title" class="form-control form-control-lg"
+                                       placeholder="Şikayetinizi kısaca özetleyin" required />
+                            </div>
+                            <span asp-validation-for="Title" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Açıklama Alanı -->
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold">Açıklama</label>
+                            <textarea asp-for="Description" class="form-control" rows="6"
+                                      placeholder="Şikayetinizi detaylı bir şekilde açıklayın" required></textarea>
+                            <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Birim Seçimi -->
+                        <div class="mb-4">
+                            <label asp-for="UnitId" class="form-label fw-bold">İlgili Birim</label>
+                            <select asp-for="UnitId" class="form-select form-select-lg" required>
+                                <option value="" disabled selected>Birim seçiniz</option>
+                                @foreach (var unit in ViewBag.Units)
+                                {
+                                <option value="@unit.Value">@unit.Text</option>
+                                }
+                            </select>
+                            <span asp-validation-for="UnitId" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Dosya Yükleme -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Destekleyici Görseller (Opsiyonel)</label>
+                            <div class="file-upload-wrapper border rounded-3 p-4 text-center">
+                                <input type="file" name="ImageFiles" id="imageUpload" multiple
+                                       class="form-control d-none" accept="image/*" />
+                                <label for="imageUpload" class="file-upload-label cursor-pointer">
+                                    <div class="file-upload-content py-4">
+                                        <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-3"></i>
+                                        <h5 class="mb-2">Dosyaları sürükleyip bırakın veya seçin</h5>
+                                        <p class="text-muted small mb-0">JPG, PNG formatında (Maks. 5MB)</p>
+                                    </div>
+                                </label>
+                            </div>
+                            <div id="filePreview" class="d-flex flex-wrap gap-3 mt-3"></div>
+                        </div>
+
+                        <!-- Form Butonları -->
+                        <div class="d-grid gap-3 d-md-flex justify-content-md-end mt-5 pt-3 border-top">
+                            <button type="reset" class="btn btn-outline-secondary px-4 py-2">
+                                <i class="bi bi-x-circle me-2"></i> Temizle
+                            </button>
+                            <button type="submit" class="btn btn-primary px-4 py-2">
+                                <i class="bi bi-send-check me-2"></i> Şikayeti Gönder
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="Description"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
+@section Styles {
+    <style>
+        .card {
+            border: none;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
 
-    <div class="form-group">
-        <label asp-for="UnitId">Birim</label>
-        <select asp-for="UnitId" class="form-control" asp-items="ViewBag.Units">
-            <option value="">Seçiniz</option>
-        </select>
-        <span asp-validation-for="UnitId" class="text-danger"></span>
-    </div>
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.12);
+            }
 
-    <div class="form-group">
-        <label>Resim (opsiyonel) birden fazla seçebilirsiniz</label>
-        <input type="file" name="ImageFiles" multiple class="form-control" />
+        .file-upload-wrapper {
+            background-color: #f8fafc;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
 
-    </div>
+            .file-upload-wrapper:hover {
+                border-color: #0d6efd;
+                background-color: rgba(13, 110, 253, 0.03);
+            }
 
-    <button type="submit" class="btn btn-primary">Kaydet</button>
-</form>
+        .file-upload-label {
+            display: block;
+            cursor: pointer;
+        }
+
+        .file-upload-content {
+            pointer-events: none;
+        }
+
+        #filePreview .preview-item {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+            #filePreview .preview-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            #filePreview .preview-item .remove-btn {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                width: 24px;
+                height: 24px;
+                background-color: rgba(220, 53, 69, 0.9);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+
+            #filePreview .preview-item:hover .remove-btn {
+                opacity: 1;
+            }
+
+        .form-control, .form-select {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s;
+        }
+
+            .form-control:focus, .form-select:focus {
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+                border-color: #86b7fe;
+            }
+
+        .btn-primary {
+            transition: all 0.3s;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+            }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+}
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Dosya yükleme ve önizleme
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const previewContainer = document.getElementById('filePreview');
+            previewContainer.innerHTML = '';
+
+            if(this.files && this.files.length > 0) {
+                // Maksimum 5 dosya kontrolü
+                if(this.files.length > 5) {
+                    alert('En fazla 5 dosya yükleyebilirsiniz.');
+                    this.value = '';
+                    return;
+                }
+
+                Array.from(this.files).forEach(file => {
+                    // Dosya boyutu kontrolü (5MB)
+                    if(file.size > 5 * 1024 * 1024) {
+                        alert(`${file.name} dosyası 5MB'den büyük!`);
+                        return;
+                    }
+
+                    // Sadece resim dosyaları
+                    if(!file.type.startsWith('image/')) {
+                        alert(`${file.name} geçerli bir resim dosyası değil!`);
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'preview-item';
+
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.alt = file.name;
+
+                        const removeBtn = document.createElement('div');
+                        removeBtn.className = 'remove-btn';
+                        removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+                        removeBtn.addEventListener('click', function() {
+                            previewItem.remove();
+                            // TODO: Dosyayı files array'den de kaldırmak gerekir
+                        });
+
+                        previewItem.appendChild(img);
+                        previewItem.appendChild(removeBtn);
+                        previewContainer.appendChild(previewItem);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+
+        // Drag and drop özelliği
+        const dropArea = document.querySelector('.file-upload-wrapper');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.style.borderColor = '#0d6efd';
+            dropArea.style.backgroundColor = 'rgba(13, 110, 253, 0.05)';
+        }
+
+        function unhighlight() {
+            dropArea.style.borderColor = '#dee2e6';
+            dropArea.style.backgroundColor = '#f8fafc';
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('imageUpload').files = files;
+
+            // Change eventini tetikle
+            const event = new Event('change');
+            document.getElementById('imageUpload').dispatchEvent(event);
+        }
+    </script>
 }

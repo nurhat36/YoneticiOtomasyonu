@@ -25,6 +25,16 @@ namespace YoneticiOtomasyonu.Services.Implementations
             _userManager = userManager;
         }
 
+        public async Task<List<UserBuildingRole>> GetBuildingManagersAsync(int buildingId)
+        {
+            return await _context.UserBuildingRoles
+                .Include(ubr => ubr.UserProfile)
+                .ThenInclude(up => up.IdentityUser)
+                .Where(ubr => ubr.BuildingId == buildingId && ubr.Role == "Yönetici")
+                .OrderByDescending(ubr => ubr.IsPrimary)
+                .ToListAsync();
+        }
+
         public async Task<(bool Success, string Message)> CreateBuildingAsync(Building building, string creatorUserId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();

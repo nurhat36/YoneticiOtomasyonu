@@ -5,104 +5,160 @@
     Layout = "_Layout";
 }
 
-<div class="container py-4">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">@ViewData["Title"]</h3>
+<div class="container py-5">
+    <div class="card border-0 shadow-lg overflow-hidden">
+        <!-- Baþlýk Kýsmý -->
+        <div class="card-header bg-primary-gradient text-white py-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-building fa-xl me-3"></i>
+                    <h2 class="mb-0 fw-bold">@ViewData["Title"]</h2>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="fas fa-arrow-left me-1"></i> Listeye Dön
+                </a>
+            </div>
         </div>
-        <div class="card-body">
+
+        <!-- Ana Ýçerik -->
+        <div class="card-body p-4 p-lg-5">
             <form asp-action="Edit" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="CurrentImageUrl" />
 
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger-gradient border-danger mb-4">
+                    <i class="fas fa-exclamation-circle me-2"></i> Lütfen formdaki hatalarý düzeltin.
+                </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <!-- Bina Temel Bilgileri -->
-                        <div class="form-group mb-3">
-                            <label asp-for="Name" class="form-label"></label>
-                            <input asp-for="Name" class="form-control" required />
-                            <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
+                <div class="row g-4">
+                    <!-- Sol Taraf - Temel Bilgiler -->
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header bg-light-gradient">
+                                <h5 class="mb-0 fw-semibold">
+                                    <i class="fas fa-info-circle me-2 text-primary"></i> Temel Bilgiler
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-floating mb-4">
+                                    <input asp-for="Name" class="form-control" placeholder=" " required />
+                                    <label asp-for="Name"></label>
+                                    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                                </div>
 
-                        <div class="form-group mb-3">
-                            <label asp-for="Address" class="form-label"></label>
-                            <textarea asp-for="Address" class="form-control" rows="3" required></textarea>
-                            <span asp-validation-for="Address" class="text-danger"></span>
-                        </div>
+                                <div class="form-floating mb-4">
+                                    <textarea asp-for="Address" class="form-control" placeholder=" " style="height: 100px" required></textarea>
+                                    <label asp-for="Address"></label>
+                                    <span asp-validation-for="Address" class="text-danger small mt-1 d-block"></span>
+                                </div>
 
-                        <div class="form-group mb-3">
-                            <label asp-for="Type" class="form-label"></label>
-                            <select asp-for="Type" class="form-select" required>
-                                <option value="">Bina Türü Seçiniz</option>
-                                <option value="Apartman">Apartman</option>
-                                <option value="Site">Site</option>
-                                <option value="Ýþ Merkezi">Ýþ Merkezi</option>
-                                <option value="Rezidans">Rezidans</option>
-                                <option value="Okul">Okul</option>
-                                <option value="Yurt">Yurt</option>
-                            </select>
-                            <span asp-validation-for="Type" class="text-danger"></span>
+                                <div class="form-floating mb-4">
+                                    <select asp-for="Type" class="form-select" required>
+                                        <option value=""></option>
+                                        <option value="Apartman">Apartman</option>
+                                        <option value="Site">Site</option>
+                                        <option value="Ýþ Merkezi">Ýþ Merkezi</option>
+                                        <option value="Rezidans">Rezidans</option>
+                                        <option value="Okul">Okul</option>
+                                        <option value="Yurt">Yurt</option>
+                                    </select>
+                                    <label asp-for="Type">Bina Türü</label>
+                                    <span asp-validation-for="Type" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <!-- Bina Özellikleri -->
-                        <div class="form-group mb-3">
-                            <label asp-for="Block" class="form-label">Blok</label>
-                            <input asp-for="Block" class="form-control" placeholder="Ör: A Blok" />
-                            <span asp-validation-for="Block" class="text-danger small"></span>
-                        </div>
+                    <!-- Sað Taraf - Ek Bilgiler ve Resim -->
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header bg-light-gradient">
+                                <h5 class="mb-0 fw-semibold">
+                                    <i class="fas fa-cog me-2 text-primary"></i> Ek Bilgiler
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-floating mb-4">
+                                    <input asp-for="Block" class="form-control" placeholder=" " />
+                                    <label asp-for="Block"></label>
+                                    <span asp-validation-for="Block" class="text-danger small mt-1 d-block"></span>
+                                    <small class="text-muted">Örnek: A Blok</small>
+                                </div>
 
-                        <div class="form-group mb-3">
-                            <label asp-for="FloorCount" class="form-label"></label>
-                            <input asp-for="FloorCount" class="form-control" type="number" min="1" max="100" required />
-                            <span asp-validation-for="FloorCount" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="UnitCount" class="form-label"></label>
-                            <input asp-for="UnitCount" class="form-control" type="number" min="1" max="1000" required />
-                            <span asp-validation-for="UnitCount" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="Description" class="form-label"></label>
-                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-
-                        <!-- Bina Resmi -->
-                        <div class="form-group mb-3">
-                            <label class="form-label">Bina Resmi</label>
-                            <div class="d-flex flex-column">
-                                @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
-                                {
-                                    <div class="mb-2">
-                                        <img src="@Model.CurrentImageUrl" class="img-thumbnail" style="max-width: 200px;" alt="Mevcut Bina Resmi">
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" id="removeImage" name="removeImage">
-                                            <label class="form-check-label text-danger" for="removeImage">
-                                                Resmi kaldýr
-                                            </label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="FloorCount" class="form-control" placeholder=" " min="1" max="100" required />
+                                            <label asp-for="FloorCount"></label>
+                                            <span asp-validation-for="FloorCount" class="text-danger small mt-1 d-block"></span>
                                         </div>
                                     </div>
-                                }
-                                <input asp-for="ImageFile" class="form-control" accept="image/*" />
-                                <small class="form-text text-muted">JPEG, PNG veya GIF formatýnda yükleyin (Max 5MB)</small>
-                                <span asp-validation-for="ImageFile" class="text-danger"></span>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="UnitCount" class="form-control" placeholder=" " min="1" max="1000" required />
+                                            <label asp-for="UnitCount"></label>
+                                            <span asp-validation-for="UnitCount" class="text-danger small mt-1 d-block"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating mt-4">
+                                    <textarea asp-for="Description" class="form-control" placeholder=" " style="height: 100px"></textarea>
+                                    <label asp-for="Description"></label>
+                                    <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="fas fa-save me-2"></i>Kaydet
+                <!-- Resim Yükleme Bölümü -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-light-gradient">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="fas fa-image me-2 text-primary"></i> Bina Görseli
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
+                            {
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="position-relative">
+                                    <img src="@Model.CurrentImageUrl" class="img-fluid rounded shadow" alt="Mevcut Bina Resmi">
+                                    <div class="form-check form-switch position-absolute top-0 end-0 mt-2 me-2">
+                                        <input class="form-check-input" type="checkbox" id="removeImage" name="removeImage">
+                                        <label class="form-check-label" for="removeImage">
+                                            <i class="fas fa-trash-alt text-danger"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                            <div class="@(!string.IsNullOrEmpty(Model.CurrentImageUrl) ? "col-md-8" : "col-12")">
+                                <div class="file-upload-wrapper">
+                                    <label for="ImageFile" class="form-label">Yeni Resim Yükle</label>
+                                    <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" id="ImageFile">
+                                    <small class="text-muted">JPEG, PNG veya GIF formatýnda (Max 5MB)</small>
+                                    <span asp-validation-for="ImageFile" class="text-danger small d-block mt-1"></span>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="progress d-none" id="uploadProgress" style="height: 6px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Butonlarý -->
+                <div class="d-flex justify-content-between mt-5 pt-3 border-top">
+                    <button type="submit" class="btn btn-primary-gradient rounded-pill px-4 py-2 fw-bold" id="submitBtn">
+                        <i class="fas fa-save me-2"></i> Deðiþiklikleri Kaydet
                     </button>
-                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
-                        <i class="fas fa-times me-2"></i>Ýptal
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                        <i class="fas fa-times me-2"></i> Ýptal Et
                     </a>
                 </div>
             </form>
@@ -112,18 +168,115 @@
 
 @section Styles {
     <style>
-        .needs-validation .form-control:invalid,
-        .needs-validation .form-control.is-invalid {
-            border-color: #dc3545;
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            --danger-gradient: linear-gradient(135deg, #dc3545, #c82333);
+            --light-gradient: linear-gradient(135deg, #f8f9fa, #e9ecef);
         }
+
+        .bg-primary-gradient {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .bg-light-gradient {
+            background: var(--light-gradient);
+            border: none;
+        }
+
+        .alert-danger-gradient {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid #dc3545;
+            border-radius: 0.375rem;
+        }
+
+        .btn-primary-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary-gradient:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+            }
 
         .card {
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .img-thumbnail {
-            max-height: 200px;
-            object-fit: cover;
+            .card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+            }
+
+        .form-floating label {
+            color: #6c757d;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            padding: 1rem 0.75rem;
+        }
+
+            .form-control:focus, .form-select:focus {
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            }
+
+        .form-switch .form-check-input {
+            width: 2.5em;
+            height: 1.5em;
+            cursor: pointer;
+        }
+
+            .form-switch .form-check-input:checked {
+                background-color: #dc3545;
+                border-color: #dc3545;
+            }
+
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+            .file-upload-wrapper input[type="file"] {
+                opacity: 0;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+                cursor: pointer;
+            }
+
+            .file-upload-wrapper label {
+                display: block;
+                padding: 1rem;
+                border: 2px dashed #dee2e6;
+                border-radius: 0.5rem;
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+
+            .file-upload-wrapper:hover label {
+                border-color: #0d6efd;
+                background-color: rgba(13, 110, 253, 0.05);
+            }
+
+        .invalid-feedback {
+            display: none;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: #dc3545;
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .was-validated .form-check-input:invalid ~ .invalid-feedback {
+            display: block;
         }
     </style>
 }
@@ -133,60 +286,77 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        // Client-side validation
-        (function () {
-            'use strict';
-            window.addEventListener('load', function () {
-                var forms = document.getElementsByClassName('needs-validation');
-                Array.prototype.filter.call(forms, function (form) {
+        $(document).ready(function () {
+            // Client-side validation
+            (function () {
+                'use strict';
+                var forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach(function (form) {
                     form.addEventListener('submit', function (event) {
-                        if (form.checkValidity() === false) {
+                        if (!form.checkValidity()) {
                             event.preventDefault();
                             event.stopPropagation();
                         }
                         form.classList.add('was-validated');
                     }, false);
                 });
-            }, false);
-        })();
+            })();
 
-        // Image file validation
-        document.getElementById('ImageFile').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            const removeCheckbox = document.getElementById('removeImage');
+            // Image file validation
+            $('#ImageFile').on('change', function (e) {
+                const file = e.target.files[0];
+                const removeCheckbox = $('#removeImage');
+                const submitBtn = $('#submitBtn');
+                const progressBar = $('#uploadProgress');
 
-            if (file) {
-                // Check file size (5MB limit)
-                if (file.size > 5 * 1024 * 1024) {
-                    e.target.setCustomValidity('Dosya boyutu 5MB\'dan büyük olamaz');
-                    return;
-                }
+                if (file) {
+                    // Check file size (5MB limit)
+                    if (file.size > 5 * 1024 * 1024) {
+                        $(this).addClass('is-invalid');
+                        $(this).siblings('.invalid-feedback').text('Dosya boyutu 5MB\'dan büyük olamaz').show();
+                        submitBtn.prop('disabled', true);
+                        return;
+                    }
 
-                // Check file type
-                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                if (!validTypes.includes(file.type)) {
-                    e.target.setCustomValidity('Sadece JPEG, PNG veya GIF formatýnda dosya yükleyebilirsiniz');
-                    return;
-                }
+                    // Check file type
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                    if (!validTypes.includes(file.type)) {
+                        $(this).addClass('is-invalid');
+                        $(this).siblings('.invalid-feedback').text('Sadece JPEG, PNG veya GIF formatýnda dosya yükleyebilirsiniz').show();
+                        submitBtn.prop('disabled', true);
+                        return;
+                    }
 
-                // If new image selected, uncheck remove checkbox
-                if (removeCheckbox) {
-                    removeCheckbox.checked = false;
-                }
+                    // If new image selected, uncheck remove checkbox
+                    if (removeCheckbox.length) {
+                        removeCheckbox.prop('checked', false);
+                    }
 
-                e.target.setCustomValidity('');
-            }
-        });
+                    // Simulate upload progress
+                    progressBar.removeClass('d-none');
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += 10;
+                        progressBar.find('.progress-bar').css('width', progress + '%');
+                        if (progress >= 100) {
+                            clearInterval(progressInterval);
+                            progressBar.addClass('d-none');
+                        }
+                    }, 100);
 
-        // Handle remove image checkbox
-        const removeCheckbox = document.getElementById('removeImage');
-        if (removeCheckbox) {
-            removeCheckbox.addEventListener('change', function () {
-                const fileInput = document.getElementById('ImageFile');
-                if (this.checked) {
-                    fileInput.value = '';
+                    $(this).removeClass('is-invalid');
+                    $(this).siblings('.invalid-feedback').hide();
+                    submitBtn.prop('disabled', false);
                 }
             });
-        }
+
+            // Handle remove image checkbox
+            $('#removeImage').on('change', function () {
+                const fileInput = $('#ImageFile');
+                if ($(this).is(':checked')) {
+                    fileInput.val('');
+                }
+            });
+        });
     </script>
 }

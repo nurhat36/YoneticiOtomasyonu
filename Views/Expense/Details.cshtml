@@ -1,55 +1,278 @@
 ﻿@model YoneticiOtomasyonu.Models.Expense
 
 @{
-    ViewData["Title"] = "Gider Detayı";
+    ViewData["Title"] = "Gider Detayları";
 }
 
-<h1>Gider Detayı</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-receipt me-2"></i> Gider Detayları
+                        </h2>
+                        <div class="badge bg-white text-primary fs-6">
+                            #@Model.Id
+                        </div>
+                    </div>
+                </div>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Tür</dt>
-        <dd class="col-sm-10">@Model.Type</dd>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <!-- Sol Taraf - Temel Bilgiler -->
+                        <div class="col-md-6">
+                            <div class="detail-card">
+                                <h5 class="detail-section-title">
+                                    <i class="bi bi-info-circle me-2"></i> Temel Bilgiler
+                                </h5>
 
-        <dt class="col-sm-2">Miktar</dt>
-        <dd class="col-sm-10">@Model.Amount</dd>
+                                <div class="detail-item">
+                                    <span class="detail-label">Gider Türü</span>
+                                    <span class="detail-value">@Model.Type</span>
+                                </div>
 
-        <dt class="col-sm-2">Tarih</dt>
-        <dd class="col-sm-10">@Model.Date.ToShortDateString()</dd>
+                                <div class="detail-item">
+                                    <span class="detail-label">Miktar</span>
+                                    <span class="detail-value">@Model.Amount.ToString("C2")</span>
+                                </div>
 
-        <dt class="col-sm-2">Açıklama</dt>
-        <dd class="col-sm-10">@Model.Description</dd>
+                                <div class="detail-item">
+                                    <span class="detail-label">Tarih</span>
+                                    <span class="detail-value">@Model.Date.ToString("dd MMMM yyyy")</span>
+                                </div>
 
-        <dt class="col-sm-2">Ödeme Yöntemi</dt>
-        <dd class="col-sm-10">@Model.PaymentMethod</dd>
+                                <div class="detail-item">
+                                    <span class="detail-label">Ödeme Yöntemi</span>
+                                    <span class="detail-value">@Model.PaymentMethod</span>
+                                </div>
 
-        <dt class="col-sm-2">Fiş No</dt>
-        <dd class="col-sm-10">@Model.ReceiptNumber</dd>
+                                <div class="detail-item">
+                                    <span class="detail-label">Fiş/Fatura No</span>
+                                    <span class="detail-value">
+                                        @(string.IsNullOrEmpty(Model.ReceiptNumber) ? "Belirtilmemiş" : Model.ReceiptNumber)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
 
-        <dt class="col-sm-2">Fiş Resmi</dt>
-        <dd class="col-sm-10">
-            @if (!string.IsNullOrEmpty(Model.ReceiptImageUrl))
-            {
-                <a href="@Model.ReceiptImageUrl" target="_blank">
-                    <img src="@Model.ReceiptImageUrl" style="width:120px; height:auto;" />
-                </a>
-            }
-            else
-            {
-                <span>Yok</span>
-            }
-        </dd>
+                        <!-- Sağ Taraf - Ek Bilgiler -->
+                        <div class="col-md-6">
+                            <div class="detail-card">
+                                <h5 class="detail-section-title">
+                                    <i class="bi bi-file-text me-2"></i> Ek Bilgiler
+                                </h5>
 
-        <dt class="col-sm-2">Kaydeden</dt>
-        <dd class="col-sm-10">
-            @if (!string.IsNullOrEmpty(Model.RecordedBy?.ProfileImageUrl))
-            {
-                <img src="@Model.RecordedBy.ProfileImageUrl" style="width:30px; height:30px; border-radius:50%; object-fit:cover; margin-right:5px;" />
-            }
-            @Model.RecordedBy?.UserName
-        </dd>
-    </dl>
+                                <div class="detail-item">
+                                    <span class="detail-label">Açıklama</span>
+                                    <span class="detail-value">
+                                        @(string.IsNullOrEmpty(Model.Description) ? "Açıklama yok" : Model.Description)
+                                    </span>
+                                </div>
+
+                                <div class="detail-item">
+                                    <span class="detail-label">Kaydeden</span>
+                                    <div class="d-flex align-items-center mt-1">
+                                        @if (!string.IsNullOrEmpty(Model.RecordedBy?.ProfileImageUrl))
+                                        {
+                                        <img src="@Model.RecordedBy.ProfileImageUrl"
+                                             class="user-avatar me-2"
+                                             alt="@Model.RecordedBy.UserName" />
+                                        }
+                                        else
+                                        {
+                                        <div class="user-avatar me-2 bg-secondary text-white">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        }
+                                        <span>@Model.RecordedBy?.UserName</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <span class="detail-label">Fiş/Fatura</span>
+                                    <div class="mt-2">
+                                        @if (!string.IsNullOrEmpty(Model.ReceiptImageUrl))
+                                        {
+                                        <a href="@Model.ReceiptImageUrl"
+                                           data-fancybox="receipt"
+                                           data-caption="Fiş/Fatura - @Model.Type"
+                                           class="receipt-thumbnail">
+                                            <img src="@Model.ReceiptImageUrl"
+                                                 alt="Fiş/Fatura"
+                                                 class="img-thumbnail" />
+                                            <div class="preview-overlay">
+                                                <i class="bi bi-zoom-in"></i>
+                                            </div>
+                                        </a>
+                                        }
+                                        else
+                                        {
+                                        <span class="text-muted">Eklenmemiş</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Butonları -->
+                    <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                        <a asp-action="Index" asp-route-buildingId="@Model.BuildingId"
+                           class="btn btn-outline-secondary px-4">
+                            <i class="bi bi-arrow-left me-1"></i> Listeye Dön
+                        </a>
+
+                        <div class="btn-group">
+                            <a asp-action="Edit" asp-route-id="@Model.Id"
+                               class="btn btn-warning px-4">
+                                <i class="bi bi-pencil-fill me-1"></i> Düzenle
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id"
+                               class="btn btn-danger px-4">
+                                <i class="bi bi-trash-fill me-1"></i> Sil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Düzenle</a>
-<a asp-action="Index" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary">Listeye Dön</a>
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ui@5.0/dist/fancybox/fancybox.css" />
+
+    <style>
+        .card {
+            border: none;
+            transition: transform 0.2s;
+        }
+
+            .card:hover {
+                transform: translateY(-2px);
+            }
+
+        .detail-card {
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            height: 100%;
+        }
+
+        .detail-section-title {
+            color: #0d6efd;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .detail-item {
+            margin-bottom: 1.25rem;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            display: block;
+            font-size: 1rem;
+            color: #212529;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .receipt-thumbnail {
+            position: relative;
+            display: inline-block;
+            transition: all 0.3s;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+            .receipt-thumbnail:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .receipt-thumbnail img {
+                max-width: 200px;
+                max-height: 150px;
+                object-fit: contain;
+                border: 1px solid #dee2e6;
+            }
+
+        .preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+            .preview-overlay i {
+                color: white;
+                font-size: 1.5rem;
+            }
+
+        .receipt-thumbnail:hover .preview-overlay {
+            opacity: 1;
+        }
+
+        .btn-group .btn {
+            transition: all 0.2s;
+        }
+
+            .btn-group .btn:hover {
+                transform: translateY(-1px);
+            }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+
+    <script>
+        // Fancybox galeri başlatma
+        Fancybox.bind("[data-fancybox]", {
+            Thumbs: {
+                autoStart: false,
+            },
+        });
+
+        // Sayfa yüklendiğinde animasyon
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.querySelector('.card');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+}

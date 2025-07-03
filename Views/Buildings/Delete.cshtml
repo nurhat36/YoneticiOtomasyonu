@@ -1,89 +1,263 @@
 @model YoneticiOtomasyonu.Models.Building
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Bina Silme";
 }
 
-<h1>Bina Sil</h1>
-
-<h3>Bu binayý silmek istediðinizden emin misiniz?</h3>
-<div>
-    <h4>Bina Bilgileri</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Block)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Block)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.FloorCount)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.FloorCount)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.UnitCount)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.UnitCount)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class="col-sm-9">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <div class="form-group">
-                    <label>Mevcut Resim:</label><br />
-                    <img src="@Model.ImageUrl" alt="Bina Resmi" style="max-width: 200px; border: 1px solid #ccc;" />
+<div class="container py-4">
+    <div class="card border-danger shadow-lg overflow-hidden">
+        <!-- Baþlýk Kýsmý -->
+        <div class="card-header bg-danger-gradient text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-xl me-3"></i>
+                    <h3 class="mb-0 fw-bold">Bina Silme Ýþlemi</h3>
                 </div>
-            }
-        </dd>
-    </dl>
+                <a asp-action="Index" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="fas fa-arrow-left me-1"></i> Listeye Dön
+                </a>
+            </div>
+        </div>
 
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-danger">Sil</button>
-        <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
-    </form>
+        <!-- Ana Ýçerik -->
+        <div class="card-body p-4">
+            <!-- Uyarý Mesajý -->
+            <div class="alert alert-danger-gradient border-danger mb-4" role="alert">
+                <div class="d-flex">
+                    <i class="fas fa-exclamation-circle fa-2x me-3 mt-1"></i>
+                    <div>
+                        <h4 class="alert-heading fw-bold mb-2">Dikkat!</h4>
+                        <p class="mb-2">
+                            Bu binayý silmek üzeresiniz. Bu iþlem geri alýnamaz! Bina ile iliþkili tüm birimler,
+                            yönetici atamalarý ve diðer veriler de silinecektir.
+                        </p>
+                        <hr class="border-danger opacity-25">
+                        <p class="mb-0 fw-medium">Lütfen bu iþlemi gerçekten yapmak istediðinizden emin olun.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bina Bilgileri Grid -->
+            <div class="row g-4">
+                <!-- Sol Taraf - Temel Bilgiler -->
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-light-gradient">
+                            <h5 class="mb-0 fw-semibold">
+                                <i class="fas fa-info-circle me-2 text-primary"></i>Bina Bilgileri
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-borderless table-hover mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th width="40%" class="text-muted ps-0">Adý:</th>
+                                            <td class="fw-medium ps-0">@Model.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0">Blok:</th>
+                                            <td class="fw-medium ps-0">@Model.Block</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0">Adres:</th>
+                                            <td class="fw-medium ps-0">@Model.Address</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0">Tür:</th>
+                                            <td class="fw-medium ps-0">@Model.Type</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0">Kat Sayýsý:</th>
+                                            <td class="fw-medium ps-0">@Model.FloorCount</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0">Birim Sayýsý:</th>
+                                            <td class="fw-medium ps-0">@Model.UnitCount</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sað Taraf - Ek Bilgiler ve Resim -->
+                <div class="col-lg-6">
+                    <!-- Ek Bilgiler Kartý -->
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-light-gradient">
+                            <h5 class="mb-0 fw-semibold">
+                                <i class="fas fa-align-left me-2 text-primary"></i>Ek Bilgiler
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4 text-muted">Oluþturulma:</dt>
+                                <dd class="col-sm-8 fw-medium">@Model.CreatedAt.ToString("dd MMMM yyyy")</dd>
+
+                                <dt class="col-sm-4 text-muted">Açýklama:</dt>
+                                <dd class="col-sm-8 fw-medium">
+                                    @(string.IsNullOrEmpty(Model.Description) ?
+                                    "<span class='text-muted fst-italic'>Açýklama yok</span>" : Model.Description)
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Bina Resmi Kartý -->
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light-gradient">
+                            <h5 class="mb-0 fw-semibold">
+                                <i class="fas fa-image me-2 text-primary"></i>Bina Görseli
+                            </h5>
+                        </div>
+                        <div class="card-body text-center p-3">
+                            <div class="ratio ratio-16x9 rounded overflow-hidden bg-light">
+                                <img src="@Model.ImageUrl" alt="Bina Resmi" class="object-fit-cover">
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Silme Formu -->
+            <div class="mt-5 pt-3">
+                <form asp-action="Delete" id="deleteForm" class="needs-validation" novalidate>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" role="switch" id="confirmDelete" required
+                               style="width: 3rem; height: 1.5rem;">
+                        <label class="form-check-label ms-3 fw-bold text-danger" for="confirmDelete">
+                            Bu binayý silmek istediðimi onaylýyorum
+                        </label>
+                        <div class="invalid-feedback">Devam etmek için bu kutuyu iþaretlemelisiniz</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between border-top pt-4">
+                        <button type="submit" class="btn btn-danger-gradient rounded-pill px-4 py-2 fw-bold" id="deleteButton" disabled>
+                            <i class="fas fa-trash-alt me-2"></i> BÝNAYI SÝL
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                            <i class="fas fa-times me-2"></i> Ýptal Et
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Styles {
+    <style>
+        :root {
+            --danger-gradient: linear-gradient(135deg, #dc3545, #c82333);
+            --light-gradient: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            --primary-gradient: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        }
+
+        .bg-danger-gradient {
+            background: var(--danger-gradient);
+            border: none;
+        }
+
+        .bg-light-gradient {
+            background: var(--light-gradient);
+            border: none;
+        }
+
+        .btn-danger-gradient {
+            background: var(--danger-gradient);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+            .btn-danger-gradient:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+            }
+
+        .alert-danger-gradient {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid #dc3545;
+            border-radius: 0.375rem;
+        }
+
+        .card {
+            border-radius: 0.75rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+            }
+
+        .form-switch .form-check-input {
+            cursor: pointer;
+        }
+
+            .form-switch .form-check-input:checked {
+                background-color: #dc3545;
+                border-color: #dc3545;
+            }
+
+        .object-fit-cover {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .invalid-feedback {
+            display: none;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #dc3545;
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .was-validated .form-check-input:invalid ~ .invalid-feedback {
+            display: block;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Onay kutusu deðiþtiðinde butonu aktif/pasif yap
+            $('#confirmDelete').change(function() {
+                $('#deleteButton').prop('disabled', !this.checked);
+            });
+
+            // Form gönderilirken ek onay
+            $('#deleteForm').submit(function(e) {
+                this.classList.add('was-validated');
+
+                if (!this.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                if (!confirm('Bu binayý silmek üzeresiniz. Bu iþlem geri alýnamaz!\n\nBina Adý: "@Model.Name"\n\nDevam etmek istiyor musunuz?')) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Butonu devre dýþý býrak ve yükleme göstergesi ekle
+                const submitBtn = $('#deleteButton');
+                submitBtn.prop('disabled', true);
+                submitBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Siliniyor...');
+
+                return true;
+            });
+        });
+    </script>
+}

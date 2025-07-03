@@ -1,31 +1,149 @@
 ﻿@model YoneticiOtomasyonu.Models.Expense
 
 @{
-    ViewData["Title"] = "Gider Sil";
+    ViewData["Title"] = "Gider Silme Onayı";
 }
 
-<h1>Gider Sil</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-danger text-white py-3">
+                    <h2 class="h5 mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i> Gider Silme Onayı</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-octagon-fill me-3 fs-4"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1">Bu işlem geri alınamaz!</h5>
+                            <p class="mb-0">Aşağıdaki gider kaydını kalıcı olarak silmek üzeresiniz.</p>
+                        </div>
+                    </div>
 
-<h3>Bu gider kaydını silmek istediğinize emin misiniz?</h3>
+                    <div class="gider-detaylari bg-light rounded-3 p-4 mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Gider Türü</span>
+                                    <span class="detail-value">@Model.Type</span>
+                                </div>
+                            </div>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Tür</dt>
-        <dd class="col-sm-10">@Model.Type</dd>
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Miktar</span>
+                                    <span class="detail-value">@Model.Amount.ToString("C2")</span>
+                                </div>
+                            </div>
 
-        <dt class="col-sm-2">Miktar</dt>
-        <dd class="col-sm-10">@Model.Amount</dd>
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Tarih</span>
+                                    <span class="detail-value">@Model.Date.ToString("dd MMMM yyyy")</span>
+                                </div>
+                            </div>
 
-        <dt class="col-sm-2">Tarih</dt>
-        <dd class="col-sm-10">@Model.Date.ToShortDateString()</dd>
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Ödeme Yöntemi</span>
+                                    <span class="detail-value">@Model.PaymentMethod</span>
+                                </div>
+                            </div>
 
-        <dt class="col-sm-2">Açıklama</dt>
-        <dd class="col-sm-10">@Model.Description</dd>
-    </dl>
+                            <div class="col-12">
+                                <div class="detail-item">
+                                    <span class="detail-label">Açıklama</span>
+                                    <span class="detail-value">@(string.IsNullOrEmpty(Model.Description) ? "Açıklama yok" : Model.Description)</span>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.ReceiptNumber))
+                            {
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Fiş/Fatura No</span>
+                                    <span class="detail-value">@Model.ReceiptNumber</span>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" class="mt-4">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="BuildingId" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" asp-route-buildingId="@Model.BuildingId"
+                               class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-arrow-left me-1"></i> Vazgeç
+                            </a>
+
+                            <button type="submit" class="btn btn-danger px-4"
+                                    onclick="return confirm('Bu gider kaydını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');">
+                                <i class="bi bi-trash-fill me-1"></i> Kalıcı Olarak Sil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<form asp-action="Delete">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Sil</button>
-    <a asp-action="Index" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary">İptal</a>
-</form>
+@section Styles {
+    <style>
+        .card {
+            border: none;
+            transition: transform 0.2s;
+        }
+
+            .card:hover {
+                transform: translateY(-2px);
+            }
+
+        .gider-detaylari {
+            border-left: 4px solid #dc3545;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            display: block;
+            font-size: 1rem;
+            color: #212529;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .btn-danger {
+            transition: all 0.2s;
+        }
+
+            .btn-danger:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.25);
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Silme butonuna ekstra onay ekleme
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const confirmMessage = "Bu gider kaydını silmek üzeresiniz. Bu işlem geri alınamaz!\n\nDevam etmek istiyor musunuz?";
+            if(!confirm(confirmMessage)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

@@ -4,85 +4,209 @@
     ViewData["Title"] = "Detaylar";
 }
 
-<h1>Bina Detaylarý</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4">@Model.Name Detaylarý</h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Düzenle</a>
+            <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+        </div>
+    </div>
 
-<div>
-    <h4>Bina Bilgileri</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
+    <div class="row">
+        <!-- Bina Bilgileri -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-building me-2"></i>Bina Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <th width="40%">Adý:</th>
+                                    <td>@Html.DisplayFor(model => model.Name)</td>
+                                </tr>
+                                <tr>
+                                    <th>Blok:</th>
+                                    <td>@Html.DisplayFor(model => model.Block)</td>
+                                </tr>
+                                <tr>
+                                    <th>Adres:</th>
+                                    <td>@Html.DisplayFor(model => model.Address)</td>
+                                </tr>
+                                <tr>
+                                    <th>Tür:</th>
+                                    <td>@Html.DisplayFor(model => model.Type)</td>
+                                </tr>
+                                <tr>
+                                    <th>Kat Sayýsý:</th>
+                                    <td>@Html.DisplayFor(model => model.FloorCount)</td>
+                                </tr>
+                                <tr>
+                                    <th>Birim Sayýsý:</th>
+                                    <td>@Html.DisplayFor(model => model.UnitCount)</td>
+                                </tr>
+                                <tr>
+                                    <th>Oluþturulma Tarihi:</th>
+                                    <td>@Html.DisplayFor(model => model.CreatedAt)</td>
+                                </tr>
+                                <tr>
+                                    <th>Açýklama:</th>
+                                    <td>@Html.DisplayFor(model => model.Description)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Block)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Block)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.FloorCount)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.FloorCount)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.UnitCount)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.UnitCount)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class="col-sm-9">
+        <!-- Bina Resmi ve Yöneticiler -->
+        <div class="col-md-6">
+            <!-- Bina Resmi -->
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
-                <div class="form-group">
-                    <label>Mevcut Resim:</label><br />
-                    <img src="@Model.ImageUrl" alt="Bina Resmi" style="max-width: 250px; border: 1px solid #ccc;" />
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-image me-2"></i>Bina Görseli</h5>
                 </div>
+                <div class="card-body text-center">
+                    <img src="@Model.ImageUrl" alt="Bina Resmi" class="img-fluid rounded" style="max-height: 250px;">
+                </div>
+            </div>
             }
-        </dd>
-    </dl>
+
+            <!-- Yöneticiler -->
+            
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i>Yöneticiler</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var manager in ViewBag.Managers as List<UserBuildingRole>)
+                {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">@manager.UserProfile.FullName</h6>
+                                    <small class="text-muted">
+                                        @manager.Role
+                                        @(manager.IsPrimary ? "(Ana Yönetici)" : "")
+                                    </small>
+                                </div>
+                                <a href="mailto:@manager.UserProfile.IdentityUser.Email"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </li>
+                }
+                        </ul>
+
+                        @if (ViewBag.UserRole == "Yönetici" || User.IsInRole("Admin"))
+            {
+                        <div class="mt-3">
+                            <a asp-controller="Building" asp-action="AddManager" asp-route-buildingId="@Model.Id"
+                               class="btn btn-sm btn-success">
+                                <i class="fas fa-plus me-1"></i>Yönetici Ekle
+                            </a>
+                        </div>
+            }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Son Etkinlikler -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Son Etkinlikler</h5>
+        </div>
+        <div class="card-body">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">22 Nisan 2024</div>
+                    <div class="timeline-content">
+                        <h6>Denetim Tamamlandý</h6>
+                        <p class="text-muted mb-0">Bina genel denetimi yapýldý ve rapor oluþturuldu.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">15 Nisan 2024</div>
+                    <div class="timeline-content">
+                        <h6>Servis Talebi Oluþturuldu</h6>
+                        <p class="text-muted mb-0">#SR-2456 numaralý servis talebi oluþturuldu.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">10 Nisan 2024</div>
+                    <div class="timeline-content">
+                        <h6>Aydýnlatma Tamiri</h6>
+                        <p class="text-muted mb-0">Giriþ katý aydýnlatma arýzalarý giderildi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Birim Ekle Butonu -->
+    <div class="mt-4 text-end">
+        <a asp-controller="Units" asp-action="Add" asp-route-buildingId="@Model.Id" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Yeni Birim Ekle
+        </a>
+    </div>
 </div>
 
-<div class="mt-3">
-    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Düzenle</a>
-    <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
-    <a asp-controller="Units" asp-action="Add" asp-route-buildingId="@Model.Id" class="btn btn-success">Birim Ekle</a>
-</div>
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+        }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+    .timeline-date {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-content {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.375rem;
+        position: relative;
+    }
+
+        .timeline-content:before {
+            content: '';
+            position: absolute;
+            left: -1.5rem;
+            top: 1.2rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            border: 3px solid #fff;
+        }
+</style>

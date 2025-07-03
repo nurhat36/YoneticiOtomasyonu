@@ -1,81 +1,238 @@
 ﻿@model IEnumerable<YoneticiOtomasyonu.Models.Expense>
 
-@{
+    @{
     ViewData["Title"] = "Gider Listesi";
-}
+    }
 
-<h1>Gider Listesi</h1>
+    <div class="container-fluid py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="bi bi-receipt-cutoff me-2"></i> Gider Listesi
+            </h1>
+            <a asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> Yeni Gider Ekle
+            </a>
+        </div>
 
-<p>
-    <a asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-primary">Yeni Gider Ekle</a>
-</p>
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-semibold">Gider Kayıtları</h6>
+                <div class="d-flex">
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Gider ara...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Tür</th>
-            <th>Miktar (TL)</th>
-            <th>Tarih</th>
-            <th>Açıklama</th>
-            <th>Ödeme Yöntemi</th>
-            <th>Fiş No</th>
-            <th>Fiş Resmi</th>
-            <th>Kaydeden</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Type</td>
-                <td>@item.Amount</td>
-                <td>@item.Date.ToShortDateString()</td>
-                <td>@item.Description</td>
-                <td>@item.PaymentMethod</td>
-                <td>@item.ReceiptNumber</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.ReceiptImageUrl))
-                    {
-                        var fileExtension = System.IO.Path.GetExtension(item.ReceiptImageUrl).ToLower();
-
-                        // Eğer resim formatındaysa (jpg, jpeg, png, gif, webp vs.)
-                        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-
-                        if (imageExtensions.Contains(fileExtension))
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0" id="expensesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Tür</th>
+                                <th>Miktar</th>
+                                <th>Tarih</th>
+                                <th>Ödeme Yöntemi</th>
+                                <th>Fiş</th>
+                                <th>Kaydeden</th>
+                                <th class="text-end pe-4">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
                         {
-                            <a href="@item.ReceiptImageUrl" target="_blank">
-                                <img src="@item.ReceiptImageUrl" style="width:40px; height:40px; object-fit:cover;" title="Resmi büyüt" />
-                            </a>
-                        }
-                        else
-                        {
-                            // Eğer başka bir döküman (PDF, doc vs.)
-                            <a href="@item.ReceiptImageUrl" target="_blank" title="Dosyayı aç">
-                                <i class="fas fa-file-alt fa-2x"></i>
-                            </a>
-                        }
-                    }
-                    else
-                    {
-                        <span>-</span>
-                    }
-                </td>
+                            <tr>
+                                <td class="ps-4 align-middle">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                                        @item.Type
+                                    </span>
+                                </td>
+                                <td class="align-middle fw-semibold">
+                                    @item.Amount.ToString("C2")
+                                </td>
+                                <td class="align-middle">
+                                    @item.Date.ToString("dd.MM.yyyy")
+                                </td>
+                                <td class="align-middle">
+                                    @item.PaymentMethod
+                                </td>
+                                <td class="align-middle">
+                                    @if (!string.IsNullOrEmpty(item.ReceiptImageUrl))
+                                    {
+                                        var fileExtension = System.IO.Path.GetExtension(item.ReceiptImageUrl).ToLower();
+                                        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
 
-                <td>
-                    @if (!string.IsNullOrEmpty(item.RecordedBy?.ProfileImageUrl))
-                    {
-                        <img src="@item.RecordedBy.ProfileImageUrl" style="width:30px; height:30px; border-radius:50%; object-fit:cover; margin-right:5px;" />
-                    }
-                    @item.RecordedBy?.UserName
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detay</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                                        if (imageExtensions.Contains(fileExtension))
+                                        {
+                                    <a href="@item.ReceiptImageUrl" data-fancybox="gallery" data-caption="@item.Type - @item.Date.ToString("dd.MM.yyyy")">
+                                        <img src="@item.ReceiptImageUrl" class="rounded" style="width:40px; height:40px; object-fit:cover;" alt="Fiş">
+                                    </a>
+                                        }
+                                        else
+                                        {
+                                    <a href="@item.ReceiptImageUrl" target="_blank" class="text-decoration-none" title="Dosyayı aç">
+                                        <i class="bi bi-file-earmark-text fs-4 text-primary"></i>
+                                    </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                    <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        @if (!string.IsNullOrEmpty(item.RecordedBy?.ProfileImageUrl))
+                                        {
+                                        <img src="@item.RecordedBy.ProfileImageUrl"
+                                             class="rounded-circle me-2"
+                                             style="width:32px; height:32px; object-fit:cover;"
+                                             alt="@item.RecordedBy.UserName">
+                                        }
+                                        else
+                                        {
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                                             style="width:32px; height:32px;">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        }
+                                        <span>@item.RecordedBy?.UserName</span>
+                                    </div>
+                                </td>
+                                <td class="text-end pe-4 align-middle">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                           class="btn btn-outline-info" title="Detaylar">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn btn-outline-warning" title="Düzenle">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="btn btn-outline-danger" title="Sil">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
+            <div class="card-footer bg-light py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        Toplam <span class="fw-semibold">@Model.Count()</span> gider kaydı
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Önceki</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Sonraki</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Styles {
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ui@5.0/dist/fancybox/fancybox.css" />
+
+        <style>
+            .card {
+                border: none;
+                box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            }
+
+            .table thead th {
+                border-bottom: none;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 0.5px;
+                color: #6c757d;
+            }
+
+            .table tbody tr {
+                transition: all 0.2s;
+            }
+
+                .table tbody tr:hover {
+                    background-color: rgba(13, 110, 253, 0.03);
+                    transform: translateX(2px);
+                }
+
+            .badge {
+                padding: 0.35em 0.65em;
+                font-weight: 500;
+            }
+
+            .btn-group .btn {
+                transition: all 0.2s;
+            }
+
+                .btn-group .btn:hover {
+                    transform: translateY(-1px);
+                }
+
+            .pagination .page-item.active .page-link {
+                background-color: #0d6efd;
+                border-color: #0d6efd;
+            }
+
+            .pagination .page-link {
+                color: #0d6efd;
+            }
+        </style>
+    }
+
+    @section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+
+        <script>
+        // Fancybox galeri başlatma
+        Fancybox.bind("[data-fancybox]", {
+            Thumbs: {
+                autoStart: false,
+            },
+        });
+
+        // Arama fonksiyonu
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const input = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#expensesTable tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        });
+
+        // Sayfa yüklendiğinde animasyon
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('#expensesTable tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(20px)';
+                row.style.transition = `opacity 0.3s ease ${index * 0.05}s, transform 0.3s ease ${index * 0.05}s`;
+
+                setTimeout(() => {
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateX(0)';
+                }, 100);
+            });
+        });
+        </script>
+    }
