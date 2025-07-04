@@ -28,6 +28,9 @@ namespace YoneticiOtomasyonu.Data
         public DbSet<Meeting> Meetings { get; set; }
         public DbSet<MeetingAttendance> MeetingAttendances { get; set; }
         public DbSet<UserBuildingRole> UserBuildingRoles { get; internal set; }
+        public DbSet<DuesSetting> DuesSettings { get; set; }
+        public DbSet<UserDebt> UserDebts { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -135,6 +138,30 @@ namespace YoneticiOtomasyonu.Data
                 .WithMany()
                 .HasForeignKey(ubr => ubr.AssignedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<DuesSetting>()
+        .HasOne(ds => ds.Building)
+        .WithMany(b => b.DuesSettings)
+        .HasForeignKey(ds => ds.BuildingId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+            // UserDebt - Building ilişkisi
+            builder.Entity<UserDebt>()
+                .HasOne(ud => ud.Building)
+                .WithMany(b => b.UserDebts)
+                .HasForeignKey(ud => ud.BuildingId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // UserDebt - User ilişkisi
+            builder.Entity<UserDebt>()
+                .HasOne(ud => ud.User)
+                .WithMany(u => u.UserDebts)
+                .HasForeignKey(ud => ud.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Type alanı için max uzunluk kontrolü
+            builder.Entity<UserDebt>()
+                .Property(ud => ud.Type)
+                .HasMaxLength(50);
 
             // Tablo isimlendirmeleri
             builder.Entity<Building>().ToTable("Buildings");

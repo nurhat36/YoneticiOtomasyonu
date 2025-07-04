@@ -9,6 +9,7 @@
         public decimal Area { get; set; } // Metrekare (m²) cinsinden alan
         public bool IsOccupied { get; set; } // Dolu/Boş durumu
         public string? Description { get; set; } // Birim açıklaması (opsiyonel)
+       
 
         // İlişkiler
         public int BuildingId { get; set; } // Bağlı olduğu bina ID
@@ -18,5 +19,7 @@
         public ApplicationUser? Resident { get; set; } // Birimde kalan/çalışan kullanıcı nesnesi
 
         public ICollection<Complaint> Complaints { get; set; } // Bu birime ait şikayetler
+        
+
     }
 }

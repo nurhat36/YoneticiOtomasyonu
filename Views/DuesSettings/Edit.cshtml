@@ -1,0 +1,44 @@
+﻿@model YoneticiOtomasyonu.Models.DuesSetting
+
+@{
+    var buildings = ViewBag.Buildings as List<YoneticiOtomasyonu.Models.Building>;
+}
+
+<h2>Aidat Bilgisi Düzenle</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label>Bina</label>
+        <select asp-for="BuildingId" class="form-control" asp-items="ViewBag.BuildingSelectList">
+            <option value="">Seçiniz</option>
+        </select>
+        <span asp-validation-for="BuildingId" class="text-danger"></span>
+    </div>
+
+
+    <div class="form-group">
+        <label>Aidat Miktarı</label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Toplanma Günü (1-31)</label>
+        <input asp-for="CollectionDay" class="form-control" />
+        <span asp-validation-for="CollectionDay" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Açıklama</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

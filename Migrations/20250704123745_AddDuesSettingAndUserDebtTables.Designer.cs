@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YoneticiOtomasyonu.Data;
 
@@ -11,9 +12,11 @@ using YoneticiOtomasyonu.Data;
 namespace YoneticiOtomasyonu.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250704123745_AddDuesSettingAndUserDebtTables")]
+    partial class AddDuesSettingAndUserDebtTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -771,9 +774,6 @@ namespace YoneticiOtomasyonu.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("UnitId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -781,8 +781,6 @@ namespace YoneticiOtomasyonu.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BuildingId");
-
-                    b.HasIndex("UnitId");
 
                     b.HasIndex("UserId");
 
@@ -1191,10 +1189,6 @@ namespace YoneticiOtomasyonu.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("YoneticiOtomasyonu.Models.Unit", "Unit")
-                        .WithMany()
-                        .HasForeignKey("UnitId");
-
                     b.HasOne("YoneticiOtomasyonu.Models.ApplicationUser", "User")
                         .WithMany("UserDebts")
                         .HasForeignKey("UserId")
@@ -1202,8 +1196,6 @@ namespace YoneticiOtomasyonu.Migrations
                         .IsRequired();
 
                     b.Navigation("Building");
-
-                    b.Navigation("Unit");
 
                     b.Navigation("User");
                 });

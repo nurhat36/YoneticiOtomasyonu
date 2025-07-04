@@ -48,5 +48,7 @@ namespace YoneticiOtomasyonu.Models
 
         // Çoktan çoğa ilişki için
         public ICollection<UserBuildingRole> UserRoles { get; set; } = new List<UserBuildingRole>();
+        public ICollection<DuesSetting> DuesSettings { get; set; } = new List<DuesSetting>();
+        public ICollection<UserDebt> UserDebts { get; set; } = new List<UserDebt>();
     }
 }

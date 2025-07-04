@@ -1,0 +1,51 @@
+﻿@model IEnumerable<YoneticiOtomasyonu.Models.UserDebt>
+
+<h2>Bina Aidat Ödemeleri</h2>
+
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Kullanıcı</th>
+            <th>Daire</th>
+            <th>Miktar (₺)</th>
+            <th>Oluşturulma</th>
+            <th>Durum</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var debt in Model)
+        {
+            <tr>
+                <td>@debt.User.UserName</td>
+                <td>@debt.Unit?.Number</td>
+                <td>@debt.Amount.ToString("N2")</td>
+                <td>@debt.CreatedAt.ToString("dd.MM.yyyy")</td>
+                <td>
+                    @if (debt.IsPaid)
+                    {
+                        <span class="badge bg-success">Ödendi</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Ödenmedi</span>
+                    }
+                </td>
+                <td>
+                    @if (!debt.IsPaid)
+                    {
+                        <a asp-action="ConfirmPayment" asp-route-debtId="@debt.Id" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-sm btn-success">
+                            Ödendi Olarak İşaretle
+                        </a>
+
+
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-secondary" disabled>✓</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

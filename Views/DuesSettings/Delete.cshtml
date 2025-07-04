@@ -1,0 +1,32 @@
+﻿@model YoneticiOtomasyonu.Models.DuesSetting
+
+<h2>Aidat Bilgisi Sil</h2>
+
+<h4>@Model.Building.Name binasına ait aidat kaydını silmek istediğinize emin misiniz?</h4>
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">
+        Miktar
+    </dt>
+    <dd class="col-sm-10">
+        @Model.Amount.ToString("N2") ₺
+    </dd>
+    <dt class="col-sm-2">
+        Toplanma Günü
+    </dt>
+    <dd class="col-sm-10">
+        @Model.CollectionDay
+    </dd>
+    <dt class="col-sm-2">
+        Açıklama
+    </dt>
+    <dd class="col-sm-10">
+        @Model.Description
+    </dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>

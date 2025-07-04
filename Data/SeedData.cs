@@ -74,6 +74,7 @@ namespace YoneticiOtomasyonu.Data
                     Address = "Örnek Mah. Demo Sokak No:1 İstanbul",
                     Type = "Site",
                     FloorCount = 10,
+                    Block = "A Blok",
                     UnitCount = 40,
                     CreatedAt = DateTime.Now,
                     Description = "Sistem tarafından oluşturulan örnek site",

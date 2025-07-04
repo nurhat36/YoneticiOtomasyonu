@@ -1,0 +1,38 @@
+﻿@model IEnumerable<YoneticiOtomasyonu.Models.UserDebt>
+
+<h2>Borçlarım</h2>
+
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Bina</th>
+            <th>Daire</th>
+            <th>Tür</th>
+            <th>Miktar (₺)</th>
+            <th>Oluşturulma Tarihi</th>
+            <th>Durum</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var debt in Model)
+        {
+            <tr>
+                <td>@debt.Building?.Name</td>
+                <td>@debt.Unit?.Number</td> <!-- Unit modelinde Number veya başka bir tanımlayıcı varsa -->
+                <td>@debt.Type</td>
+                <td>@debt.Amount.ToString("N2")</td>
+                <td>@debt.CreatedAt.ToString("dd.MM.yyyy")</td>
+                <td>
+                    @if (debt.IsPaid)
+                    {
+                        <span class="badge bg-success">Ödendi</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Ödenmedi</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

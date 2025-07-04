@@ -176,5 +176,19 @@ namespace YoneticiOtomasyonu.Controllers
                 return View(model);
             }
         }
+        public async Task<IActionResult> MyDebts()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var debts = await _context.UserDebts
+                .Where(d => d.UserId == userId)
+                .Include(d => d.Building)
+                .Include(d => d.Unit)
+                .OrderByDescending(d => d.CreatedAt)
+                .ToListAsync();
+
+            return View(debts);
+        }
+
     }
 }
