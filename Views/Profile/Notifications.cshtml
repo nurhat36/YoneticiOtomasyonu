@@ -1,32 +1,326 @@
 ﻿@model List<YoneticiOtomasyonu.Models.Notification>
 
-<h2>Bildirimlerim</h2>
+    <div class="notifications-container">
+        <div class="notifications-header">
+            <h2 class="notifications-title">Bildirimlerim</h2>
+            <div class="notifications-actions">
+                <button class="btn-mark-all" onclick="markAllAsRead()">
+                    <i class="fas fa-check-double"></i> Tümünü okundu olarak işaretle
+                </button>
+                <span class="badge unread-count">@Model.Count(n => !n.IsRead) yeni bildirim</span>
+            </div>
+        </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Mesaj</th>
-            <th>Tarih</th>
-            <th>Durum</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+        <div class="notifications-list">
+            @foreach (var item in Model.OrderByDescending(n => n.CreatedAt))
         {
-            <tr class="@(item.IsRead ? "" : "table-warning")">
-                <td>
-                    @if (!string.IsNullOrEmpty(item.Link))
+            <div class="notification-card @(item.IsRead ? "read" : "unread")" data-id="@item.Id">
+                <div class="notification-icon">
+                    @if (!item.IsRead)
                     {
-                        <a href="@item.Link">@item.Message</a>
+                    <div class="unread-dot"></div>
                     }
-                    else
-                    {
-                        @item.Message
-                    }
-                </td>
-                <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>@(item.IsRead ? "Okundu" : "Yeni")</td>
-            </tr>
+                    <i class="fas @GetNotificationIcon(item)"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">
+                        @if (!string.IsNullOrEmpty(item.Link))
+                        {
+                        <a href="@item.Link" class="notification-link">@item.Message</a>
+                        }
+                        else
+                        {
+                        <span>@item.Message</span>
+                        }
+                    </div>
+                    <div class="notification-meta">
+                        <span class="notification-date">
+                            <i class="far fa-clock"></i> @item.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                        </span>
+                        <span class="notification-status">
+                            @if (item.IsRead)
+                            {
+                            <span class="status-badge read">
+                                <i class="fas fa-check-circle"></i> Okundu
+                            </span>
+                            }
+                            else
+                            {
+                            <span class="status-badge unread">
+                                <i class="fas fa-circle"></i> Yeni
+                            </span>
+                            }
+                        </span>
+                    </div>
+                </div>
+                <div class="notification-actions">
+                    <button class="btn-action mark-as-read" title="Okundu olarak işaretle">
+                        <i class="far fa-check-circle"></i>
+                    </button>
+                    <button class="btn-action delete-notification" title="Sil">
+                        <i class="far fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+        </div>
+    </div>
+
+    @functions {
+    string GetNotificationIcon(Notification notification)
+    {
+        // Bu fonksiyonu bildirim türüne göre farklı ikonlar döndürmek için özelleştirebilirsiniz
+        if (notification.Message.Contains("ödeme") || notification.Message.Contains("borç"))
+            return "fa-money-bill-wave";
+        if (notification.Message.Contains("duyuru"))
+            return "fa-bullhorn";
+        if (notification.Message.Contains("mesaj"))
+            return "fa-envelope";
+        return "fa-bell";
+    }
+    }
+
+    <style>
+        .notifications-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .notifications-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .notifications-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-mark-all {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .btn-mark-all:hover {
+                background-color: #3a5ce4;
+            }
+
+        .unread-count {
+            background-color: #ff4757;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification-card {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            align-items: center;
+            border-left: 4px solid transparent;
+        }
+
+            .notification-card.unread {
+                background-color: #f8f9fa;
+                border-left-color: #4a6cf7;
+                box-shadow: 0 2px 12px rgba(74, 108, 247, 0.1);
+            }
+
+            .notification-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+        .notification-icon {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background-color: #e3f2fd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #4a6cf7;
+            font-size: 16px;
+        }
+
+        .unread-dot {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 12px;
+            height: 12px;
+            background-color: #ff4757;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-message {
+            font-size: 15px;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .notification-link {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .notification-link:hover {
+                color: #4a6cf7;
+                text-decoration: underline;
+            }
+
+        .notification-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .notification-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .notification-status {
+            margin-left: auto;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            gap: 5px;
+        }
+
+            .status-badge.read {
+                background-color: #e8f5e9;
+                color: #388e3c;
+            }
+
+            .status-badge.unread {
+                background-color: #ffebee;
+                color: #d32f2f;
+            }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .notification-card:hover .notification-actions {
+            opacity: 1;
+        }
+
+        .btn-action {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+            .btn-action:hover {
+                background-color: #f1f3f5;
+                color: #4a6cf7;
+            }
+
+        @@media (max-width: 768px) {
+            .notifications-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .notification-card {
+                padding: 12px;
+            }
+
+            .notification-meta {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .notification-status {
+                margin-left: 0;
+            }
+
+            .notification-actions {
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <script>
+    function markAllAsRead() {
+        // Tüm bildirimleri okundu olarak işaretleme fonksiyonu
+        console.log("Tüm bildirimler okundu olarak işaretlendi");
+        // Burada AJAX çağrısı yapılabilir
+    }
+
+    // Bildirim kartlarına tıklanabilirlik ekleme
+    document.querySelectorAll('.notification-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Eğer tıklanan element bir aksiyon butonu değilse
+            if (!e.target.closest('.btn-action')) {
+                const link = this.querySelector('.notification-link');
+                if (link) {
+                    window.location.href = link.href;
+                }
+            }
+        });
+    });
+    </script>

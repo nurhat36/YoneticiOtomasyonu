@@ -1,51 +1,441 @@
 ﻿@model IEnumerable<YoneticiOtomasyonu.Models.UserDebt>
 
-<h2>Bina Aidat Ödemeleri</h2>
+    <div class="payment-container">
+        <div class="payment-header">
+            <div class="header-left">
+                <!-- Back Button -->
+                <a href="javascript:history.back()" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Geri Dön</span>
+                </a>
+                <h2 class="payment-title">
+                    <i class="fas fa-building me-2"></i>Bina Aidat Ödemeleri
+                </h2>
+            </div>
+            <div class="payment-actions">
+                <button class="btn-refresh">
+                    <i class="fas fa-sync-alt"></i> Yenile
+                </button>
+            </div>
+        </div>
 
-<table class="table table-bordered mt-3">
-    <thead>
-        <tr>
-            <th>Kullanıcı</th>
-            <th>Daire</th>
-            <th>Miktar (₺)</th>
-            <th>Oluşturulma</th>
-            <th>Durum</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var debt in Model)
-        {
-            <tr>
-                <td>@debt.User.UserName</td>
-                <td>@debt.Unit?.Number</td>
-                <td>@debt.Amount.ToString("N2")</td>
-                <td>@debt.CreatedAt.ToString("dd.MM.yyyy")</td>
-                <td>
-                    @if (debt.IsPaid)
+        <div class="payment-card">
+            <div class="table-responsive">
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Kullanıcı</th>
+                            <th>Daire</th>
+                            <th>Miktar (₺)</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var debt in Model)
                     {
-                        <span class="badge bg-success">Ödendi</span>
+                        <tr class="@(debt.IsPaid ? "payment-paid" : "payment-unpaid")">
+                            <td data-label="Kullanıcı">
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="user-name">@debt.User.UserName</div>
+                                        <div class="user-email">@debt.User.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="Daire">
+                                <span class="unit-number">@debt.Unit?.Number</span>
+                            </td>
+                            <td data-label="Miktar">
+                                <span class="payment-amount">@debt.Amount.ToString("N2") ₺</span>
+                            </td>
+                            <td data-label="Tarih">
+                                <span class="payment-date">@debt.CreatedAt.ToString("dd.MM.yyyy")</span>
+                            </td>
+                            <td data-label="Durum">
+                                @if (debt.IsPaid)
+                                {
+                                <span class="payment-status paid">
+                                    <i class="fas fa-check-circle"></i> Ödendi
+                                </span>
+                                }
+                                else
+                                {
+                                <span class="payment-status unpaid">
+                                    <i class="fas fa-exclamation-circle"></i> Ödenmedi
+                                </span>
+                                }
+                            </td>
+                            <td data-label="İşlemler">
+                                @if (!debt.IsPaid)
+                                {
+                                <a asp-action="ConfirmPayment" asp-route-debtId="@debt.Id" asp-route-buildingId="@ViewBag.BuildingId" class="btn-mark-paid">
+                                    <i class="fas fa-check"></i> Ödeme Onayla
+                                </a>
+                                }
+                                else
+                                {
+                                <span class="btn-paid-disabled">
+                                    <i class="fas fa-check-double"></i> Onaylandı
+                                </span>
+                                }
+                            </td>
+                        </tr>
                     }
-                    else
-                    {
-                        <span class="badge bg-danger">Ödenmedi</span>
-                    }
-                </td>
-                <td>
-                    @if (!debt.IsPaid)
-                    {
-                        <a asp-action="ConfirmPayment" asp-route-debtId="@debt.Id" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-sm btn-success">
-                            Ödendi Olarak İşaretle
-                        </a>
+                    </tbody>
+                </table>
+            </div>
 
+            <div class="payment-summary">
+                <div class="summary-item">
+                    <span class="summary-label">Toplam Borç</span>
+                    <span class="summary-value total-debt">@Model.Where(d => !d.IsPaid).Sum(d => d.Amount).ToString("N2") ₺</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Toplanan</span>
+                    <span class="summary-value paid-amount">@Model.Where(d => d.IsPaid).Sum(d => d.Amount).ToString("N2") ₺</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Kalan Daire</span>
+                    <span class="summary-value">@Model.Count(d => !d.IsPaid) / @Model.Count()</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    }
-                    else
-                    {
-                        <button class="btn btn-sm btn-secondary" disabled>✓</button>
-                    }
-                </td>
-            </tr>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
         }
-    </tbody>
-</table>
+
+        .payment-container {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: var(--dark-color);
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+            .back-button:hover {
+                background-color: #f0f4ff;
+                transform: translateX(-3px);
+            }
+
+            .back-button i {
+                font-size: 1.1rem;
+            }
+
+        .payment-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
+
+        .payment-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-refresh {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+            .btn-refresh:hover {
+                background: #f5f5f5;
+                transform: translateY(-2px);
+            }
+
+        .payment-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .payment-table thead th {
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
+                font-weight: 600;
+                padding: 1.25rem;
+                text-align: left;
+                position: sticky;
+                top: 0;
+            }
+
+            .payment-table tbody tr {
+                border-bottom: 1px solid #f0f0f0;
+                transition: var(--transition);
+            }
+
+                .payment-table tbody tr:hover {
+                    background-color: #f9f9f9;
+                }
+
+            .payment-table tbody td {
+                padding: 1.25rem;
+                vertical-align: middle;
+            }
+
+        .payment-paid {
+            opacity: 0.8;
+            background-color: #f8f9fa;
+        }
+
+        .payment-unpaid {
+            background-color: #fff5f7;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e3f2fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .user-email {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .unit-number {
+            background: #f0f0f0;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .payment-amount {
+            font-weight: 600;
+        }
+
+        .payment-date {
+            color: #6c757d;
+        }
+
+        .payment-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            gap: 0.5rem;
+        }
+
+            .payment-status.paid {
+                background-color: #e8f5e9;
+                color: #388e3c;
+            }
+
+            .payment-status.unpaid {
+                background-color: #ffebee;
+                color: #d32f2f;
+            }
+
+        .btn-mark-paid {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+            .btn-mark-paid:hover {
+                background: #3aa8d8;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+        .btn-paid-disabled {
+            background: #e0e0e0;
+            color: #757575;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .payment-summary {
+            display: flex;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-top: 1px solid #eaeaea;
+        }
+
+        .summary-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            position: relative;
+        }
+
+            .summary-item:not(:last-child)::after {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 20%;
+                height: 60%;
+                width: 1px;
+                background-color: #e0e0e0;
+            }
+
+        .summary-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .total-debt {
+            color: #e74c3c;
+        }
+
+        .paid-amount {
+            color: #2ecc71;
+        }
+
+        @@media (max-width: 992px) {
+            .payment-container {
+                padding: 1rem;
+            }
+
+            .payment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .back-button {
+                align-self: flex-start;
+                margin-bottom: 0.5rem;
+            }
+
+            .payment-actions {
+                align-self: flex-end;
+            }
+
+            .payment-table thead {
+                display: none;
+            }
+
+            .payment-table tbody tr {
+                display: block;
+                margin-bottom: 1.5rem;
+                border-radius: var(--border-radius);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .payment-table tbody td {
+                display: flex;
+                justify-content: space-between;
+                padding: 1rem;
+                text-align: right;
+            }
+
+                .payment-table tbody td::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: var(--dark-color);
+                    margin-right: 1rem;
+                }
+
+            .payment-summary {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .summary-item:not(:last-child)::after {
+                display: none;
+            }
+        }
+    </style>

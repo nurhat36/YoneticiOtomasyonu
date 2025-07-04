@@ -1,32 +1,85 @@
 ﻿@model YoneticiOtomasyonu.Models.DuesSetting
 
-<h2>Aidat Bilgisi Sil</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-danger bg-gradient text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Aidat Bilgisi Sil
+                        </h2>
+                        <a asp-action="Index" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i> Geri
+                        </a>
+                    </div>
+                </div>
 
-<h4>@Model.Building.Name binasına ait aidat kaydını silmek istediğinize emin misiniz?</h4>
-<hr />
-<dl class="row">
-    <dt class="col-sm-2">
-        Miktar
-    </dt>
-    <dd class="col-sm-10">
-        @Model.Amount.ToString("N2") ₺
-    </dd>
-    <dt class="col-sm-2">
-        Toplanma Günü
-    </dt>
-    <dd class="col-sm-10">
-        @Model.CollectionDay
-    </dd>
-    <dt class="col-sm-2">
-        Açıklama
-    </dt>
-    <dd class="col-sm-10">
-        @Model.Description
-    </dd>
-</dl>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-circle fs-4 me-3"></i>
+                            <div>
+                                <h4 class="alert-heading mb-1">@Model.Building.Name binasına ait aidat kaydını silmek istediğinize emin misiniz?</h4>
+                                <p class="mb-0">Bu işlem geri alınamaz!</p>
+                            </div>
+                        </div>
+                    </div>
 
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Sil</button>
-    <a asp-action="Index" class="btn btn-secondary">İptal</a>
-</form>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered table-hover">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light" style="width: 30%">
+                                        <i class="fas fa-lira-sign me-1"></i> Miktar
+                                    </th>
+                                    <td>@Model.Amount.ToString("N2") ₺</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-calendar-day me-1"></i> Toplanma Günü
+                                    </th>
+                                    <td>@Model.CollectionDay</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-info-circle me-1"></i> Açıklama
+                                    </th>
+                                    <td>@(string.IsNullOrEmpty(Model.Description) ? "Açıklama yok" : Model.Description)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <form asp-action="Delete" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary btn-lg px-4 me-md-2">
+                                <i class="fas fa-times me-1"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg px-4">
+                                <i class="fas fa-trash-alt me-1"></i> Sil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome için -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+@section Scripts {
+    <script>
+        // Silme butonuna tıklanınca ekstra onay
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!confirm('Bu kaydı silmek istediğinizden emin misiniz?\nBu işlem geri alınamaz!')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

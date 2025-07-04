@@ -1,33 +1,103 @@
 ﻿@model YoneticiOtomasyonu.Models.DuesSetting
 
-<h2>@ViewBag.BuildingName binasına Aidat Bilgisi Ekle</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary bg-gradient text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0">
+                            <i class="fas fa-money-bill-wave me-2"></i>
+                            @ViewBag.BuildingName Binasi için Aidat Bilgisi Ekle
+                        </h2>
+                        <a asp-action="Index" asp-route-buildingId="@Model.BuildingId" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i> Geri
+                        </a>
+                    </div>
+                </div>
 
-<form asp-action="Create" method="post">
-    <input type="hidden" asp-for="BuildingId" />
+                <div class="card-body">
+                    <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="BuildingId" />
 
-    <div class="form-group">
-        <label>Aidat Miktarı</label>
-        <input asp-for="Amount" class="form-control" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="Amount" class="form-label fw-bold">
+                                <i class="fas fa-lira-sign me-1"></i> Aidat Miktarı
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-money-bill-alt text-primary"></i>
+                                </span>
+                                <input asp-for="Amount" class="form-control form-control-lg" placeholder="Aidat miktarını giriniz" required />
+                                <span class="input-group-text">₺</span>
+                            </div>
+                            <span asp-validation-for="Amount" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="CollectionDay" class="form-label fw-bold">
+                                <i class="fas fa-calendar-day me-1"></i> Toplanma Günü
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-calendar-check text-primary"></i>
+                                </span>
+                                <input asp-for="CollectionDay" class="form-control form-control-lg"
+                                       placeholder="1-31 arasında bir gün giriniz"
+                                       min="1" max="31" required />
+                            </div>
+                            <small class="text-muted">Her ayın bu günü aidatlar toplanacaktır</small>
+                            <span asp-validation-for="CollectionDay" class="text-danger small d-block"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold">
+                                <i class="fas fa-info-circle me-1"></i> Açıklama
+                            </label>
+                            <textarea asp-for="Description" class="form-control form-control-lg"
+                                      rows="3" placeholder="Opsiyonel açıklama..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="Index" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary btn-lg px-4 me-md-2">
+                                <i class="fas fa-times me-1"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg px-4">
+                                <i class="fas fa-save me-1"></i> Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label>Toplanma Günü (1-31)</label>
-        <input asp-for="CollectionDay" class="form-control" />
-        <span asp-validation-for="CollectionDay" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label>Açıklama</label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-success">Kaydet</button>
-    <a asp-action="Index" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary">Geri</a>
-</form>
+<!-- Font Awesome için -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Client-side validation için
+        (function () {
+            'use strict'
+
+            var forms = document.querySelectorAll('.needs-validation')
+
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
 }

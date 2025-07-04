@@ -1,38 +1,295 @@
 ﻿@model IEnumerable<YoneticiOtomasyonu.Models.UserDebt>
 
-<h2>Borçlarım</h2>
+    <div class="debt-container">
+        <!-- Geri Dön Butonu Eklendi -->
+        <div class="header-section">
+            <button onclick="window.history.back()" class="back-button">
+                <i class="fas fa-arrow-left"></i> Geri Dön
+            </button>
+            <h2 class="debt-title">Borçlarım</h2>
+        </div>
 
-<table class="table table-bordered mt-3">
-    <thead>
-        <tr>
-            <th>Bina</th>
-            <th>Daire</th>
-            <th>Tür</th>
-            <th>Miktar (₺)</th>
-            <th>Oluşturulma Tarihi</th>
-            <th>Durum</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var debt in Model)
-        {
-            <tr>
-                <td>@debt.Building?.Name</td>
-                <td>@debt.Unit?.Number</td> <!-- Unit modelinde Number veya başka bir tanımlayıcı varsa -->
-                <td>@debt.Type</td>
-                <td>@debt.Amount.ToString("N2")</td>
-                <td>@debt.CreatedAt.ToString("dd.MM.yyyy")</td>
-                <td>
-                    @if (debt.IsPaid)
+        <div class="debt-card">
+            <div class="debt-summary">
+                <div class="summary-item">
+                    <span class="summary-label">Toplam Borç</span>
+                    <span class="summary-value total-debt">@Model.Where(d => !d.IsPaid).Sum(d => d.Amount).ToString("N2") ₺</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Ödenen</span>
+                    <span class="summary-value paid-amount">@Model.Where(d => d.IsPaid).Sum(d => d.Amount).ToString("N2") ₺</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Kalan</span>
+                    <span class="summary-value remaining-debt">@Model.Where(d => !d.IsPaid).Sum(d => d.Amount).ToString("N2") ₺</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="debt-table">
+                    <thead>
+                        <tr>
+                            <th>Bina</th>
+                            <th>Daire</th>
+                            <th>Tür</th>
+                            <th>Miktar</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var debt in Model.OrderByDescending(d => d.CreatedAt))
                     {
-                        <span class="badge bg-success">Ödendi</span>
+                        <tr class="@(debt.IsPaid ? "paid" : "unpaid")">
+                            <td data-label="Bina">@debt.Building?.Name</td>
+                            <td data-label="Daire">@debt.Unit?.Number</td>
+                            <td data-label="Tür">
+                                <span class="debt-type">@debt.Type</span>
+                            </td>
+                            <td data-label="Miktar">@debt.Amount.ToString("N2") ₺</td>
+                            <td data-label="Tarih">
+                                <span class="debt-date">@debt.CreatedAt.ToString("dd.MM.yyyy")</span>
+                            </td>
+                            <td data-label="Durum">
+                                @if (debt.IsPaid)
+                                {
+                                <span class="status-badge paid">
+                                    <i class="fas fa-check-circle"></i> Ödendi
+                                </span>
+                                }
+                                else
+                                {
+                                <span class="status-badge unpaid">
+                                    <i class="fas fa-exclamation-circle"></i> Ödenmedi
+                                </span>
+                                }
+                            </td>
+                        </tr>
                     }
-                    else
-                    {
-                        <span class="badge bg-danger">Ödenmedi</span>
-                    }
-                </td>
-            </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .debt-container {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
         }
-    </tbody>
-</table>
+
+        .header-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+            .back-button:hover {
+                background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            }
+
+        .debt-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .debt-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .debt-summary {
+            display: flex;
+            background: linear-gradient(to right, #f8f9fa, #ffffff);
+            padding: 25px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .summary-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+            .summary-item:not(:last-child)::after {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 20%;
+                height: 60%;
+                width: 1px;
+                background-color: #e0e0e0;
+            }
+
+        .summary-label {
+            display: block;
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .total-debt {
+            color: #e74c3c;
+        }
+
+        .paid-amount {
+            color: #2ecc71;
+        }
+
+        .remaining-debt {
+            color: #f39c12;
+        }
+
+        .debt-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .debt-table thead th {
+                background: linear-gradient(to right, #6a11cb, #2575fc);
+                color: white;
+                font-weight: 600;
+                padding: 16px;
+                text-align: left;
+            }
+
+            .debt-table tbody tr {
+                border-bottom: 1px solid #e9ecef;
+                transition: all 0.2s;
+            }
+
+                .debt-table tbody tr:hover {
+                    background-color: #f8f9fa;
+                    transform: translateX(5px);
+                }
+
+            .debt-table tbody td {
+                padding: 16px;
+                vertical-align: middle;
+            }
+
+        .debt-type {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .debt-date {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+            .status-badge i {
+                margin-right: 6px;
+            }
+
+            .status-badge.paid {
+                background-color: #e8f5e9;
+                color: #388e3c;
+            }
+
+            .status-badge.unpaid {
+                background-color: #ffebee;
+                color: #d32f2f;
+            }
+
+        tr.unpaid {
+            background-color: #fff5f5;
+        }
+
+        tr.paid {
+            opacity: 0.8;
+            background-color: #f9f9f9;
+        }
+
+        @@media (max-width: 768px) {
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .debt-summary {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .summary-item {
+                text-align: left;
+                padding: 12px 0;
+            }
+
+                .summary-item:not(:last-child)::after {
+                    display: none;
+                }
+
+            .debt-table thead {
+                display: none;
+            }
+
+            .debt-table tbody tr {
+                display: block;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .debt-table tbody td {
+                display: flex;
+                justify-content: space-between;
+                padding: 12px 16px;
+                text-align: right;
+            }
+
+                .debt-table tbody td::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: #495057;
+                    margin-right: 15px;
+                }
+        }
+    </style>

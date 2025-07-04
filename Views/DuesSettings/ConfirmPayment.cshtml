@@ -1,30 +1,82 @@
 ﻿@model YoneticiOtomasyonu.Models.UserDebt
 
-<h2>Aidat Ödemesini Onayla</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h4 mb-0">Aidat Ödemesini Onayla</h3>
+                        <span class="badge bg-white text-primary">@Model.CreatedAt.ToString("dd.MM.yyyy")</span>
+                    </div>
+                </div>
 
-<p><strong>Kullanıcı:</strong> @Model.User.UserName</p>
-<p><strong>Daire:</strong> @Model.Unit?.Number</p>
-<p><strong>Miktar:</strong> @Model.Amount.ToString("N2") ₺</p>
-<p><strong>Oluşturulma:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-user text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted small mb-1">Kullanıcı</p>
+                                    <p class="h6 mb-0">@Model.User.UserName</p>
+                                </div>
+                            </div>
+                        </div>
 
-<form asp-action="ConfirmPayment" method="post">
-    <input type="hidden" name="debtId" value="@Model.Id" />
-    <input type="hidden" name="buildingId" value="@Model.BuildingId" />
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light p-3 rounded-circle me-3">
+                                    <i class="fas fa-home text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted small mb-1">Daire</p>
+                                    <p class="h6 mb-0">@Model.Unit?.Number</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    <div class="form-group">
-        <label>Ödeme Yöntemi</label>
-        <select name="paymentMethod" class="form-control" required>
-            <option value="">Seçiniz</option>
-            <option value="Nakit">Nakit</option>
-            <option value="Havale">Havale</option>
-            <option value="Kredi Kartı">Kredi Kartı</option>
-        </select>
+                    <div class="alert alert-success d-flex align-items-center mb-4">
+                        <i class="fas fa-money-bill-wave me-3 fs-4"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1">Ödenecek Tutar</h5>
+                            <p class="mb-0 fs-4 fw-bold">@Model.Amount.ToString("N2") ₺</p>
+                        </div>
+                    </div>
+
+                    <form asp-action="ConfirmPayment" method="post">
+                        <input type="hidden" name="debtId" value="@Model.Id" />
+                        <input type="hidden" name="buildingId" value="@Model.BuildingId" />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Ödeme Yöntemi</label>
+                            <select name="paymentMethod" class="form-select form-select-lg" required>
+                                <option value="">Seçiniz</option>
+                                <option value="Nakit">Nakit</option>
+                                <option value="Havale">Havale</option>
+                                <option value="Kredi Kartı">Kredi Kartı</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Açıklama</label>
+                            <textarea name="description" class="form-control" rows="3" placeholder="Opsiyonel açıklama girebilirsiniz..."></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg py-3">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Ödendi Olarak Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label>Açıklama</label>
-        <textarea name="description" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-success mt-2">Ödendi Olarak Kaydet</button>
-</form>
+<!-- Font Awesome için -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
