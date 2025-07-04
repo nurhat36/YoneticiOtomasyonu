@@ -1,0 +1,32 @@
+﻿@model List<YoneticiOtomasyonu.Models.Notification>
+
+<h2>Bildirimlerim</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mesaj</th>
+            <th>Tarih</th>
+            <th>Durum</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="@(item.IsRead ? "" : "table-warning")">
+                <td>
+                    @if (!string.IsNullOrEmpty(item.Link))
+                    {
+                        <a href="@item.Link">@item.Message</a>
+                    }
+                    else
+                    {
+                        @item.Message
+                    }
+                </td>
+                <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@(item.IsRead ? "Okundu" : "Yeni")</td>
+            </tr>
+        }
+    </tbody>
+</table>

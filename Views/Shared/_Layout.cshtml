@@ -41,12 +41,18 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Buildings" asp-action="create">kendi binanı oluştur</a>
                         </li>
                     </ul>
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav align-items-center">
+
                         @if (SignInManager.IsSignedIn(User))
                         {
+                            <li class="nav-item me-2 position-relative">
+                                @await Component.InvokeAsync("Notification")
+                            </li>
+
+
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img src="@profilePic" alt="Profil Resmi" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="@profilePic" alt="Profil Resmi" class="rounded-circle" style="width:32px; height:32px; object-fit:cover;">
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <li>
@@ -54,12 +60,8 @@
                                             <span class="fw-bold">@UserManager.GetUserName(User)</span>
                                         </div>
                                     </li>
+
                                     <li><hr class="dropdown-divider" /></li>
-
-                                    
-
-
-
 
                                     <li>
                                         <a class="dropdown-item" asp-controller="Profile" asp-action="ProfiliDuzenle">
@@ -72,8 +74,6 @@
                                         </a>
                                     </li>
 
-
-
                                     <li><hr class="dropdown-divider" /></li>
 
                                     <li>
@@ -83,7 +83,6 @@
                                                 <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
                                             </button>
                                         </form>
-
                                     </li>
                                 </ul>
                             </li>
@@ -98,6 +97,7 @@
                             </li>
                         }
                     </ul>
+
                 </div>
             </div>
         </nav>

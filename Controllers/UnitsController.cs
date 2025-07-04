@@ -92,6 +92,10 @@ namespace YoneticiOtomasyonu.Controllers
 
                     _context.UserBuildingRoles.Add(newRole);
                     await _context.SaveChangesAsync();
+                    string message = $"Sayın kullanıcı, sizi {model.BuildingId} numaralı bina  daire {model.Number} ekledik.";
+                    string link = Url.Action("Details", "Buildings", new { id = model.BuildingId });
+
+                    await AddNotification(model.ResidentId, message, link);
                 }
             }
 
@@ -99,6 +103,21 @@ namespace YoneticiOtomasyonu.Controllers
             TempData["Success"] = "Birim başarıyla eklendi";
             return RedirectToAction("Details", "Buildings", new { id = model.BuildingId });
         }
+        private async Task AddNotification(string userId, string message, string? link = null)
+        {
+            var notification = new Notification
+            {
+                UserId = userId,
+                Message = message,
+                Link = link,
+                CreatedAt = DateTime.Now,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IActionResult> List(int buildingId)
         {
             var building = await _context.Buildings

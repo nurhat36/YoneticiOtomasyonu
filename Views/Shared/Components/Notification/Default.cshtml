@@ -1,0 +1,15 @@
+﻿@model int
+
+<li class="nav-item">
+    <a class="nav-link position-relative" asp-controller="Profile" asp-action="Notifications">
+        <i class="fas fa-bell"></i>
+        @if (Model > 0)
+        {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                @Model
+                <span class="visually-hidden">Okunmamış bildirimler</span>
+            </span>
+        }
+    </a>
+</li>
+

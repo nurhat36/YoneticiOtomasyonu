@@ -30,6 +30,8 @@ namespace YoneticiOtomasyonu.Data
         public DbSet<UserBuildingRole> UserBuildingRoles { get; internal set; }
         public DbSet<DuesSetting> DuesSettings { get; set; }
         public DbSet<UserDebt> UserDebts { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder builder)

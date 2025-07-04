@@ -189,6 +189,28 @@ namespace YoneticiOtomasyonu.Controllers
 
             return View(debts);
         }
+        [Authorize]
+        public async Task<IActionResult> Notifications()
+        {
+            var userId = _userManager.GetUserId(User);
+            var notifications = await _context.Notifications
+                .Where(n => n.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+            var unread = notifications.Where(n => !n.IsRead).ToList();
+            if (unread.Any())
+            {
+                foreach (var notif in unread)
+                {
+                    notif.IsRead = true;
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return View(notifications);
+        }
+
 
     }
 }
