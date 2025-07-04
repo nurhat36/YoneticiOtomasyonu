@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<YoneticiOtomasyonu.Models.ViewModels.DuesSettingViewModel>
 
-<h2>Aidat Bilgileri</h2>
+<h2 class="d-inline-block">Aidat Bilgileri</h2>
+<a asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-primary float-end">Yeni Aidat Bilgisi Ekle</a>
 
 @{
     var buildingId = ViewBag.BuildingId ?? 0;
