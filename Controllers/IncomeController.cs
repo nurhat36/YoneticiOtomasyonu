@@ -224,6 +224,9 @@ namespace YoneticiOtomasyonu.Controllers
             return View(income);
         }
 
+
+
+
         // Silme POST
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
