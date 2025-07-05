@@ -193,6 +193,10 @@ namespace YoneticiOtomasyonu.Controllers
                 };
 
                 _context.UserDebts.Add(debt);
+                string message = $"Sayın kullanıcı, sizi {debt.BuildingId} numaralı bina  daire {debt.UnitId} Ödenmemiş bir adet aidatınız bulunmaktadır lütfen en kısa zamanda ödeyiniz.";
+                string link = Url.Action("MyDebts", "Profile");
+
+                await AddNotification(debt.UserId, message, link);
             }
 
             await _context.SaveChangesAsync();
@@ -200,6 +204,21 @@ namespace YoneticiOtomasyonu.Controllers
             TempData["Message"] = "Aidatlar başarıyla atandı!";
             return RedirectToAction("Index", new { buildingId = buildingId });
         }
+        private async Task AddNotification(string userId, string message, string? link = null)
+        {
+            var notification = new Notification
+            {
+                UserId = userId,
+                Message = message,
+                Link = link,
+                CreatedAt = DateTime.Now,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IActionResult> BuildingDues(int buildingId)
         {
             var userId = _userManager.GetUserId(User);
