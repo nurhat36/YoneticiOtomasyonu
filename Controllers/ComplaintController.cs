@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using YoneticiOtomasyonu.Data;
 using YoneticiOtomasyonu.Models;
-
+namespace YoneticiOtomasyonu.Controllers { 
 [Authorize]
 public class ComplaintController : Controller
 {
@@ -150,4 +150,5 @@ public class ComplaintController : Controller
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
+}
 }
