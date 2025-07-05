@@ -1,6 +1,503 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Gizlilik Politikası";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="privacy-container">
+    <div class="privacy-header">
+        <div class="container">
+            <h1 class="privacy-title"><i class="fas fa-shield-alt me-3"></i>@ViewData["Title"]</h1>
+            <p class="privacy-subtitle">Son Güncellenme: @DateTime.Now.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</p>
+        </div>
+    </div>
+
+    <div class="container privacy-content">
+        <div class="row">
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="privacy-sidebar sticky-top">
+                    <h5 class="sidebar-title">İçindekiler</h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#data-collection">Veri Toplama</a>
+                        <a class="nav-link" href="#data-usage">Veri Kullanımı</a>
+                        <a class="nav-link" href="#data-protection">Veri Koruma</a>
+                        <a class="nav-link" href="#cookies">Çerezler</a>
+                        <a class="nav-link" href="#rights">Haklarınız</a>
+                        <a class="nav-link" href="#changes">Değişiklikler</a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <div class="privacy-card">
+                    <section id="data-collection">
+                        <h2 class="section-title"><span class="number">1</span>Veri Toplama</h2>
+                        <p>Web sitemizi ziyaret ettiğinizde, aşağıdaki bilgileri toplayabiliriz:</p>
+                        <ul class="privacy-list">
+                            <li>IP adresiniz ve tarayıcı bilgileriniz</li>
+                            <li>Ziyaret ettiğiniz sayfalar ve zaman damgaları</li>
+                            <li>Formlar aracılığıyla sağladığınız kişisel bilgiler</li>
+                            <li>Kullanıcı hesabı oluşturduğunuzda iletişim bilgileriniz</li>
+                        </ul>
+                    </section>
+
+                    <section id="data-usage" class="mt-5">
+                        <h2 class="section-title"><span class="number">2</span>Veri Kullanımı</h2>
+                        <p>Topladığımız bilgileri aşağıdaki amaçlarla kullanıyoruz:</p>
+                        <div class="usage-grid">
+                            <div class="usage-item">
+                                <div class="usage-icon bg-primary">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <h5>Hizmet Sağlama</h5>
+                                <p>Hizmetlerimizi iyileştirmek ve kişiselleştirmek</p>
+                            </div>
+                            <div class="usage-item">
+                                <div class="usage-icon bg-success">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <h5>İletişim</h5>
+                                <p>Sizinle iletişim kurmak ve güncellemeler sağlamak</p>
+                            </div>
+                            <div class="usage-item">
+                                <div class="usage-icon bg-info">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h5>Analiz</h5>
+                                <p>Site kullanımını analiz etmek ve iyileştirmek</p>
+                            </div>
+                            <div class="usage-item">
+                                <div class="usage-icon bg-warning">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h5>Güvenlik</h5>
+                                <p>Güvenlik önlemleri ve dolandırıcılık önleme</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="data-protection" class="mt-5">
+                        <h2 class="section-title"><span class="number">3</span>Veri Koruma</h2>
+                        <div class="protection-card">
+                            <div class="protection-content">
+                                <h5>Verileriniz güvende</h5>
+                                <p>Kişisel verilerinizi korumak için endüstri standartlarında güvenlik önlemleri uyguluyoruz. Verileriniz şifrelenmiş bağlantılar (SSL/TLS) üzerinden iletilir ve güvenli sunucularda saklanır.</p>
+                                <ul class="protection-list">
+                                    <li><i class="fas fa-check-circle text-success me-2"></i>Veri şifreleme</li>
+                                    <li><i class="fas fa-check-circle text-success me-2"></i>Düzenli güvenlik denetimleri</li>
+                                    <li><i class="fas fa-check-circle text-success me-2"></i>Sınırlı personel erişimi</li>
+                                </ul>
+                            </div>
+                            <div class="protection-image">
+                                <img src="https://cdn-icons-png.flaticon.com/512/2452/2452491.png" alt="Veri Güvenliği" class="img-fluid">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="cookies" class="mt-5">
+                        <h2 class="section-title"><span class="number">4</span>Çerezler</h2>
+                        <p>Web sitemiz, kullanıcı deneyiminizi geliştirmek için çerezler kullanmaktadır. Çerezler, web sitesinin cihazınızda depoladığı küçük veri dosyalarıdır.</p>
+
+                        <div class="cookie-types mt-4">
+                            <div class="cookie-card essential">
+                                <h5><i class="fas fa-circle me-2"></i>Zorunlu Çerezler</h5>
+                                <p>Sitenin temel işlevlerinin çalışması için gereklidir, devre dışı bırakılamaz.</p>
+                            </div>
+                            <div class="cookie-card analytics">
+                                <h5><i class="fas fa-circle me-2"></i>Analitik Çerezler</h5>
+                                <p>Site trafiğini ve kullanıcı davranışlarını anlamamıza yardımcı olur.</p>
+                            </div>
+                            <div class="cookie-card marketing">
+                                <h5><i class="fas fa-circle me-2"></i>Pazarlama Çerezleri</h5>
+                                <p>İlgi alanlarınıza göre reklamlar göstermek için kullanılır.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="rights" class="mt-5">
+                        <h2 class="section-title"><span class="number">5</span>Haklarınız</h2>
+                        <p>Kişisel verilerinizle ilgili aşağıdaki haklara sahipsiniz:</p>
+
+                        <div class="rights-accordion">
+                            <div class="accordion-item">
+                                <button class="accordion-button" type="button">
+                                    <i class="fas fa-eye me-2"></i>Erişim Hakkı
+                                </button>
+                                <div class="accordion-content">
+                                    <p>Hakkınızda hangi verileri tuttuğumuzu öğrenme hakkına sahipsiniz.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <button class="accordion-button" type="button">
+                                    <i class="fas fa-edit me-2"></i>Düzeltme Hakkı
+                                </button>
+                                <div class="accordion-content">
+                                    <p>Yanlış veya eksik verilerinizi düzeltme hakkına sahipsiniz.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <button class="accordion-button" type="button">
+                                    <i class="fas fa-trash-alt me-2"></i>Silme Hakkı
+                                </button>
+                                <div class="accordion-content">
+                                    <p>Verilerinizin silinmesini talep etme hakkına sahipsiniz.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="changes" class="mt-5">
+                        <h2 class="section-title"><span class="number">6</span>Politika Değişiklikleri</h2>
+                        <p>Gizlilik politikamızı zaman zaman güncelleyebiliriz. Önemli değişiklikler yaptığımızda, yeni politikayı bu sayfada yayınlayarak sizi bilgilendireceğiz.</p>
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Bildirim:</strong> Bu politikanın son güncellenme tarihi sayfanın başında belirtilmiştir.
+                        </div>
+                    </section>
+
+                    <div class="contact-section mt-5 p-4 rounded">
+                        <h4><i class="fas fa-question-circle me-2"></i>Sorularınız mı var?</h4>
+                        <p>Gizlilik politikamızla ilgili herhangi bir sorunuz varsa, lütfen <a href="/contact">iletişim sayfamız</a> aracılığıyla bizimle iletişime geçin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .privacy-container {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .privacy-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .privacy-title {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .privacy-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .privacy-sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-title {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-link {
+            color: #6c757d;
+            padding: 0.5rem 0;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+            .nav-link:hover, .nav-link.active {
+                color: #0d6efd;
+                border-left: 3px solid #0d6efd;
+                padding-left: 10px;
+            }
+
+        .privacy-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2.5rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+            .section-title .number {
+                background-color: #0d6efd;
+                color: white;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+                font-size: 0.9rem;
+            }
+
+        .privacy-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+            .privacy-list li {
+                padding: 0.5rem 0;
+                padding-left: 1.75rem;
+                position: relative;
+            }
+
+                .privacy-list li:before {
+                    content: "•";
+                    color: #0d6efd;
+                    font-weight: bold;
+                    position: absolute;
+                    left: 0;
+                }
+
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .usage-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+            .usage-item:hover {
+                transform: translateY(-5px);
+            }
+
+        .usage-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .usage-item h5 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .protection-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .protection-content {
+            flex: 1;
+        }
+
+        .protection-image {
+            flex: 1;
+            text-align: center;
+            display: none;
+        }
+
+        .protection-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 1rem;
+        }
+
+            .protection-list li {
+                margin-bottom: 0.5rem;
+            }
+
+        .cookie-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .cookie-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+            .cookie-card.essential {
+                border-color: #0d6efd;
+            }
+
+            .cookie-card.analytics {
+                border-color: #20c997;
+            }
+
+            .cookie-card.marketing {
+                border-color: #fd7e14;
+            }
+
+            .cookie-card h5 {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+                display: flex;
+                align-items: center;
+            }
+
+            .cookie-card.essential h5 i {
+                color: #0d6efd;
+            }
+
+            .cookie-card.analytics h5 i {
+                color: #20c997;
+            }
+
+            .cookie-card.marketing h5 i {
+                color: #fd7e14;
+            }
+
+        .rights-accordion {
+            margin-top: 1.5rem;
+        }
+
+        .accordion-item {
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .accordion-button {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background-color: white;
+            border: none;
+            text-align: left;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .accordion-button:hover {
+                background-color: #f8f9fa;
+            }
+
+        .accordion-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            background-color: white;
+        }
+
+            .accordion-content.show {
+                padding: 1rem 1.5rem;
+                max-height: 200px;
+            }
+
+        .contact-section {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+        }
+
+        @@media (min-width: 992px) {
+            .protection-image {
+                display: block;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .privacy-title {
+                font-size: 2rem;
+            }
+
+            .privacy-card {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .protection-card {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Accordion functionality
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const isOpen = content.classList.contains('show');
+
+                    // Close all accordion items
+                    document.querySelectorAll('.accordion-content').forEach(item => {
+                        item.classList.remove('show');
+                    });
+
+                    // Open clicked item if it was closed
+                    if (!isOpen) {
+                        content.classList.add('show');
+                    }
+                });
+            });
+
+            // Highlight current section in sidebar
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            window.addEventListener('scroll', function() {
+                let current = '';
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+
+                    if (pageYOffset >= (sectionTop - 200)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+}

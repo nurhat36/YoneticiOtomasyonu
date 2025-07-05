@@ -1,8 +1,193 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="homepage-hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Yönetim Otomasyonuna Hoş Geldiniz</h1>
+            <p class="hero-subtitle">Profesyonel bina ve gelir yönetimi için güçlü çözüm</p>
+
+            <div class="hero-actions">
+                <a href="/Identity/Account/Login" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-sign-in-alt me-2"></i> Giriş Yap
+                </a>
+                <a href="/Identity/Account/Register" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-user-plus me-2"></i> Kayıt Ol
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="hero-wave">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#fff" fill-opacity="1" d="M0,160L48,170.7C96,181,192,203,288,197.3C384,192,480,160,576,165.3C672,171,768,213,864,218.7C960,224,1056,192,1152,165.3C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
+    </div>
 </div>
+
+<div class="features-section py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-primary">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Gelir Takibi</h3>
+                    <p>Tüm gelirlerinizi tek bir panelden kolayca yönetin ve analiz edin.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-success">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3>Bina Yönetimi</h3>
+                    <p>Birden fazla binanızı merkezi olarak yönetebilirsiniz.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-info">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>Otomatik Raporlar</h3>
+                    <p>Özelleştirilebilir raporlarla finansal durumunuzu takip edin.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="mb-4">Hemen Başlayın</h2>
+        <p class="lead mb-4">Yönetim otomasyon sistemimiz ile işlerinizi kolaylaştırın.</p>
+        <a href="/Identity/Account/Register" class="btn btn-primary btn-lg px-4">
+            <i class="fas fa-rocket me-2"></i> Ücretsiz Deneyin
+        </a>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .homepage-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6rem 0 8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+
+            .hero-wave svg {
+                position: relative;
+                display: block;
+                width: calc(100% + 1.3px);
+                height: 100px;
+            }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            height: 100%;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+            .feature-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 1.75rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .feature-card p {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .cta-section {
+            background-color: #f7fafc;
+        }
+
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.25rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+                .hero-actions .btn {
+                    width: 100%;
+                    max-width: 250px;
+                    margin-bottom: 1rem;
+                }
+        }
+    </style>
+}
+
+@section Scripts {
+    <!-- Font Awesome ikonları için -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+}

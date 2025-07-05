@@ -4,15 +4,133 @@
     ViewData["Title"] = "Gelir Sil";
 }
 
-<h1>Gelir Sil</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-danger text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0"><i class="fas fa-trash-alt me-2"></i> Gelir Silme</h2>
+                        <a asp-action="Index" class="text-white">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </div>
 
-<div>
-    <h4>@Model.Type - @Model.Amount TL</h4>
-    <p>@Model.Description</p>
+                <div class="card-body p-4">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Dikkat!</h4>
+                        <p>Bu işlem geri alınamaz. Aşağıdaki gelir bilgisini silmek üzeresiniz.</p>
+                    </div>
+
+                    <div class="detail-card mb-4">
+                        <div class="detail-header">
+                            <i class="fas fa-money-bill-wave me-2"></i>
+                            <span class="fw-bold">@Model.Type</span>
+                            <span class="badge bg-danger ms-2">Silinecek</span>
+                        </div>
+                        <div class="detail-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Miktar</span>
+                                        <span class="detail-value text-danger fw-bold">@Model.Amount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Tarih</span>
+                                        <span class="detail-value">@Model.Date.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="detail-item mt-3">
+                                <span class="detail-label">Açıklama</span>
+                                <span class="detail-value">@(string.IsNullOrEmpty(Model.Description) ? "Açıklama yok" : Model.Description)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" class="mt-4">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-times me-2"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="fas fa-trash-alt me-2"></i> Kalıcı Olarak Sil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<form asp-action="Delete">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Sil</button>
-    <a asp-action="Index" class="btn btn-secondary">İptal</a>
-</form>
+@section Styles {
+    <style>
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .detail-card {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .detail-header {
+            background-color: #f8f9fa;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-body {
+            padding: 1.25rem;
+        }
+
+        .detail-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 500;
+            display: block;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            color: #212529;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .alert {
+            border-left: 4px solid #dc3545;
+        }
+
+        .btn-outline-secondary {
+            border-color: #dee2e6;
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: #f8f9fa;
+            }
+
+        .gap-2 {
+            gap: 1rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    <!-- Font Awesome ikonları için -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+}

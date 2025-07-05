@@ -5,76 +5,179 @@
     var buildingId = (int)ViewBag.BuildingId;
 }
 
-<h1>Gelir Düzenle</h1>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-6 fw-bold text-primary">
+                    <i class="fas fa-edit me-2"></i>Gelir Düzenle
+                </h1>
+                <a asp-action="Index" asp-route-buildingId="@buildingId" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Listeye Dön
+                </a>
+            </div>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" name="buildingId" value="@buildingId" />
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" name="buildingId" value="@buildingId" />
 
-    <div class="form-group">
-        <label asp-for="Type"></label>
-        <input asp-for="Type" class="form-control" />
-        <span asp-validation-for="Type" class="text-danger"></span>
+                        <div class="row g-4">
+                            <!-- Sol Taraf -->
+                            <div class="col-lg-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Type" class="form-control" placeholder=" " required />
+                                    <label asp-for="Type"></label>
+                                    <span asp-validation-for="Type" class="invalid-feedback"></span>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Amount" class="form-control" placeholder=" " required />
+                                    <label asp-for="Amount"></label>
+                                    <span asp-validation-for="Amount" class="invalid-feedback"></span>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Date" type="date" class="form-control" placeholder=" " required />
+                                    <label asp-for="Date"></label>
+                                    <span asp-validation-for="Date" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
+                            <!-- Sağ Taraf -->
+                            <div class="col-lg-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="PaymentMethod" class="form-control" placeholder=" " required />
+                                    <label asp-for="PaymentMethod"></label>
+                                    <span asp-validation-for="PaymentMethod" class="invalid-feedback"></span>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <select asp-for="UnitId" class="form-select" asp-items="ViewBag.UnitId" id="unitSelect" required>
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <label asp-for="UnitId">Birim</label>
+                                    <span asp-validation-for="UnitId" class="invalid-feedback"></span>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Description" class="form-control" placeholder=" " />
+                                    <label asp-for="Description"></label>
+                                    <span asp-validation-for="Description" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kullanıcı Bilgileri -->
+                        <div id="residentInfo" class="card bg-light mt-4" style="display:none;">
+                            <div class="card-body">
+                                <h5 class="card-title text-muted mb-3">
+                                    <i class="fas fa-user-circle me-2"></i>Birim Kullanıcısı
+                                </h5>
+                                <div class="d-flex align-items-center">
+                                    <img id="residentImage" src="" alt="Profil Resmi"
+                                         class="rounded-circle me-3"
+                                         style="width: 80px; height: 80px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-1" id="residentName"></h6>
+                                        <small class="text-muted">Birim Sorumlusu</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Butonları -->
+                        <div class="d-flex justify-content-end gap-3 mt-5">
+                            <button type="submit" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-save me-2"></i> Güncelle
+                            </button>
+                            <a asp-action="Index" asp-route-buildingId="@buildingId" class="btn btn-outline-secondary px-4 py-2">
+                                <i class="fas fa-times me-2"></i> İptal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="Amount"></label>
-        <input asp-for="Amount" class="form-control" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
-    </div>
+@section Styles {
+    <style>
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
 
-    <div class="form-group">
-        <label asp-for="Date"></label>
-        <input asp-for="Date" type="date" class="form-control" />
-        <span asp-validation-for="Date" class="text-danger"></span>
-    </div>
+        .form-floating > label {
+            color: #6c757d;
+        }
 
-    <div class="form-group">
-        <label asp-for="Description"></label>
-        <input asp-for="Description" class="form-control" />
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+        }
 
-    <div class="form-group">
-        <label asp-for="PaymentMethod"></label>
-        <input asp-for="PaymentMethod" class="form-control" />
-        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
-    </div>
+            .form-control:focus, .form-select:focus {
+                border-color: #86b7fe;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            }
 
-    <div class="form-group">
-        <label asp-for="UnitId">Birim</label>
-        <select asp-for="UnitId" class="form-control" asp-items="ViewBag.UnitId" id="unitSelect">
-            <option value="">Seçiniz</option>
-        </select>
-        <span asp-validation-for="UnitId" class="text-danger"></span>
-    </div>
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+        }
 
-    <div id="residentInfo" style="display:none; margin-top:15px;">
-        <strong>Birime Kayıtlı Kullanıcı:</strong>
-        <div id="residentName"></div>
-        <img id="residentImage" src="" alt="Profil Resmi" style="width:100px; height:100px; border-radius:50%; object-fit:cover;" />
-    </div>
+        .btn-outline-secondary {
+            border-color: #e0e0e0;
+        }
 
-    <button type="submit" class="btn btn-success">Güncelle</button>
-    <a asp-action="Index" asp-route-buildingId="@buildingId" class="btn btn-secondary">İptal</a>
-</form>
+        .invalid-feedback {
+            font-size: 0.85rem;
+        }
+
+        .page-header {
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
+
+        #residentInfo {
+            transition: all 0.3s ease;
+        }
+    </style>
+}
 
 @section Scripts {
+    <!-- Font Awesome ikonları için -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <script>
         $(document).ready(function () {
+            // Floating label uyumu için
+            $('.form-floating input, .form-floating select').on('input change', function () {
+                $(this).toggleClass('is-invalid', !this.checkValidity());
+            });
+
             function loadResidentInfo(unitId) {
                 if (unitId) {
                     $.get('/Income/GetResidentInfo', { unitId: unitId }, function (data) {
                         if (data && data.name) {
                             $('#residentName').text(data.name);
-                            $('#residentImage').attr('src', data.profileImage);
-                            $('#residentInfo').show();
+                            $('#residentImage').attr('src', data.profileImage || '/images/default-profile.png');
+                            $('#residentInfo').fadeIn(300);
                         } else {
-                            $('#residentInfo').hide();
+                            $('#residentInfo').fadeOut(300);
                         }
+                    }).fail(function () {
+                        $('#residentInfo').fadeOut(300);
                     });
                 } else {
-                    $('#residentInfo').hide();
+                    $('#residentInfo').fadeOut(300);
                 }
             }
 
@@ -87,6 +190,22 @@
                 var unitId = $(this).val();
                 loadResidentInfo(unitId);
             });
+
+            // Form validation
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })()
         });
     </script>
 }

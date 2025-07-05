@@ -4,103 +4,224 @@
     ViewData["Title"] = "Yeni Bina Oluþtur";
 }
 
-<div class="container py-4">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">@ViewData["Title"]</h3>
-        </div>
-        <div class="card-body">
-            <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <!-- Bina Temel Bilgileri -->
-                        <div class="form-group mb-3">
-                            <label asp-for="Name" class="form-label"></label>
-                            <input asp-for="Name" class="form-control" required />
-                            <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="Address" class="form-label"></label>
-                            <textarea asp-for="Address" class="form-control" rows="3" required></textarea>
-                            <span asp-validation-for="Address" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="Type" class="form-label"></label>
-                            <select asp-for="Type" class="form-select" required>
-                                <option value="">Bina Türü Seçiniz</option>
-                                <option value="Apartman">Apartman</option>
-                                <option value="Site">Site</option>
-                                <option value="Ýþ Merkezi">Ýþ Merkezi</option>
-                                <option value="Rezidans">Rezidans</option>
-                                <option value="Okul">Okul</option>
-                                <option value="Yurt">Yurt</option>
-                            </select>
-                            <span asp-validation-for="Type" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <!-- Bina Özellikleri -->
-                        <div class="form-group mb-3">
-                            <label asp-for="Block" class="form-label">Blok</label>
-                            <input asp-for="Block" class="form-control" placeholder="Ör: A Blok" />
-                            <span asp-validation-for="Block" class="text-danger small"></span>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="FloorCount" class="form-label"></label>
-                            <input asp-for="FloorCount" class="form-control" type="number" min="1" max="100" required />
-                            <span asp-validation-for="FloorCount" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="UnitCount" class="form-label"></label>
-                            <input asp-for="UnitCount" class="form-control" type="number" min="1" max="1000" required />
-                            <span asp-validation-for="UnitCount" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="Description" class="form-label"></label>
-                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-
-                        <!-- Bina Resmi -->
-                        <div class="form-group mb-3">
-                            <label asp-for="ImageFile" class="form-label"></label>
-                            <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
-                            <small class="form-text text-muted">JPEG, PNG veya GIF formatýnda yükleyin (Max 5MB)</small>
-                            <span asp-validation-for="ImageFile" class="text-danger"></span>
-                        </div>
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-gradient-primary py-4 text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0 fw-semibold">
+                            <i class="fas fa-building me-2"></i>@ViewData["Title"]
+                        </h2>
+                        <a asp-action="Index" class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-arrow-left me-1"></i> Listeye Dön
+                        </a>
                     </div>
                 </div>
 
-                <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="fas fa-save me-2"></i>Oluþtur
-                    </button>
-                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
-                        <i class="fas fa-arrow-left me-2"></i>Listeye Dön
-                    </a>
+                <div class="card-body p-5">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Lütfen formdaki hatalarý düzeltin.
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Sol Sütun -->
+                            <div class="col-lg-6">
+                                <!-- Bina Adý -->
+                                <div class="form-floating mb-4">
+                                    <input asp-for="Name" class="form-control" placeholder=" " required />
+                                    <label asp-for="Name" class="form-label"></label>
+                                    <span asp-validation-for="Name" class="invalid-feedback"></span>
+                                </div>
+
+                                <!-- Adres -->
+                                <div class="form-floating mb-4">
+                                    <textarea asp-for="Address" class="form-control" placeholder=" " style="height: 120px" required></textarea>
+                                    <label asp-for="Address" class="form-label"></label>
+                                    <span asp-validation-for="Address" class="invalid-feedback"></span>
+                                </div>
+
+                                <!-- Bina Türü -->
+                                <div class="mb-4">
+                                    <label asp-for="Type" class="form-label fw-semibold mb-2"></label>
+                                    <select asp-for="Type" class="form-select form-select-lg" required>
+                                        <option value="">Bina Türü Seçiniz</option>
+                                        <option value="Apartman">Apartman</option>
+                                        <option value="Site">Site</option>
+                                        <option value="Ýþ Merkezi">Ýþ Merkezi</option>
+                                        <option value="Rezidans">Rezidans</option>
+                                        <option value="Okul">Okul</option>
+                                        <option value="Yurt">Yurt</option>
+                                    </select>
+                                    <span asp-validation-for="Type" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
+                            <!-- Sað Sütun -->
+                            <div class="col-lg-6">
+                                <!-- Blok -->
+                                <div class="form-floating mb-4">
+                                    <input asp-for="Block" class="form-control" placeholder=" " />
+                                    <label asp-for="Block" class="form-label">Blok</label>
+                                    <span asp-validation-for="Block" class="invalid-feedback"></span>
+                                    <small class="text-muted">Örnek: A Blok, B Blok</small>
+                                </div>
+
+                                <!-- Kat Sayýsý -->
+                                <div class="form-floating mb-4">
+                                    <input asp-for="FloorCount" class="form-control" type="number" min="1" max="100" placeholder=" " required />
+                                    <label asp-for="FloorCount" class="form-label"></label>
+                                    <span asp-validation-for="FloorCount" class="invalid-feedback"></span>
+                                </div>
+
+                                <!-- Birim Sayýsý -->
+                                <div class="form-floating mb-4">
+                                    <input asp-for="UnitCount" class="form-control" type="number" min="1" max="1000" placeholder=" " required />
+                                    <label asp-for="UnitCount" class="form-label"></label>
+                                    <span asp-validation-for="UnitCount" class="invalid-feedback"></span>
+                                </div>
+
+                                <!-- Açýklama -->
+                                <div class="form-floating mb-4">
+                                    <textarea asp-for="Description" class="form-control" placeholder=" " style="height: 100px"></textarea>
+                                    <label asp-for="Description" class="form-label"></label>
+                                    <span asp-validation-for="Description" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
+                            <!-- Resim Yükleme -->
+                            <div class="col-12">
+                                <div class="file-upload-card p-4 border rounded-3 bg-light">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="upload-icon bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+                                                <i class="fas fa-camera fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">Bina Görseli</h5>
+                                            <p class="small text-muted mb-2">JPEG, PNG veya GIF formatýnda yükleyin (Max 5MB)</p>
+                                            <div class="d-flex gap-3">
+                                                <div class="flex-grow-1">
+                                                    <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" id="imageUpload" hidden />
+                                                    <label for="imageUpload" class="btn btn-outline-primary mb-0">Dosya Seç</label>
+                                                    <span id="fileName" class="ms-2 small">Dosya seçilmedi</span>
+                                                </div>
+                                            </div>
+                                            <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Butonlarý -->
+                            <div class="col-12 mt-4">
+                                <div class="d-flex justify-content-end gap-3">
+                                    <button type="submit" class="btn btn-primary btn-lg px-4 py-3">
+                                        <i class="fas fa-save me-2"></i>Bina Oluþtur
+                                    </button>
+                                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4 py-3">
+                                        <i class="fas fa-times me-2"></i>Ýptal
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 @section Styles {
     <style>
-        .needs-validation .form-control:invalid,
-        .needs-validation .form-control.is-invalid {
-            border-color: #dc3545;
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
         }
 
         .card {
-            border-radius: 0.5rem;
+            border: none;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: #86b7fe;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            }
+
+        .form-floating > label {
+            color: #6c757d;
+            padding: 1rem 1.25rem;
+        }
+
+        .form-select-lg {
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+        }
+
+        .file-upload-card {
+            transition: all 0.3s ease;
+        }
+
+            .file-upload-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+            }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-lg {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #3a7bd5;
+            border: none;
+            padding: 12px 24px;
+        }
+
+            .btn-primary:hover {
+                background-color: #2c6bc7;
+            }
+
+        .invalid-feedback {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .was-validated .form-control:invalid,
+        .was-validated .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 1.25rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.3125rem) center;
+            background-size: calc(0.75em + 0.625rem) calc(0.75em + 0.625rem);
+        }
+
+        .was-validated .form-control:valid,
+        .was-validated .form-control.is-valid {
+            border-color: #198754;
+            padding-right: calc(1.5em + 1.25rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.3125rem) center;
+            background-size: calc(0.75em + 0.625rem) calc(0.75em + 0.625rem);
         }
     </style>
 }
@@ -109,6 +230,10 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <script>
         // Client-side validation enhancement
         (function () {
@@ -127,13 +252,19 @@
             }, false);
         })();
 
-        // Image file validation
-        document.getElementById('ImageFile').addEventListener('change', function (e) {
+        // File upload display
+        document.getElementById('imageUpload').addEventListener('change', function (e) {
             const file = e.target.files[0];
+            const fileNameElement = document.getElementById('fileName');
+
             if (file) {
+                // Display file name
+                fileNameElement.textContent = file.name;
+
                 // Check file size (5MB limit)
                 if (file.size > 5 * 1024 * 1024) {
                     e.target.setCustomValidity('Dosya boyutu 5MB\'dan büyük olamaz');
+                    fileNameElement.classList.add('text-danger');
                     return;
                 }
 
@@ -141,11 +272,24 @@
                 const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
                 if (!validTypes.includes(file.type)) {
                     e.target.setCustomValidity('Sadece JPEG, PNG veya GIF formatýnda dosya yükleyebilirsiniz');
+                    fileNameElement.classList.add('text-danger');
                     return;
                 }
 
                 e.target.setCustomValidity('');
+                fileNameElement.classList.remove('text-danger');
+                fileNameElement.classList.add('text-success');
+            } else {
+                fileNameElement.textContent = 'Dosya seçilmedi';
+                fileNameElement.classList.remove('text-success', 'text-danger');
             }
+        });
+
+        // Floating label enhancement
+        document.querySelectorAll('.form-floating .form-control').forEach(input => {
+            input.addEventListener('input', function () {
+                this.classList.toggle('is-invalid', !this.checkValidity());
+            });
         });
     </script>
 }
