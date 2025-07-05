@@ -19,6 +19,8 @@
         public ApplicationUser? Resident { get; set; } // Birimde kalan/çalışan kullanıcı nesnesi
 
         public ICollection<Complaint> Complaints { get; set; } // Bu birime ait şikayetler
+
+
         
 
     }
