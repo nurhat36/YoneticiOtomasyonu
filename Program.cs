@@ -7,6 +7,7 @@ using YoneticiOtomasyonu.Services.Interfaces;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Security.Claims;
 using YoneticiOtomasyonu.Services.Implementations;
+using YoneticiOtomasyonu.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,7 @@ builder.Services.AddAuthorization(options =>
 // Razor Pages and MVC Services
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -74,7 +76,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
+app.MapHub<ChatHub>("/chathub");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

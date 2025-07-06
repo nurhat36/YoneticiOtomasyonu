@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YoneticiOtomasyonu.Data;
 
@@ -11,9 +12,11 @@ using YoneticiOtomasyonu.Data;
 namespace YoneticiOtomasyonu.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250706145731_AddAnnouncementImages")]
+    partial class AddAnnouncementImages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,7 +218,7 @@ namespace YoneticiOtomasyonu.Migrations
 
                     b.HasIndex("AnnouncementId");
 
-                    b.ToTable("AnnouncementImages");
+                    b.ToTable("AnnouncementImage");
                 });
 
             modelBuilder.Entity("YoneticiOtomasyonu.Models.ApplicationUser", b =>
@@ -668,42 +671,6 @@ namespace YoneticiOtomasyonu.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("MeetingAttendances", (string)null);
-                });
-
-            modelBuilder.Entity("YoneticiOtomasyonu.Models.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("YoneticiOtomasyonu.Models.Notification", b =>
@@ -1235,25 +1202,6 @@ namespace YoneticiOtomasyonu.Migrations
                     b.Navigation("Meeting");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("YoneticiOtomasyonu.Models.Message", b =>
-                {
-                    b.HasOne("YoneticiOtomasyonu.Models.ApplicationUser", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("YoneticiOtomasyonu.Models.ApplicationUser", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("YoneticiOtomasyonu.Models.Notification", b =>

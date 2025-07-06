@@ -23,6 +23,7 @@ namespace YoneticiOtomasyonu.Data
         public DbSet<WorkTask> WorkTasks { get; set; }
         public DbSet<ComplaintImage> ComplaintImages { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<AnnouncementImage> AnnouncementImages { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<Meeting> Meetings { get; set; }
@@ -31,6 +32,9 @@ namespace YoneticiOtomasyonu.Data
         public DbSet<DuesSetting> DuesSettings { get; set; }
         public DbSet<UserDebt> UserDebts { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Message> Messages { get; set; }
+
+
 
 
 
@@ -43,7 +47,17 @@ namespace YoneticiOtomasyonu.Data
     .HasForeignKey(ci => ci.ComplaintId)
     .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<Message>()
+        .HasOne(m => m.Sender)
+        .WithMany()
+        .HasForeignKey(m => m.SenderId)
+        .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
             // WorkTask ilişkileri
             builder.Entity<WorkTask>()
                 .HasOne(t => t.Complaint)

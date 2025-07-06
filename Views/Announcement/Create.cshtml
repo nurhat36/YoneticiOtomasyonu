@@ -1,0 +1,48 @@
+﻿@model YoneticiOtomasyonu.Models.Announcement
+
+@{
+    ViewData["Title"] = "Yeni Duyuru Ekle";
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="BuildingId" />
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Content" class="form-label"></label>
+        <textarea asp-for="Content" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ExpireDate" class="form-label">Son Geçerlilik Tarihi</label>
+        <input asp-for="ExpireDate" type="date" class="form-control" />
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsImportant" class="form-check-input" />
+        <label asp-for="IsImportant" class="form-check-label">Önemli Duyuru</label>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Duyuru Görselleri</label>
+        <input type="file" name="images" class="form-control" multiple />
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> Kaydet
+    </button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

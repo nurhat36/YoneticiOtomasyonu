@@ -1,0 +1,51 @@
+﻿@model YoneticiOtomasyonu.Models.Announcement
+
+@{
+    ViewData["Title"] = "Duyuru Detayı";
+}
+
+<h2 class="mb-4">@Model.Title</h2>
+
+<div class="mb-3">
+    <strong>Bina:</strong> @Model.Building?.Name ?? "—"
+</div>
+
+<div class="mb-3">
+    <strong>Oluşturulma:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")
+</div>
+
+@if (Model.ExpireDate.HasValue)
+{
+    <div class="mb-3">
+        <strong>Geçerlilik:</strong> @Model.ExpireDate.Value.ToString("dd.MM.yyyy")
+    </div>
+}
+
+<div class="mb-3">
+    <strong>Önemli:</strong> @(Model.IsImportant ? "Evet" : "Hayır")
+</div>
+
+<p>@Model.Content</p>
+
+@if (Model.Images != null && Model.Images.Any())
+{
+    <h5 class="mt-4 mb-3">Duyuru Görselleri</h5>
+    <div class="row g-3">
+        @foreach (var img in Model.Images)
+        {
+            <div class="col-6 col-md-3">
+                <div class="card">
+                    <img src="@img.ImageUrl" class="card-img-top img-fluid" style="object-fit: cover; height: 150px;" alt="Duyuru Görseli">
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-muted mt-3">Duyuruya ait görsel bulunmuyor.</p>
+}
+
+<a asp-action="Index" asp-route-buildingId="@Model.Building.Id" class="btn btn-outline-secondary mt-4">
+    <i class="fas fa-arrow-left me-1"></i> Geri Dön
+</a>

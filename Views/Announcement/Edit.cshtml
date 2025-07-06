@@ -1,0 +1,64 @@
+﻿@model YoneticiOtomasyonu.Models.Announcement
+
+@{
+    ViewData["Title"] = "Duyuru Düzenle";
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="BuildingId" />
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Content" class="form-label"></label>
+        <textarea asp-for="Content" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ExpireDate" class="form-label">Son Geçerlilik Tarihi</label>
+        <input asp-for="ExpireDate" type="date" class="form-control" />
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsImportant" class="form-check-input" />
+        <label asp-for="IsImportant" class="form-check-label">Önemli Duyuru</label>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Yeni Görseller Ekle</label>
+        <input type="file" name="newImages" class="form-control" multiple />
+    </div>
+
+    @if (Model.Images != null && Model.Images.Any())
+    {
+        <h5 class="mt-4 mb-2">Mevcut Görseller</h5>
+        <div class="row g-3">
+            @foreach (var img in Model.Images)
+            {
+                <div class="col-6 col-md-3">
+                    <div class="card">
+                        <img src="@img.ImageUrl" class="card-img-top img-fluid" style="object-fit: cover; height: 150px;" alt="Duyuru Görseli">
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success mt-4">
+        <i class="fas fa-save me-1"></i> Güncelle
+    </button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
