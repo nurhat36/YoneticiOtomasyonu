@@ -1,0 +1,287 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using YoneticiOtomasyonu.Models  <!-- Kendi projenin namespace'ine göre düzenle -->
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var profilePic = user?.ProfileImageUrl ?? "/images/default-profile.png";
+}
+
+<div id="chatBox" class="card shadow position-fixed d-flex flex-column"
+     style="bottom: 90px; right: 20px; width: 320px; max-height: 400px; display: none; z-index: 1050;">
+    <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+        <strong><i class="fas fa-comments me-2"></i> Mesajlar</strong>
+        <button id="chatClose" class="btn-close btn-close-white" aria-label="Kapat"></button>
+    </div>
+    <div class="card-body p-3 flex-grow-1 overflow-auto" id="chatMessages" style="height: 300px;">
+        <div class="text-center py-5 text-muted" id="noMessages">
+            <i class="fas fa-comment-slash fa-3x mb-3"></i>
+            <p>Henüz mesaj yok</p>
+            <small>Bir yönetici seçerek mesajlaşmaya başlayın</small>
+        </div>
+    </div>
+    <div class="card-footer p-3">
+        <select id="receiverSelect" class="form-select mb-2" aria-label="Yönetici seçin">
+            <option value="">Yönetici seçin</option>
+        </select>
+        <div class="input-group">
+            <input type="text" id="chatInput" class="form-control" placeholder="Mesaj yaz..." disabled aria-label="Mesaj yaz" />
+            <button id="sendButton" class="btn btn-primary" type="button" disabled aria-label="Gönder">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let isChatOpen = false;
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .withAutomaticReconnect()
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        // Chat kutusunu açma/kapama
+        // Chat kutusunu açma/kapama
+        // Chat kutusunu açma/kapama
+        $("#chatToggle").click(function (e) {
+            e.stopPropagation();
+            if (isChatOpen) {
+                $("#chatBox").fadeOut(200);
+                isChatOpen = false;
+            } else {
+                $("#chatBox").fadeIn(200);
+                isChatOpen = true;
+                loadManagers();
+                updateUnreadCount();
+            }
+        });
+
+        // Chat kutusu kapatma butonu
+        $("#chatClose").click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $("#chatBox").fadeOut(200);
+            isChatOpen = false;
+        });
+
+
+        async function loadManagers() {
+            try {
+                showLoading("#receiverSelect", "Yöneticiler yükleniyor...");
+                const response = await fetch('/Message/GetMyManagers');
+                if (!response.ok) throw new Error("Yöneticiler alınamadı");
+
+                const managers = await response.json();
+                const select = $("#receiverSelect");
+                select.empty().append('<option value="">Yönetici seçin</option>');
+
+                if (managers.length === 0) {
+                    select.append('<option value="" disabled>Yönetici bulunamadı</option>');
+                } else {
+                    managers.forEach(manager => {
+                        select.append(new Option(manager.name, manager.id));
+                    });
+                }
+            } catch (err) {
+                console.error("Yöneticiler yüklenirken hata:", err);
+                toastr.error("Yöneticiler yüklenirken bir hata oluştu");
+            } finally {
+                hideLoading("#receiverSelect");
+            }
+        }
+
+        function showLoading(element, text) {
+            $(element).prop("disabled", true).html(`<option value="">${text}</option>`);
+        }
+
+        function hideLoading(element) {
+            $(element).prop("disabled", false);
+        }
+
+        async function updateUnreadCount() {
+            try {
+                const response = await fetch('/Message/GetUnreadCount');
+                const data = await response.json();
+                const badge = $("#unreadCount");
+
+                if (data.count > 0) {
+                    badge.text(data.count).show();
+                } else {
+                    badge.hide();
+                }
+            } catch (err) {
+                console.error("Okunmamış mesaj sayısı alınırken hata:", err);
+            }
+        }
+
+        $("#receiverSelect").change(async function () {
+            const receiverId = $(this).val();
+            const chatInput = $("#chatInput");
+            const sendButton = $("#sendButton");
+
+            if (receiverId) {
+                chatInput.prop("disabled", false);
+                sendButton.prop("disabled", false);
+
+                try {
+                    showLoading("#chatMessages", "Mesajlar yükleniyor...");
+                    const response = await fetch(`/Message/GetMessages?userId=${receiverId}`);
+
+                    if (!response.ok) {
+                        throw new Error(await response.text());
+                    }
+
+                    const messages = await response.json();
+                    renderMessages(messages, "@UserManager.GetUserId(User)");
+                } catch (err) {
+                    console.error("Mesajlar yüklenirken hata:", err);
+                    toastr.error("Mesaj geçmişi yüklenirken bir hata oluştu: " + err.message);
+                } finally {
+                    hideLoading("#chatMessages");
+                }
+            } else {
+                chatInput.prop("disabled", true);
+                sendButton.prop("disabled", true);
+                $("#chatMessages").html(`
+                                    <div class="text-center py-5 text-muted" id="noMessages">
+                                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                                        <p>Henüz mesaj yok</p>
+                                        <small>Bir yönetici seçerek mesajlaşmaya başlayın</small>
+                                    </div>
+                                `);
+            }
+        });
+
+        function renderMessages(messages, currentUserId) {
+            const chatMessages = $("#chatMessages");
+
+            if (!messages || messages.length === 0) {
+                chatMessages.html(`
+                                    <div class="text-center py-5 text-muted" id="noMessages">
+                                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                                        <p>Henüz mesaj yok</p>
+                                        <small>İlk mesajı göndererek sohbeti başlatın</small>
+                                    </div>
+                                `);
+                return;
+            }
+
+            $("#noMessages").remove();
+            chatMessages.empty();
+
+            messages.forEach(message => {
+                const isSender = message.senderId === currentUserId;
+                const messageClass = isSender ? "message-sender" : "message-receiver";
+
+                chatMessages.append(`
+                                    <div class="message-container ${messageClass}">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
+                                            <small class="text-muted">${message.sentAt}</small>
+                                        </div>
+                                        <p class="mb-0">${message.content}</p>
+                                    </div>
+                                `);
+            });
+
+            chatMessages.scrollTop(chatMessages[0].scrollHeight);
+        }
+
+        async function sendMessage() {
+            const receiverId = $("#receiverSelect").val();
+            const content = $("#chatInput").val().trim();
+
+            if (!receiverId || !content) return;
+
+            try {
+                $("#sendButton").prop("disabled", true);
+                const response = await fetch('/Message/SendMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify({
+                        ReceiverId: receiverId,
+                        Content: content
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    $("#chatInput").val("");
+                    $("#receiverSelect").trigger("change");
+                } else {
+                    throw new Error(result.message || "Mesaj gönderilemedi");
+                }
+            } catch (err) {
+                console.error("Mesaj gönderilirken hata:", err);
+                toastr.error("Mesaj gönderilirken bir hata oluştu: " + err.message);
+            } finally {
+                $("#sendButton").prop("disabled", false);
+            }
+        }
+
+        $("#sendButton").click(sendMessage);
+        $("#chatInput").keypress(function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        connection.on("ReceiveMessage", (message) => {
+            if (isChatOpen && $("#receiverSelect").val() === message.SenderId) {
+                $("#noMessages").remove();
+                const chatMessages = $("#chatMessages");
+
+                const messageHtml = `
+                                    <div class="message-container message-receiver">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="fw-bold">${message.SenderName}</small>
+                                            <small class="text-muted">${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                                        </div>
+                                        <p class="mb-0">${message.Content}</p>
+                                    </div>
+                                `;
+
+                chatMessages.append(messageHtml);
+                chatMessages.scrollTop(chatMessages[0].scrollHeight);
+            } else {
+                updateUnreadCount();
+                toastr.info(`Yeni mesaj: ${message.Content}`, `${message.SenderName}`, {
+                    positionClass: "toast-bottom-right",
+                    timeOut: 5000,
+                    closeButton: true
+                });
+            }
+        });
+
+        async function startConnection() {
+            try {
+                // Önceki bağlantıyı kapat
+                if (connection.state !== signalR.HubConnectionState.Disconnected) {
+                    await connection.stop();
+                }
+
+                await connection.start();
+                console.log("SignalR bağlantısı kuruldu");
+
+                // Kullanıcı ID'si ile gruba katıl
+                await connection.invoke("JoinChatGroup", "@UserManager.GetUserId(User)")
+                    .catch(err => console.error("JoinChatGroup hatası:", err));
+
+                connection.onclose(async () => {
+                    console.log("SignalR bağlantısı kesildi. Yeniden bağlanıyor...");
+                    await startConnection();
+                });
+            } catch (err) {
+                console.error("SignalR bağlantı hatası:", err);
+                setTimeout(startConnection, 5000);
+            }
+        }
+</script>
