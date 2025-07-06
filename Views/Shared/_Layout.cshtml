@@ -78,6 +78,15 @@
                                             <i class="fas fa-building me-2"></i>Binalarım
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="WorkTask" asp-action="MyTasks">
+                                            <i class="fas fa-tasks me-1"></i> Görevlerim
+                                            @await Component.InvokeAsync("TaskCounter")
+                                        </a>
+                                    </li>
+
+
+
 
                                     <li><hr class="dropdown-divider" /></li>
 

@@ -93,24 +93,33 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="status" class="form-label">Durum</label>
                                 <select name="status" id="status" class="form-select" required>
                                     @foreach (var option in ViewBag.StatusList as List<SelectListItem>)
                                     {
-                                    <option value="@option.Value" selected="@(option.Selected ? "selected" : null)">@option.Text</option>
+                                        <option value="@option.Value" selected="@(option.Selected ? "selected" : null)">@option.Text</option>
                                     }
                                 </select>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="assignedToId" class="form-label">Atanacak Personel</label>
                                 <select name="assignedToId" id="assignedToId" class="form-select">
                                     <option value="">Seçiniz</option>
                                     @foreach (var user in ViewBag.Users as List<YoneticiOtomasyonu.Models.ApplicationUser>)
                                     {
-                                    <option value="@user.Id" selected="@(Model.AssignedToId == user.Id ? "selected" : null)">@user.UserName</option>
+                                        <option value="@user.Id" selected="@(Model.AssignedToId == user.Id ? "selected" : null)">@user.UserName</option>
                                     }
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="priority" class="form-label">Görev Önceliği</label>
+                                <select name="priority" id="priority" class="form-select" required>
+                                    <option value="Düşük">Düşük</option>
+                                    <option value="Orta" selected>Orta</option>
+                                    <option value="Yüksek">Yüksek</option>
                                 </select>
                             </div>
                         </div>
@@ -125,6 +134,7 @@
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

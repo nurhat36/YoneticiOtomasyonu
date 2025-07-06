@@ -1,0 +1,174 @@
+﻿@model YoneticiOtomasyonu.Models.WorkTask
+
+@{
+    ViewData["Title"] = "Görev Detayı";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Görev Detayı</h2>
+        <span class="badge bg-@GetStatusColor(Model.Status) fs-6 py-2 px-3">
+            @Model.Status
+        </span>
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-3 overflow-hidden">
+        <div class="card-header bg-primary text-white py-3">
+            <h4 class="card-title mb-0">
+                <i class="fas fa-tasks me-2"></i>@Model.Title
+            </h4>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-muted mb-3">Görev Açıklaması</h5>
+                        <div class="p-3 bg-light rounded-2">
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                @Model.Description
+                            }
+                            else
+                            {
+                                <span class="text-muted">Açıklama girilmemiş</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-muted mb-3">Şikayet Bilgileri</h5>
+                        <div class="p-3 bg-light rounded-2">
+                            @if (Model.Complaint != null)
+                            {
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-exclamation-circle text-danger me-2"></i>
+                                    <strong>Şikayet #@Model.Complaint.Id:</strong>
+                                    <span class="ms-2">@(Model.Complaint.Title ?? "Başlık yok")</span>
+                                </div>
+                                <p class="mb-0">@(Model.Complaint.Description ?? "Detaylı açıklama yok")</p>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Şikayet bilgisi bulunmuyor</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                        <div class="card-header bg-light py-2">
+                            <h6 class="mb-0 fw-bold">Görev Bilgileri</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                                    <span><i class="fas fa-flag me-2 text-warning"></i>Öncelik</span>
+                                    <span class="badge bg-@GetPriorityColor(Model.Priority)">@Model.Priority</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                                    <span><i class="fas fa-calendar-alt me-2 text-info"></i>Oluşturulma</span>
+                                    <span>@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                                    <span><i class="fas fa-building me-2 text-secondary"></i>Bina</span>
+                                    <span>@(Model.Building?.Name ?? "Belirtilmemiş")</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Complaint != null && Model.Complaint.Images != null && Model.Complaint.Images.Any())
+            {
+                <div class="mt-4">
+                    <h5 class="fw-bold text-muted mb-3">
+                        <i class="fas fa-images me-2"></i>Şikayet Görselleri
+                    </h5>
+                    <div class="row g-3">
+                        @foreach (var img in Model.Complaint.Images)
+                        {
+                            <div class="col-6 col-md-4 col-lg-3">
+                                <a href="@img.ImageUrl" data-fancybox="gallery" data-caption="Şikayet Görseli">
+                                    <div class="ratio ratio-1x1">
+                                        <img src="@img.ImageUrl" class="img-thumbnail rounded-3 w-100 h-100 object-fit-cover" alt="Şikayet Görseli">
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="mt-5 pt-3 border-top">
+                <form asp-action="UpdateStatus" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <h5 class="fw-bold text-muted mb-3">Görev Durumunu Güncelle</h5>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">Yeni Durum</label>
+                            <select name="status" id="status" class="form-select shadow-sm" asp-items="ViewBag.StatusList" required>
+                                <option value="">Durum seçiniz</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button type="submit" class="btn btn-primary px-4 py-2 w-100">
+                                <i class="fas fa-save me-2"></i>Durumu Güncelle
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusColor(string status)
+    {
+        switch (status?.ToLower())
+        {
+            case "yeni": return "info";
+            case "devam ediyor": return "warning";
+            case "tamamlandı": return "success";
+            case "iptal edildi": return "danger";
+            default: return "secondary";
+        }
+    }
+
+    string GetPriorityColor(string priority)
+    {
+        switch (priority?.ToLower())
+        {
+            case "yüksek": return "danger";
+            case "orta": return "warning";
+            case "düşük": return "success";
+            default: return "secondary";
+        }
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+    <style>
+        .object-fit-cover {
+            object-fit: cover;
+        }
+
+        .card {
+            transition: transform 0.2s;
+        }
+
+            .card:hover {
+                transform: translateY(-2px);
+            }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+}

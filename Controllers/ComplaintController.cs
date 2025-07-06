@@ -134,21 +134,68 @@ public class ComplaintController : Controller
     }
 
 
-    // Yönetici cevabı
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Respond(int id, string response, string status, string assignedToId)
-    {
-        var complaint = await _context.Complaints.FindAsync(id);
-        if (complaint == null) return NotFound();
+        // Yönetici cevabı
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        
+        public async Task<IActionResult> Respond(int id, string response, string status, string assignedToId, string priority)
+        {
+            var complaint = await _context.Complaints
+                .Include(c => c.Unit) // Unit bilgisini dahil et
+                .FirstOrDefaultAsync(c => c.Id == id);
 
-        complaint.Response = response;
-        complaint.Status = status;
-        complaint.ResponseDate = DateTime.Now;
-        complaint.AssignedToId = string.IsNullOrEmpty(assignedToId) ? null : assignedToId;
+            if (complaint == null) return NotFound();
 
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+            complaint.Response = response;
+            complaint.Status = status;
+            complaint.ResponseDate = DateTime.Now;
+            complaint.AssignedToId = string.IsNullOrEmpty(assignedToId) ? null : assignedToId;
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            var currentUserId = currentUser?.Id;
+
+            var buildingId = complaint.Unit?.BuildingId ?? 0;
+
+            if (!string.IsNullOrEmpty(assignedToId))
+            {
+                var workTask = new WorkTask
+                {
+                    Title = $"Şikayet #{complaint.Id} Görevi",
+                    Description = $"Bu görev şikayet #{complaint.Id} yanıtlanmasına istinaden oluşturulmuştur.",
+                    CreatedAt = DateTime.Now,
+                    Status = "Beklemede",
+                    Priority = priority,
+                    ComplaintId = complaint.Id,
+                    BuildingId = buildingId,
+                    CreatedById = currentUserId,
+                    AssignedToId = assignedToId
+                };
+
+                _context.WorkTasks.Add(workTask);
+                string message = $"Sayın kullanıcı, sizi {buildingId} numaralı binada  bir göreve eklendiniz . Görevin önceliği {priority} .Lütfen en kısa zamanda ilgileniniz.";
+                string link = Url.Action("MyTasks", "WorkTask" );
+
+                await AddNotification(assignedToId, message, link);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        private async Task AddNotification(string userId, string message, string? link = null)
+        {
+            var notification = new Notification
+            {
+                UserId = userId,
+                Message = message,
+                Link = link,
+                CreatedAt = DateTime.Now,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+        }
+
+
     }
-}
 }
