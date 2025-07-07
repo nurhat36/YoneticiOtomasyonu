@@ -210,7 +210,7 @@ namespace YoneticiOtomasyonu.Controllers
 
             return View(notifications);
         }
-        [Route("profile/{slug}")]
+        [Route("profile/detail/{slug}")]
         public async Task<IActionResult> Detail(string slug)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Slug == slug);

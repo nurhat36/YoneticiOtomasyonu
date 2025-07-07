@@ -5,6 +5,7 @@
 @{
     var user = await UserManager.GetUserAsync(User);
     var profilePic = user?.ProfileImageUrl ?? "/images/default-profile.png";
+    var slug = user?.Slug ?? "default-slug";
 }
 <!DOCTYPE html>
 <html lang="tr">
@@ -79,12 +80,12 @@
                                     </li>
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Profile" asp-action="ProfiliDuzenle">
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="ProfiliDuzenle" >
                                             <i class="fas fa-user me-2"></i>Profil Bilgilerim
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Profile" asp-action="MyDebts">
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="MyDebts" >
                                             <i class="fas fa-money-check-alt me-2"></i>Borçlarım
                                         </a>
                                     </li>
