@@ -8,6 +8,11 @@ namespace YoneticiOtomasyonu.Hubs
     [Authorize]
     public class ChatHub : Hub
     {
+        public async Task JoinChatGroup(string groupName)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", $"{Context.ConnectionId} gruba katıldı.");
+        }
         public override async Task OnConnectedAsync()
         {
             var userId = Context.UserIdentifier;

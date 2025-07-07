@@ -66,7 +66,19 @@ builder.Services.AddAuthorization(options =>
 // Razor Pages and MVC Services
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+});
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -76,7 +88,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-app.MapHub<ChatHub>("/chathub");
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -84,7 +96,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapHub<ChatHub>("/chathub");
 // Routing Configuration
 app.MapControllerRoute(
     name: "default",

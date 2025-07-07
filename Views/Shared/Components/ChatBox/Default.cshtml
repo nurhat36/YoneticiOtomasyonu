@@ -32,7 +32,11 @@
         </div>
     </div>
 </div>
+<!-- jQuery ekleyin -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- SignalR ekleyin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.12/signalr.min.js"></script>
 <script>
     $(document).ready(function () {
         let isChatOpen = false;
@@ -43,8 +47,6 @@
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
-        // Chat kutusunu açma/kapama
-        // Chat kutusunu açma/kapama
         // Chat kutusunu açma/kapama
         $("#chatToggle").click(function (e) {
             e.stopPropagation();
@@ -66,7 +68,6 @@
             $("#chatBox").fadeOut(200);
             isChatOpen = false;
         });
-
 
         async function loadManagers() {
             try {
@@ -146,12 +147,12 @@
                 chatInput.prop("disabled", true);
                 sendButton.prop("disabled", true);
                 $("#chatMessages").html(`
-                                    <div class="text-center py-5 text-muted" id="noMessages">
-                                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
-                                        <p>Henüz mesaj yok</p>
-                                        <small>Bir yönetici seçerek mesajlaşmaya başlayın</small>
-                                    </div>
-                                `);
+                    <div class="text-center py-5 text-muted" id="noMessages">
+                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                        <p>Henüz mesaj yok</p>
+                        <small>Bir yönetici seçerek mesajlaşmaya başlayın</small>
+                    </div>
+                `);
             }
         });
 
@@ -160,12 +161,12 @@
 
             if (!messages || messages.length === 0) {
                 chatMessages.html(`
-                                    <div class="text-center py-5 text-muted" id="noMessages">
-                                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
-                                        <p>Henüz mesaj yok</p>
-                                        <small>İlk mesajı göndererek sohbeti başlatın</small>
-                                    </div>
-                                `);
+                    <div class="text-center py-5 text-muted" id="noMessages">
+                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                        <p>Henüz mesaj yok</p>
+                        <small>İlk mesajı göndererek sohbeti başlatın</small>
+                    </div>
+                `);
                 return;
             }
 
@@ -177,14 +178,14 @@
                 const messageClass = isSender ? "message-sender" : "message-receiver";
 
                 chatMessages.append(`
-                                    <div class="message-container ${messageClass}">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
-                                            <small class="text-muted">${message.sentAt}</small>
-                                        </div>
-                                        <p class="mb-0">${message.content}</p>
-                                    </div>
-                                `);
+                    <div class="message-container ${messageClass}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
+                            <small class="text-muted">${message.sentAt}</small>
+                        </div>
+                        <p class="mb-0">${message.content}</p>
+                    </div>
+                `);
             });
 
             chatMessages.scrollTop(chatMessages[0].scrollHeight);
@@ -214,7 +215,15 @@
 
                 if (result.success) {
                     $("#chatInput").val("");
-                    $("#receiverSelect").trigger("change");
+                    // Mesajı hemen ekleyerek bekleme süresini azalt
+                    const currentUserId = "@UserManager.GetUserId(User)";
+                    const newMessage = {
+                        senderId: currentUserId,
+                        senderName: "Siz",
+                        content: content,
+                        sentAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+                    };
+                    renderMessages([newMessage], currentUserId);
                 } else {
                     throw new Error(result.message || "Mesaj gönderilemedi");
                 }
@@ -235,25 +244,25 @@
         });
 
         connection.on("ReceiveMessage", (message) => {
-            if (isChatOpen && $("#receiverSelect").val() === message.SenderId) {
+            if (isChatOpen && $("#receiverSelect").val() === message.senderId) {
                 $("#noMessages").remove();
                 const chatMessages = $("#chatMessages");
 
                 const messageHtml = `
-                                    <div class="message-container message-receiver">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <small class="fw-bold">${message.SenderName}</small>
-                                            <small class="text-muted">${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
-                                        </div>
-                                        <p class="mb-0">${message.Content}</p>
-                                    </div>
-                                `;
+                    <div class="message-container message-receiver">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="fw-bold">${message.senderName}</small>
+                            <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                        </div>
+                        <p class="mb-0">${message.content}</p>
+                    </div>
+                `;
 
                 chatMessages.append(messageHtml);
                 chatMessages.scrollTop(chatMessages[0].scrollHeight);
             } else {
                 updateUnreadCount();
-                toastr.info(`Yeni mesaj: ${message.Content}`, `${message.SenderName}`, {
+                toastr.info(`Yeni mesaj: ${message.content}`, `${message.senderName}`, {
                     positionClass: "toast-bottom-right",
                     timeOut: 5000,
                     closeButton: true
@@ -284,4 +293,8 @@
                 setTimeout(startConnection, 5000);
             }
         }
+
+        // SignalR bağlantısını başlat
+        startConnection();
+    }); // document.ready kapanışı
 </script>
