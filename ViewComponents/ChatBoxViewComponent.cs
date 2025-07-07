@@ -73,7 +73,10 @@ namespace YoneticiOtomasyonu.ViewComponents
                         LastMessageDate = _context.Messages
                             .Where(m => (m.SenderId == userId && m.ReceiverId == contactId) ||
                                         (m.SenderId == contactId && m.ReceiverId == userId))
-                            .Max(m => m.SentAt)
+                            .Max(m => m.SentAt),
+                        LastActiveAt = user.LastActiveAt
+
+
                     });
                 }
             }
@@ -91,5 +94,8 @@ namespace YoneticiOtomasyonu.ViewComponents
         public string ProfileImageUrl { get; set; }
         public int UnreadCount { get; set; }
         public DateTime LastMessageDate { get; set; }
+        public DateTime? LastActiveAt { get; set; }
+
+        public bool IsOnline => LastActiveAt.HasValue && LastActiveAt.Value > DateTime.UtcNow.AddMinutes(-5);
     }
 }

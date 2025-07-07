@@ -23,7 +23,13 @@
                        data-username="@contact.FullName"
                        data-userimage="@contact.ProfileImageUrl">
                         <div class="d-flex align-items-center">
-                            <img src="@contact.ProfileImageUrl" class="rounded-circle me-2" width="40" height="40" alt="@contact.FullName">
+                            <div class="position-relative d-inline-block">
+                                <img src="@contact.ProfileImageUrl" class="rounded-circle me-2" width="40" height="40" alt="@contact.FullName">
+                                @if (contact.IsOnline)
+                                {
+                                    <span class="online-indicator"></span>
+                                }
+                            </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">@contact.FullName</h6>
@@ -190,12 +196,12 @@
 
             if (!messages || messages.length === 0) {
                 messagesContainer.html(`
-                        <div class="text-center py-5 text-muted">
-                            <i class="fas fa-comment-slash fa-3x mb-3"></i>
-                            <p>Henüz mesaj yok</p>
-                            <small>İlk mesajı göndererek sohbeti başlatın</small>
-                        </div>
-                    `);
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                        <p>Henüz mesaj yok</p>
+                        <small>İlk mesajı göndererek sohbeti başlatın</small>
+                    </div>
+                `);
                 return;
             }
 
@@ -206,14 +212,14 @@
                 const unreadClass = isUnread ? "unread-message" : "";
 
                 messagesContainer.append(`
-                        <div class="message-container ${messageClass} ${unreadClass}">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
-                                <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
-                            </div>
-                            <p class="mb-0">${message.content}</p>
+                    <div class="message-container ${messageClass} ${unreadClass}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
+                            <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
                         </div>
-                    `);
+                        <p class="mb-0">${message.content}</p>
+                    </div>
+                `);
             });
 
             messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
@@ -300,22 +306,22 @@
                         sentAt: new Date().toISOString(),
                         isRead: true
                     };
-
+                    
                     // Eğer "Henüz mesaj yok" görünüyorsa kaldır
                     if ($("#messagesContainer").text().includes("Henüz mesaj yok")) {
                         $("#messagesContainer").empty();
                     }
-
+                    
                     $("#messagesContainer").append(`
-                            <div class="message-container message-sender">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <small class="fw-bold">Siz</small>
-                                    <small class="text-muted">${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
-                                </div>
-                                <p class="mb-0">${content}</p>
+                        <div class="message-container message-sender">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="fw-bold">Siz</small>
+                                <small class="text-muted">${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
                             </div>
-                        `);
-
+                            <p class="mb-0">${content}</p>
+                        </div>
+                    `);
+                    
                     $("#messagesContainer").scrollTop($("#messagesContainer")[0].scrollHeight);
                 } else {
                     throw new Error(result.message || "Mesaj gönderilemedi");
@@ -345,14 +351,14 @@
                 }
 
                 messagesContainer.append(`
-                        <div class="message-container message-receiver">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <small class="fw-bold">${message.senderName}</small>
-                                <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
-                            </div>
-                            <p class="mb-0">${message.content}</p>
+                    <div class="message-container message-receiver">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="fw-bold">${message.senderName}</small>
+                            <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
                         </div>
-                    `);
+                        <p class="mb-0">${message.content}</p>
+                    </div>
+                `);
 
                 messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
             } else {
@@ -467,5 +473,16 @@
         top: 0;
         background-color: #f9f9f9;
         z-index: 1;
+    }
+
+    .online-indicator {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background-color: #28a745; /* Bootstrap success yeşili */
+        border: 2px solid white; /* Profil resmiyle birleşsin */
+        border-radius: 50%;
     }
 </style>
