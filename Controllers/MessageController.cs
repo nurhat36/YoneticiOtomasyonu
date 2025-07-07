@@ -57,6 +57,8 @@ namespace YoneticiOtomasyonu.Controllers
             return View(messages);
         }
 
+        // MessageController'a eklenmesi gereken methodlar
+
         [HttpGet]
         public async Task<IActionResult> GetMessages(string userId)
         {
@@ -64,18 +66,56 @@ namespace YoneticiOtomasyonu.Controllers
 
             var messages = await _context.Messages
                 .Where(m => (m.SenderId == currentUserId && m.ReceiverId == userId) ||
-                            (m.SenderId == userId && m.ReceiverId == currentUserId))
+                           (m.SenderId == userId && m.ReceiverId == currentUserId))
                 .OrderBy(m => m.SentAt)
-                .Select(m => new {
-                    id = m.Id,
+                .Select(m => new
+                {
                     senderId = m.SenderId,
                     senderName = m.Sender.UserName,
                     content = m.Content,
-                    sentAt = m.SentAt.ToString("g")
+                    sentAt = m.SentAt,
+                    isRead = m.IsRead
                 })
                 .ToListAsync();
 
             return Json(messages);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAsRead(string senderId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+
+            var unreadMessages = await _context.Messages
+                .Where(m => m.SenderId == senderId && m.ReceiverId == currentUserId && !m.IsRead)
+                .ToListAsync();
+
+            foreach (var message in unreadMessages)
+            {
+                message.IsRead = true;
+                
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUnreadCounts()
+        {
+            var currentUserId = _userManager.GetUserId(User);
+
+            var unreadCounts = await _context.Messages
+                .Where(m => m.ReceiverId == currentUserId && !m.IsRead)
+                .GroupBy(m => m.SenderId)
+                .Select(g => new
+                {
+                    senderId = g.Key,
+                    count = g.Count()
+                })
+                .ToListAsync();
+
+            return Json(unreadCounts);
         }
 
         [HttpPost]
