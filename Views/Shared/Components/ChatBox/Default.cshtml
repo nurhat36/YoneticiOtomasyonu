@@ -3,9 +3,11 @@
 @using YoneticiOtomasyonu.Models
 @inject UserManager<ApplicationUser> UserManager
 
+<button id="chatToggleBtn">
+    <i class="fas fa-comments"></i>
+</button>
 
-<div id="chatBox" class="card shadow position-fixed d-flex flex-column"
-     style="bottom: 90px; right: 20px; width: 320px; max-height: 400px; display: none; z-index: 1050;">
+<div id="chatBox" class="card shadow d-flex flex-column">
     <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
         <strong><i class="fas fa-comments me-2"></i> Mesajlar</strong>
         <button id="chatClose" class="btn-close btn-close-white" aria-label="Kapat"></button>
@@ -45,9 +47,7 @@
                 </div>
             }
         </div>
-        <div id="chatMessages" class="p-3" style="display: none;">
-            <!-- Mesajlar burada gösterilecek -->
-        </div>
+        <div id="chatMessages" class="p-3" style="display: none;"></div>
     </div>
     <div class="card-footer p-3">
         <div id="chatControls" style="display: none;">
@@ -64,34 +64,37 @@
                 </button>
             </div>
         </div>
-        <div class="card-footer p-3">
-            <select id="receiverSelect" class="form-select mb-2" aria-label="Yönetici seçin">
+        <div>
+            <select id="receiverSelect" class="form-select mt-2" aria-label="Yönetici seçin">
                 <option value="">Yönetici seçin</option>
             </select>
-            
         </div>
     </div>
 </div>
 
-<!-- jQuery ve SignalR -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.12/signalr.min.js"></script>
 
 <script>
     $(document).ready(function () {
         let isChatOpen = localStorage.getItem('chatOpen') === 'true';
-        console.log("Başlangıç chatOpen durumu:", isChatOpen);
+        const $chatBox = $("#chatBox");
 
         if (isChatOpen) {
-            $("#chatBox").fadeIn();
-        }
-        else {
-            $("#chatBox").hide();
+            $chatBox.addClass("open");
         }
 
-        // else kısmında hide() çağırmana gerek yok çünkü zaten CSS'te !important ile kapalı
+        $("#chatToggleBtn").click(function () {
+            $chatBox.toggleClass("open");
+            isChatOpen = $chatBox.hasClass("open");
+            localStorage.setItem('chatOpen', isChatOpen);
+        });
 
-        
+        $("#chatClose").click(function () {
+            $chatBox.removeClass("open");
+            localStorage.setItem('chatOpen', false);
+        });
+
         let currentReceiverId = null;
         let currentReceiverName = null;
 
@@ -103,45 +106,7 @@
 
         // Chat kutusunu açma/kapama
         // Chat kutusunu açma/kapama - DÜZELTİLMİŞ VERSİYON
-        $(document).on('click', '#chatToggle', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            isChatOpen = !isChatOpen;
-            localStorage.setItem('chatOpen', isChatOpen);
-            console.log("Chat durumu değiştirildi:", isChatOpen);
-
-            if (isChatOpen) {
-                $("#chatBox").fadeIn(200);
-                updateUnreadCount();
-            } else {
-                $("#chatBox").fadeOut(200);
-            }
-
-            if (isChatOpen) {
-                setTimeout(() => {
-                    $(document).one('click', function (e) {
-                        if (!$(e.target).closest('#chatBox, #chatToggle').length) {
-                            $("#chatBox").fadeOut(200);
-                            isChatOpen = false;
-                            localStorage.setItem('chatOpen', false);
-                        }
-                    });
-                }, 100);
-            }
-        });
-
-
-
-        // Chat kutusu kapatma butonu - DÜZELTİLMİŞ VERSİYON
-        $(document).on('click', '#chatClose', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            $("#chatBox").fadeOut(200);
-            isChatOpen = false;
-            localStorage.setItem('chatOpen', false);
-            console.log("Chat kapatıldı, durum saklandı:", isChatOpen);
-        });
+        
 
         // Kişi listesinden birini seçme
         $(document).on('click', '.contact-item', function (e) {
@@ -213,12 +178,12 @@
 
             if (!messages || messages.length === 0) {
                 chatMessages.html(`
-                        <div class="text-center py-5 text-muted">
-                            <i class="fas fa-comment-slash fa-3x mb-3"></i>
-                            <p>Henüz mesaj yok</p>
-                            <small>İlk mesajı göndererek sohbeti başlatın</small>
-                        </div>
-                    `);
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                                <p>Henüz mesaj yok</p>
+                                <small>İlk mesajı göndererek sohbeti başlatın</small>
+                            </div>
+                        `);
                 return;
             }
 
@@ -229,14 +194,14 @@
                 const unreadClass = isUnread ? "unread-message" : "";
 
                 chatMessages.append(`
-                        <div class="message-container ${messageClass} ${unreadClass}">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
-                                <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                            <div class="message-container ${messageClass} ${unreadClass}">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
+                                    <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                                </div>
+                                <p class="mb-0">${message.content}</p>
                             </div>
-                            <p class="mb-0">${message.content}</p>
-                        </div>
-                    `);
+                        `);
             });
 
             chatMessages.scrollTop(chatMessages[0].scrollHeight);
@@ -352,14 +317,14 @@
                 }
 
                 chatMessages.append(`
-                        <div class="message-container message-receiver">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <small class="fw-bold">${message.senderName}</small>
-                                <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                            <div class="message-container message-receiver">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-bold">${message.senderName}</small>
+                                    <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                                </div>
+                                <p class="mb-0">${message.content}</p>
                             </div>
-                            <p class="mb-0">${message.content}</p>
-                        </div>
-                    `);
+                        `);
 
                 chatMessages.scrollTop(chatMessages[0].scrollHeight);
             } else {
@@ -396,18 +361,40 @@
         }
 
         startConnection();
+        // Buraya mevcut SignalR, message load ve diğer fonksiyonlar aynı şekilde eklenecek
     });
 </script>
 
 <style>
-    #chatBox {
-        display: none; /* Bu mutlaka olmalı */
-        flex-direction: column; /* Flex yapısını destekle */
-        position: fixed; /* Fixed pozisyon doğru çalışsın */
+    #chatToggleBtn {
+        position: fixed;
+        bottom: 20px;
         right: 20px;
-        bottom: 90px;
-        z-index: 1050; /* Diğer elementlerin üzerinde olsun */
+        background: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        cursor: pointer;
+        z-index: 1100;
+        font-size: 24px;
     }
+
+    #chatBox {
+        position: fixed;
+        bottom: -500px;
+        right: 20px;
+        width: 320px;
+        max-height: 500px;
+        transition: bottom 0.4s ease;
+        z-index: 1050;
+    }
+
+        #chatBox.open {
+            bottom: 90px;
+        }
+
     .message-container {
         padding: 8px 12px;
         margin-bottom: 8px;
