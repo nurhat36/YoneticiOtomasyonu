@@ -210,7 +210,23 @@ namespace YoneticiOtomasyonu.Controllers
 
             return View(notifications);
         }
+        [Route("profile/{slug}")]
+        public async Task<IActionResult> Detail(string slug)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Slug == slug);
+            if (user == null)
+                return NotFound();
 
+            var vm = new UserProfileViewModel
+            {
+                FullName = user.UserName,
+                ProfileImageUrl = user.ProfileImageUrl,
+                Slug = user.Slug,
+                LastActiveAt = user.LastActiveAt
+            };
+
+            return View(vm);
+        }
 
     }
 }

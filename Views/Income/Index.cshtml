@@ -72,8 +72,11 @@
                                     <div class="d-flex align-items-center">
                                         @if (!string.IsNullOrEmpty(item.Payer?.ProfileImageUrl))
                                         {
-                                            <img src="@item.Payer.ProfileImageUrl" class="rounded-circle mr-2"
-                                                 width="30" height="30" alt="Profil Resmi">
+                                            <a  asp-controller="Profile" asp-action="Detail" asp-route-slug="@item.Payer.Slug">
+                                                <img src="@item.Payer.ProfileImageUrl" class="rounded-circle mr-2"
+                                                     width="30" height="30" alt="Profil Resmi">
+                                            </a>
+
                                         }
                                         else
                                         {

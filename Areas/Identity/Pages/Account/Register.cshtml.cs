@@ -18,7 +18,9 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using YoneticiOtomasyonu.Helpers;
 using YoneticiOtomasyonu.Models;
 
 namespace YoneticiOtomasyonu.Areas.Identity.Pages.Account
@@ -123,11 +125,26 @@ namespace YoneticiOtomasyonu.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                // Burada Email değil UserName atanmalı:
                 await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
-                // 👇 EKLENEN KOD: Profil resmini sunucuda kaydet
+                // 👉 Slug ekle
+                if (user is ApplicationUser appUser)
+                {
+                    // Helpers klasöründeki SlugHelper'ı kullan
+                    var generatedSlug = SlugHelper.GenerateSlug(Input.UserName);
+
+                    // Eğer aynı slug varsa, benzersiz hale getir
+                    var slugCheck = await _userManager.Users.AnyAsync(u => u.Slug == generatedSlug);
+                    if (slugCheck)
+                    {
+                        generatedSlug += "-" + Guid.NewGuid().ToString("N").Substring(0, 6);
+                    }
+
+                    appUser.Slug = generatedSlug;
+                }
+
+                // 👉 Profil resmi işlemi
                 if (Input.ProfileImage != null && Input.ProfileImage.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "userimages");
@@ -143,10 +160,9 @@ namespace YoneticiOtomasyonu.Areas.Identity.Pages.Account
                         await Input.ProfileImage.CopyToAsync(fileStream);
                     }
 
-                    // ApplicationUser sınıfında ProfileImageUrl alanı olduğunu varsayıyoruz
-                    if (user is ApplicationUser appUser)
+                    if (user is ApplicationUser appUser2)
                     {
-                        appUser.ProfileImageUrl = "/userimages/" + uniqueFileName;
+                        appUser2.ProfileImageUrl = "/userimages/" + uniqueFileName;
                     }
                 }
 
@@ -184,9 +200,9 @@ namespace YoneticiOtomasyonu.Areas.Identity.Pages.Account
                 }
             }
 
-            // Eğer hata varsa formu yeniden göster
             return Page();
         }
+
 
 
 

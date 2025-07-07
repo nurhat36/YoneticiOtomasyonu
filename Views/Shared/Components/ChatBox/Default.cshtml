@@ -20,7 +20,8 @@
                 {
                     <a href="#" class="list-group-item list-group-item-action contact-item"
                        data-userid="@contact.UserId"
-                       data-username="@contact.FullName">
+                       data-username="@contact.FullName"
+                       data-userimage="@contact.ProfileImageUrl">
                         <div class="d-flex align-items-center">
                             <img src="@contact.ProfileImageUrl" class="rounded-circle me-2" width="40" height="40" alt="@contact.FullName">
                             <div class="flex-grow-1">
@@ -47,16 +48,21 @@
                 </div>
             }
         </div>
-        <div id="chatMessages" class="p-3" style="display: none;"></div>
-    </div>
-    <div class="card-footer p-3">
-        <div id="chatControls" style="display: none;">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 id="currentChatUserName" class="mb-0"></h6>
+        <div id="chatMessages" class="p-3" style="display: none;">
+            <div id="chatHeader" class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="display: none;">
+                <div class="d-flex align-items-center">
+                    <img id="currentChatUserImage" src="" class="rounded-circle me-2" width="40" height="40" alt="">
+                    <h6 id="currentChatUserName" class="mb-0"></h6>
+                </div>
                 <button id="backToContacts" class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Geri
                 </button>
             </div>
+            <div id="messagesContainer"></div>
+        </div>
+    </div>
+    <div class="card-footer p-3">
+        <div id="chatControls" style="display: none;">
             <div class="input-group">
                 <input type="text" id="chatInput" class="form-control" placeholder="Mesaj yaz..." aria-label="Mesaj yaz" />
                 <button id="sendButton" class="btn btn-primary" type="button" aria-label="Gönder">
@@ -97,6 +103,7 @@
 
         let currentReceiverId = null;
         let currentReceiverName = null;
+        let currentReceiverImage = null;
 
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/chathub")
@@ -104,22 +111,22 @@
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
-        // Chat kutusunu açma/kapama
-        // Chat kutusunu açma/kapama - DÜZELTİLMİŞ VERSİYON
-        
-
         // Kişi listesinden birini seçme
         $(document).on('click', '.contact-item', function (e) {
             e.preventDefault();
             currentReceiverId = $(this).data('userid');
             currentReceiverName = $(this).data('username');
+            currentReceiverImage = $(this).data('userimage');
 
             // UI güncelleme
             $("#recentContacts").hide();
-            $("#chatMessages").show().html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
-            $("#chatControls").show();
+            $("#chatMessages").show();
+            $("#chatHeader").show();
             $("#currentChatUserName").text(currentReceiverName);
+            $("#currentChatUserImage").attr("src", currentReceiverImage);
+            $("#chatControls").show();
             $("#receiverSelect").hide();
+            $("#messagesContainer").html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
 
             // Mesajları yükle
             loadMessages(currentReceiverId);
@@ -130,12 +137,14 @@
 
         // Geri butonu
         $("#backToContacts").click(function () {
-            $("#chatMessages").hide().empty();
+            $("#chatMessages").hide();
+            $("#chatHeader").hide();
             $("#recentContacts").show();
             $("#chatControls").hide();
             $("#receiverSelect").show();
             currentReceiverId = null;
             currentReceiverName = null;
+            currentReceiverImage = null;
         });
 
         // Yeni kişi seçimi
@@ -145,19 +154,22 @@
                 const receiverName = $(this).find("option:selected").text();
                 currentReceiverId = receiverId;
                 currentReceiverName = receiverName;
+                currentReceiverImage = "/images/default-profile.png"; // Varsayılan resim
 
                 // UI güncelleme
                 $("#recentContacts").hide();
-                $("#chatMessages").show().html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
-                $("#chatControls").show();
+                $("#chatMessages").show();
+                $("#chatHeader").show();
                 $("#currentChatUserName").text(currentReceiverName);
+                $("#currentChatUserImage").attr("src", currentReceiverImage);
+                $("#chatControls").show();
                 $("#receiverSelect").val('').hide();
+                $("#messagesContainer").html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
 
                 // Mesajları yükle
                 loadMessages(currentReceiverId);
             }
         });
-
 
         async function loadMessages(userId) {
             try {
@@ -168,22 +180,22 @@
                 renderMessages(messages, "@UserManager.GetUserId(User)");
             } catch (err) {
                 console.error("Mesajlar yüklenirken hata:", err);
-                $("#chatMessages").html('<div class="alert alert-danger">Mesajlar yüklenirken hata oluştu</div>');
+                $("#messagesContainer").html('<div class="alert alert-danger">Mesajlar yüklenirken hata oluştu</div>');
             }
         }
 
         function renderMessages(messages, currentUserId) {
-            const chatMessages = $("#chatMessages");
-            chatMessages.empty();
+            const messagesContainer = $("#messagesContainer");
+            messagesContainer.empty();
 
             if (!messages || messages.length === 0) {
-                chatMessages.html(`
-                            <div class="text-center py-5 text-muted">
-                                <i class="fas fa-comment-slash fa-3x mb-3"></i>
-                                <p>Henüz mesaj yok</p>
-                                <small>İlk mesajı göndererek sohbeti başlatın</small>
-                            </div>
-                        `);
+                messagesContainer.html(`
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                            <p>Henüz mesaj yok</p>
+                            <small>İlk mesajı göndererek sohbeti başlatın</small>
+                        </div>
+                    `);
                 return;
             }
 
@@ -193,18 +205,18 @@
                 const isUnread = !isSender && !message.isRead;
                 const unreadClass = isUnread ? "unread-message" : "";
 
-                chatMessages.append(`
-                            <div class="message-container ${messageClass} ${unreadClass}">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
-                                    <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
-                                </div>
-                                <p class="mb-0">${message.content}</p>
+                messagesContainer.append(`
+                        <div class="message-container ${messageClass} ${unreadClass}">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
+                                <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
                             </div>
-                        `);
+                            <p class="mb-0">${message.content}</p>
+                        </div>
+                    `);
             });
 
-            chatMessages.scrollTop(chatMessages[0].scrollHeight);
+            messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
         }
 
         async function markMessagesAsRead(senderId) {
@@ -288,7 +300,23 @@
                         sentAt: new Date().toISOString(),
                         isRead: true
                     };
-                    renderMessages([newMessage], "@UserManager.GetUserId(User)");
+
+                    // Eğer "Henüz mesaj yok" görünüyorsa kaldır
+                    if ($("#messagesContainer").text().includes("Henüz mesaj yok")) {
+                        $("#messagesContainer").empty();
+                    }
+
+                    $("#messagesContainer").append(`
+                            <div class="message-container message-sender">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-bold">Siz</small>
+                                    <small class="text-muted">${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                                </div>
+                                <p class="mb-0">${content}</p>
+                            </div>
+                        `);
+
+                    $("#messagesContainer").scrollTop($("#messagesContainer")[0].scrollHeight);
                 } else {
                     throw new Error(result.message || "Mesaj gönderilemedi");
                 }
@@ -311,22 +339,22 @@
         connection.on("ReceiveMessage", (message) => {
             if (currentReceiverId === message.senderId) {
                 // Aktif sohbete yeni mesaj geldi
-                const chatMessages = $("#chatMessages");
-                if (chatMessages.children().length === 1 && chatMessages.children().hasClass("text-muted")) {
-                    chatMessages.empty();
+                const messagesContainer = $("#messagesContainer");
+                if (messagesContainer.text().includes("Henüz mesaj yok")) {
+                    messagesContainer.empty();
                 }
 
-                chatMessages.append(`
-                            <div class="message-container message-receiver">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <small class="fw-bold">${message.senderName}</small>
-                                    <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
-                                </div>
-                                <p class="mb-0">${message.content}</p>
+                messagesContainer.append(`
+                        <div class="message-container message-receiver">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="fw-bold">${message.senderName}</small>
+                                <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
                             </div>
-                        `);
+                            <p class="mb-0">${message.content}</p>
+                        </div>
+                    `);
 
-                chatMessages.scrollTop(chatMessages[0].scrollHeight);
+                messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
             } else {
                 // Başka birinden mesaj geldi
                 updateUnreadCount();
@@ -361,7 +389,6 @@
         }
 
         startConnection();
-        // Buraya mevcut SignalR, message load ve diğer fonksiyonlar aynı şekilde eklenecek
     });
 </script>
 
@@ -424,5 +451,21 @@
 
     #chatMessages {
         background-color: #f9f9f9;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    #messagesContainer {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-bottom: 10px;
+    }
+
+    #chatHeader {
+        position: sticky;
+        top: 0;
+        background-color: #f9f9f9;
+        z-index: 1;
     }
 </style>

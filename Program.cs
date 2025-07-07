@@ -97,6 +97,21 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<ChatHub>("/chathub");
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity.IsAuthenticated)
+    {
+        var userManager = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+        var user = await userManager.GetUserAsync(context.User);
+        if (user != null)
+        {
+            user.LastActiveAt = DateTime.UtcNow;
+            await userManager.UpdateAsync(user);
+        }
+    }
+
+    await next.Invoke();
+});
 // Routing Configuration
 app.MapControllerRoute(
     name: "default",

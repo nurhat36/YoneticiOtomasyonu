@@ -1,0 +1,22 @@
+﻿@using YoneticiOtomasyonu.Models.ViewModels
+@model UserProfileViewModel
+
+<div class="card" style="max-width: 400px;">
+    <img src="@Model.ProfileImageUrl" class="card-img-top" alt="@Model.FullName" />
+    <div class="card-body">
+        <h5 class="card-title">@Model.FullName</h5>
+
+        @if (Model.IsOnline)
+        {
+            <span class="badge bg-success">🟢 Şu anda aktif</span>
+        }
+        else if (Model.LastActiveAt.HasValue)
+        {
+            <span class="badge bg-secondary">En son aktif: @Model.LastActiveAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">Hiç aktif olmadı</span>
+        }
+    </div>
+</div>
