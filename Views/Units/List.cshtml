@@ -20,9 +20,11 @@
                 <a asp-action="Details" asp-controller="Buildings" asp-route-id="@ViewBag.BuildingId" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Binaya Dön
                 </a>
-                <a asp-action="Create" class="btn btn-primary ms-2">
-                    <i class="fas fa-plus me-2"></i>Yeni Birim Ekle
-                </a>
+                
+                    <a asp-controller="Units" asp-action="Add" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Yeni Birim Ekle
+                    </a>
+                
             </div>
         </div>
 
