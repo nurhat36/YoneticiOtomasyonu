@@ -1,44 +1,155 @@
 ﻿@model YoneticiOtomasyonu.Models.Unit
 
 @{
-    ViewData["Title"] = "Birim Sil";
+    ViewData["Title"] = "Birim Silme Onayı";
 }
 
-<h2>Birim Sil</h2>
-<hr />
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-danger text-white py-3">
+                    <h2 class="h5 mb-0"><i class="fas fa-exclamation-triangle me-2"></i> Birim Silme Onayı</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="fas fa-exclamation-circle me-3 fs-4"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1">Bu işlem geri alınamaz!</h5>
+                            <p class="mb-0">Aşağıdaki birimi kalıcı olarak silmek üzeresiniz.</p>
+                        </div>
+                    </div>
 
-<div class="alert alert-warning">
-    <strong>Uyarı!</strong> Bu birimi silmek istediğinizden emin misiniz?
+                    <div class="birim-detaylari bg-light rounded-3 p-4 mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Birim Numarası</span>
+                                    <span class="detail-value">@Model.Number</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Tür</span>
+                                    <span class="detail-value">@Model.Type</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Kat</span>
+                                    <span class="detail-value">@(Model.Floor == 0 ? "Zemin Kat" : $"{Model.Floor}. Kat")</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Alan</span>
+                                    <span class="detail-value">@Model.Area m²</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Durum</span>
+                                    <span class="detail-value">
+                                        @if (Model.IsOccupied)
+                                        {
+                                        <span class="badge bg-danger py-1 px-2">Dolu</span>
+                                        }
+                                        else
+                                        {
+                                        <span class="badge bg-success py-1 px-2">Boş</span>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <span class="detail-label">Bina</span>
+                                    <span class="detail-value">@Model.Building?.Name</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="DeleteConfirmed" method="post" class="mt-4">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="BuildingId" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="List" asp-route-buildingId="@Model.BuildingId"
+                               class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-arrow-left me-1"></i> Vazgeç
+                            </a>
+
+                            <button type="submit" class="btn btn-danger px-4"
+                                    onclick="return confirm('Bu birimi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');">
+                                <i class="fas fa-trash-alt me-1"></i> Kalıcı Olarak Sil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<dl class="row">
-    <dt class="col-sm-3">Numara</dt>
-    <dd class="col-sm-9">@Model.Number</dd>
-
-    <dt class="col-sm-3">Tür</dt>
-    <dd class="col-sm-9">@Model.Type</dd>
-
-    <dt class="col-sm-3">Kat</dt>
-    <dd class="col-sm-9">@(Model.Floor == 0 ? "Zemin" : $"{Model.Floor}. Kat")</dd>
-
-    <dt class="col-sm-3">Alan</dt>
-    <dd class="col-sm-9">@Model.Area m²</dd>
-
-    <dt class="col-sm-3">Durum</dt>
-    <dd class="col-sm-9">
-        @if (Model.IsOccupied)
-        {
-            <span class="badge bg-danger">Dolu</span>
+@section Styles {
+    <style>
+        .card {
+            border: none;
+            transition: transform 0.2s;
         }
-        else
-        {
-            <span class="badge bg-success">Boş</span>
-        }
-    </dd>
-</dl>
 
-<form asp-action="DeleteConfirmed" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Sil</button>
-    <a asp-action="List" asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary">İptal</a>
-</form>
+            .card:hover {
+                transform: translateY(-2px);
+            }
+
+        .birim-detaylari {
+            border-left: 4px solid #dc3545;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            display: block;
+            font-size: 1rem;
+            color: #212529;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .btn-danger {
+            transition: all 0.2s;
+        }
+
+            .btn-danger:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.25);
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Silme butonuna ekstra onay ekleme
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const confirmMessage = "Bu birimi silmek üzeresiniz. Bu işlem geri alınamaz!\n\nDevam etmek istiyor musunuz?";
+            if(!confirm(confirmMessage)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}
