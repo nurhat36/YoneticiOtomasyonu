@@ -6,60 +6,110 @@
 
     <div class="container-fluid py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0 text-gray-800">
-                <i class="bi bi-receipt-cutoff me-2"></i> Gider Listesi
-            </h1>
-            <a asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-primary">
+            <div>
+                <h1 class="h2 fw-bold text-gray-800 mb-1">
+                    <i class="bi bi-credit-card-2-front me-2"></i>Gider Yönetimi
+                </h1>
+                <p class="text-muted small mb-0">Sistemde kayıtlı tüm gider hareketleri</p>
+            </div>
+            <a asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-primary shadow-sm">
                 <i class="bi bi-plus-circle me-2"></i> Yeni Gider Ekle
             </a>
         </div>
 
-        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
-            <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-semibold">Gider Kayıtları</h6>
-                <div class="d-flex">
-                    <div class="input-group input-group-sm" style="width: 250px;">
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
+            <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-list-check me-2 text-primary"></i>Gider Kayıtları
+                </h5>
+                <div class="d-flex gap-2 w-100 w-md-auto">
+                    <div class="input-group flex-grow-1" style="max-width: 300px;">
+                        <span class="input-group-text bg-transparent"><i class="bi bi-search"></i></span>
                         <input type="text" id="searchInput" class="form-control" placeholder="Gider ara...">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <i class="bi bi-search"></i>
-                        </button>
+                    </div>
+                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                        <i class="bi bi-funnel"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="collapse" id="filterCollapse">
+                <div class="card-body bg-light py-3 border-bottom">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small">Gider Türü</label>
+                            <select class="form-select">
+                                <option selected>Tümü</option>
+                                <option>Elektrik</option>
+                                <option>Su</option>
+                                <option>Doğalgaz</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">Tarih Aralığı</label>
+                            <input type="text" class="form-control datepicker" placeholder="Başlangıç - Bitiş">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">Ödeme Yöntemi</label>
+                            <select class="form-select">
+                                <option selected>Tümü</option>
+                                <option>Nakit</option>
+                                <option>Kredi Kartı</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button class="btn btn-primary w-100">Filtrele</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0" id="expensesTable">
+                    <table class="table table-hover align-middle mb-0" id="expensesTable">
                         <thead class="table-light">
                             <tr>
-                                <th class="ps-4">Tür</th>
-                                <th>Miktar</th>
-                                <th>Tarih</th>
-                                <th>Ödeme Yöntemi</th>
-                                <th>Fiş</th>
-                                <th>Kaydeden</th>
-                                <th class="text-end pe-4">İşlemler</th>
+                                <th class="ps-4 py-3">Tür</th>
+                                <th class="py-3">Miktar</th>
+                                <th class="py-3">Tarih</th>
+                                <th class="py-3">Ödeme Yöntemi</th>
+                                <th class="py-3">Fiş</th>
+                                <th class="py-3">Kaydeden</th>
+                                <th class="pe-4 py-3 text-end">İşlemler</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model)
                         {
-                            <tr>
-                                <td class="ps-4 align-middle">
-                                    <span class="badge bg-primary bg-opacity-10 text-primary">
-                                        @item.Type
+                            <tr class="animate__animated animate__fadeIn">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-primary bg-opacity-10 p-2 rounded-2">
+                                            <i class="bi bi-lightning-charge text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <span class="d-block fw-semibold">@item.Type</span>
+                                            <small class="text-muted">@item.Description</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-bold @(item.Amount > 1000 ? "text-danger" : "text-success")">
+                                        @item.Amount.ToString("C2")
                                     </span>
                                 </td>
-                                <td class="align-middle fw-semibold">
-                                    @item.Amount.ToString("C2")
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-calendar3 text-muted"></i>
+                                        <span>@item.Date.ToString("dd.MM.yyyy")</span>
+                                    </div>
                                 </td>
-                                <td class="align-middle">
-                                    @item.Date.ToString("dd.MM.yyyy")
+                                <td>
+                                    <span class="badge @GetPaymentMethodBadgeClass(item.PaymentMethod)">
+                                        @item.PaymentMethod
+                                    </span>
                                 </td>
-                                <td class="align-middle">
-                                    @item.PaymentMethod
-                                </td>
-                                <td class="align-middle">
+                                <td>
                                     @if (!string.IsNullOrEmpty(item.ReceiptImageUrl))
                                     {
                                         var fileExtension = System.IO.Path.GetExtension(item.ReceiptImageUrl).ToLower();
@@ -67,14 +117,14 @@
 
                                         if (imageExtensions.Contains(fileExtension))
                                         {
-                                    <a href="@item.ReceiptImageUrl" data-fancybox="gallery" data-caption="@item.Type - @item.Date.ToString("dd.MM.yyyy")">
-                                        <img src="@item.ReceiptImageUrl" class="rounded" style="width:40px; height:40px; object-fit:cover;" alt="Fiş">
+                                    <a href="@item.ReceiptImageUrl" data-fancybox="gallery" data-caption="@item.Type - @item.Date.ToString("dd.MM.yyyy")" class="d-inline-block">
+                                        <img src="@item.ReceiptImageUrl" class="rounded-2" style="width:40px; height:40px; object-fit:cover;" alt="Fiş">
                                     </a>
                                         }
                                         else
                                         {
-                                    <a href="@item.ReceiptImageUrl" target="_blank" class="text-decoration-none" title="Dosyayı aç">
-                                        <i class="bi bi-file-earmark-text fs-4 text-primary"></i>
+                                    <a href="@item.ReceiptImageUrl" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-file-earmark-text"></i>
                                     </a>
                                         }
                                     }
@@ -83,38 +133,35 @@
                                     <span class="text-muted">-</span>
                                     }
                                 </td>
-                                <td class="align-middle">
-                                    <div class="d-flex align-items-center">
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
                                         @if (!string.IsNullOrEmpty(item.RecordedBy?.ProfileImageUrl))
                                         {
                                         <img src="@item.RecordedBy.ProfileImageUrl"
-                                             class="rounded-circle me-2"
+                                             class="rounded-circle"
                                              style="width:32px; height:32px; object-fit:cover;"
                                              alt="@item.RecordedBy.UserName">
                                         }
                                         else
                                         {
-                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                                        <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center"
                                              style="width:32px; height:32px;">
-                                            <i class="bi bi-person-fill"></i>
+                                            <i class="bi bi-person"></i>
                                         </div>
                                         }
                                         <span>@item.RecordedBy?.UserName</span>
                                     </div>
                                 </td>
-                                <td class="text-end pe-4 align-middle">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a asp-action="Details" asp-route-id="@item.Id"
-                                           class="btn btn-outline-info" title="Detaylar">
-                                            <i class="bi bi-eye-fill"></i>
+                                <td class="pe-4 text-end">
+                                    <div class="btn-group btn-group-sm shadow-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@item.Id"
-                                           class="btn btn-outline-warning" title="Düzenle">
-                                            <i class="bi bi-pencil-fill"></i>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning">
+                                            <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a asp-action="Delete" asp-route-id="@item.Id"
-                                           class="btn btn-outline-danger" title="Sil">
-                                            <i class="bi bi-trash-fill"></i>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
                                         </a>
                                     </div>
                                 </td>
@@ -125,12 +172,12 @@
                 </div>
             </div>
 
-            <div class="card-footer bg-light py-3">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="card-footer bg-white py-3">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                     <div class="text-muted small">
-                        Toplam <span class="fw-semibold">@Model.Count()</span> gider kaydı
+                        Toplam <span class="fw-bold">@Model.Count()</span> gider kaydı listeleniyor
                     </div>
-                    <nav>
+                    <nav aria-label="Page navigation">
                         <ul class="pagination pagination-sm mb-0">
                             <li class="page-item disabled">
                                 <a class="page-link" href="#" tabindex="-1">Önceki</a>
@@ -148,17 +195,38 @@
         </div>
     </div>
 
+    @functions {
+    string GetPaymentMethodBadgeClass(string paymentMethod)
+    {
+        switch (paymentMethod.ToLower())
+        {
+            case "nakit":
+                return "bg-success bg-opacity-10 text-success";
+            case "kredi kartı":
+                return "bg-info bg-opacity-10 text-info";
+            case "banka transferi":
+                return "bg-primary bg-opacity-10 text-primary";
+            case "çek":
+                return "bg-warning bg-opacity-10 text-warning";
+            default:
+                return "bg-secondary bg-opacity-10 text-secondary";
+        }
+    }
+    }
+
     @section Styles {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ui@5.0/dist/fancybox/fancybox.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
         <style>
             .card {
                 border: none;
-                box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+                box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05);
             }
 
             .table thead th {
-                border-bottom: none;
+                border-bottom: 1px solid #f0f0f0;
                 text-transform: uppercase;
                 font-size: 0.75rem;
                 letter-spacing: 0.5px;
@@ -167,24 +235,41 @@
 
             .table tbody tr {
                 transition: all 0.2s;
+                border-bottom: 1px solid #f8f9fa;
             }
+
+                .table tbody tr:last-child {
+                    border-bottom: none;
+                }
 
                 .table tbody tr:hover {
                     background-color: rgba(13, 110, 253, 0.03);
-                    transform: translateX(2px);
+                    transform: translateY(-1px);
                 }
 
             .badge {
-                padding: 0.35em 0.65em;
+                padding: 0.4em 0.65em;
                 font-weight: 500;
             }
 
             .btn-group .btn {
+                border-radius: 0.25rem !important;
                 transition: all 0.2s;
             }
 
+                .btn-group .btn:first-child {
+                    border-top-left-radius: 0.5rem !important;
+                    border-bottom-left-radius: 0.5rem !important;
+                }
+
+                .btn-group .btn:last-child {
+                    border-top-right-radius: 0.5rem !important;
+                    border-bottom-right-radius: 0.5rem !important;
+                }
+
                 .btn-group .btn:hover {
                     transform: translateY(-1px);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
                 }
 
             .pagination .page-item.active .page-link {
@@ -194,6 +279,19 @@
 
             .pagination .page-link {
                 color: #0d6efd;
+                border-radius: 0.375rem;
+                margin: 0 2px;
+            }
+
+            #filterCollapse {
+                transition: all 0.3s ease;
+            }
+
+            .datepicker {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                background-size: 16px 16px;
             }
         </style>
     }
@@ -202,37 +300,37 @@
         <script src="https://cdn.jsdelivr.net/npm/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 
         <script>
-        // Fancybox galeri başlatma
-        Fancybox.bind("[data-fancybox]", {
-            Thumbs: {
-                autoStart: false,
-            },
-        });
-
-        // Arama fonksiyonu
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const input = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#expensesTable tbody tr');
-
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(input) ? '' : 'none';
+            // Fancybox galeri başlatma
+            Fancybox.bind("[data-fancybox]", {
+                Thumbs: {
+                    autoStart: false,
+                },
+                Toolbar: {
+                    display: {
+                        left: ["infobar"],
+                        middle: ["zoomIn", "zoomOut", "toggle1to1", "rotateCCW", "rotateCW", "flipX", "flipY"],
+                        right: ["slideshow", "thumbs", "close"],
+                    },
+                },
             });
-        });
 
-        // Sayfa yüklendiğinde animasyon
-        document.addEventListener('DOMContentLoaded', function() {
-            const rows = document.querySelectorAll('#expensesTable tbody tr');
-            rows.forEach((row, index) => {
-                row.style.opacity = '0';
-                row.style.transform = 'translateX(20px)';
-                row.style.transition = `opacity 0.3s ease ${index * 0.05}s, transform 0.3s ease ${index * 0.05}s`;
+            // Arama fonksiyonu
+            document.getElementById('searchInput').addEventListener('input', function () {
+                const input = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#expensesTable tbody tr');
 
-                setTimeout(() => {
-                    row.style.opacity = '1';
-                    row.style.transform = 'translateX(0)';
-                }, 100);
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(input) ? '' : 'none';
+                });
             });
-        });
+
+            // Satır animasyonları
+            document.addEventListener('DOMContentLoaded', function () {
+                const rows = document.querySelectorAll('#expensesTable tbody tr');
+                rows.forEach((row, index) => {
+                    row.style.animationDelay = `${index * 0.05}s`;
+                });
+            });
         </script>
     }

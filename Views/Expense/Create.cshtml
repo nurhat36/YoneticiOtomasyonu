@@ -4,40 +4,60 @@
     ViewData["Title"] = "Yeni Gider Kaydı";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0 rounded-3">
-                <div class="card-header bg-success text-white py-3">
-                    <h2 class="h5 mb-0"><i class="bi bi-cash-stack me-2"></i> Yeni Gider Kaydı</h2>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-glass border-0 shadow-lg rounded-2 overflow-hidden">
+                <div class="card-header bg-gradient-success text-white py-3 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="h5 mb-0 fw-semibold">
+                                <i class="fas fa-receipt me-2"></i> @ViewData["Title"]
+                            </h2>
+                        </div>
+                        <a asp-action="Index" asp-route-buildingId="@Model.BuildingId" class="btn btn-sm btn-light text-success">
+                            <i class="fas fa-arrow-left me-1"></i> Listeye Dön
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body p-4">
+
+                <div class="card-body p-4 p-md-5">
                     <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <input type="hidden" asp-for="BuildingId" />
 
-                        <div class="row g-3">
+                        <div class="row g-4">
                             <!-- Gider Türü -->
                             <div class="col-md-6">
-                                <label asp-for="Type" class="form-label fw-semibold">Gider Türü</label>
-                                <select asp-for="Type" class="form-select" asp-items="ViewBag.ExpenseTypes" required>
-                                    <option value="" disabled selected>Gider türü seçiniz</option>
-                                </select>
+                                <label asp-for="Type" class="form-label fw-semibold text-muted">Gider Türü*</label>
+                                <div class="input-group input-group-glass">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-tag text-success"></i>
+                                    </span>
+                                    <select asp-for="Type" class="form-select" asp-items="ViewBag.ExpenseTypes" required>
+                                        <option value="" disabled selected>Seçim yapınız</option>
+                                    </select>
+                                </div>
                                 <span asp-validation-for="Type" class="text-danger small"></span>
                             </div>
 
                             <!-- Ödeme Yöntemi -->
                             <div class="col-md-6">
-                                <label asp-for="PaymentMethod" class="form-label fw-semibold">Ödeme Yöntemi</label>
-                                <select asp-for="PaymentMethod" class="form-select" asp-items="ViewBag.PaymentMethods" required>
-                                    <option value="" disabled selected>Ödeme yöntemi seçiniz</option>
-                                </select>
+                                <label asp-for="PaymentMethod" class="form-label fw-semibold text-muted">Ödeme Yöntemi*</label>
+                                <div class="input-group input-group-glass">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-credit-card text-success"></i>
+                                    </span>
+                                    <select asp-for="PaymentMethod" class="form-select" asp-items="ViewBag.PaymentMethods" required>
+                                        <option value="" disabled selected>Seçim yapınız</option>
+                                    </select>
+                                </div>
                                 <span asp-validation-for="PaymentMethod" class="text-danger small"></span>
                             </div>
 
                             <!-- Tutar -->
                             <div class="col-md-6">
-                                <label asp-for="Amount" class="form-label fw-semibold">Tutar (₺)</label>
-                                <div class="input-group">
+                                <label asp-for="Amount" class="form-label fw-semibold text-muted">Tutar (₺)*</label>
+                                <div class="input-group input-group-glass">
                                     <span class="input-group-text bg-light">₺</span>
                                     <input asp-for="Amount" class="form-control" placeholder="0,00" required
                                            type="number" step="0.01" min="0" />
@@ -47,52 +67,63 @@
 
                             <!-- Tarih -->
                             <div class="col-md-6">
-                                <label asp-for="Date" class="form-label fw-semibold">İşlem Tarihi</label>
-                                <input asp-for="Date" type="date" class="form-control flatpickr" required />
+                                <label asp-for="Date" class="form-label fw-semibold text-muted">İşlem Tarihi*</label>
+                                <div class="input-group input-group-glass">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-calendar-alt text-success"></i>
+                                    </span>
+                                    <input asp-for="Date" type="date" class="form-control flatpickr" required />
+                                </div>
                                 <span asp-validation-for="Date" class="text-danger small"></span>
                             </div>
 
                             <!-- Fiş No -->
                             <div class="col-md-6">
-                                <label asp-for="ReceiptNumber" class="form-label fw-semibold">Fiş/Fatura No</label>
-                                <input asp-for="ReceiptNumber" class="form-control" placeholder="Fiş veya fatura numarası" />
+                                <label asp-for="ReceiptNumber" class="form-label fw-semibold text-muted">Fiş/Fatura No</label>
+                                <div class="input-group input-group-glass">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-file-invoice text-success"></i>
+                                    </span>
+                                    <input asp-for="ReceiptNumber" class="form-control" placeholder="Fiş veya fatura numarası" />
+                                </div>
                                 <span asp-validation-for="ReceiptNumber" class="text-danger small"></span>
                             </div>
 
                             <!-- Açıklama -->
                             <div class="col-12">
-                                <label asp-for="Description" class="form-label fw-semibold">Açıklama</label>
-                                <textarea asp-for="Description" class="form-control" rows="2"
+                                <label asp-for="Description" class="form-label fw-semibold text-muted">Açıklama</label>
+                                <textarea asp-for="Description" class="form-control" rows="3"
                                           placeholder="Giderle ilgili detaylı açıklama"></textarea>
                                 <span asp-validation-for="Description" class="text-danger small"></span>
                             </div>
 
                             <!-- Dosya Yükleme -->
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Fiş/Fatura Belgesi</label>
-                                <div class="file-upload-card">
-                                    <input type="file" name="receiptFile" id="receiptFile" class="form-control d-none"
+                                <label class="form-label fw-semibold text-muted">Fiş/Fatura Belgesi</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" name="receiptFile" id="receiptFile" class="d-none"
                                            accept=".pdf,.jpg,.jpeg,.png" />
-                                    <label for="receiptFile" class="file-upload-label">
-                                        <div class="file-upload-content">
-                                            <i class="bi bi-cloud-arrow-up fs-1 text-muted"></i>
-                                            <p class="mb-1 fw-medium">Dosya seçin veya sürükleyip bırakın</p>
+                                    <label for="receiptFile" class="file-upload-container">
+                                        <div class="file-upload-content text-center p-4">
+                                            <i class="fas fa-cloud-upload-alt fs-1 text-success mb-3"></i>
+                                            <h5 class="mb-2">Dosya Yükle</h5>
                                             <p class="small text-muted mb-0">PDF, JPG veya PNG formatında (Max 5MB)</p>
+                                            <p class="small text-muted">Sürükleyip bırakarak da yükleyebilirsiniz</p>
                                         </div>
                                     </label>
-                                    <div id="filePreview" class="mt-2 text-center"></div>
+                                    <div id="filePreview" class="file-preview mt-3"></div>
                                 </div>
                             </div>
 
                             <!-- Butonlar -->
-                            <div class="col-12 mt-4">
-                                <div class="d-flex justify-content-end gap-2">
+                            <div class="col-12 mt-4 pt-3">
+                                <div class="d-flex justify-content-end gap-3">
                                     <a asp-action="Index" asp-route-buildingId="@Model.BuildingId"
-                                       class="btn btn-outline-secondary px-4">
-                                        <i class="bi bi-x-circle me-1"></i> İptal
+                                       class="btn btn-lg btn-outline-secondary px-4 rounded-pill">
+                                        <i class="fas fa-times me-2"></i> İptal
                                     </a>
-                                    <button type="submit" class="btn btn-success px-4">
-                                        <i class="bi bi-check-circle me-1"></i> Kaydet
+                                    <button type="submit" class="btn btn-lg btn-success px-4 rounded-pill">
+                                        <i class="fas fa-save me-2"></i> Kaydet
                                     </button>
                                 </div>
                             </div>
@@ -105,47 +136,124 @@
 </div>
 
 @section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <style>
-        .card {
-            border: none;
-            transition: transform 0.2s;
+        :root {
+            --success-color: #28a745;
+            --success-light: #d4edda;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
-            .card:hover {
-                transform: translateY(-2px);
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .input-group-glass {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+            .input-group-glass .form-control,
+            .input-group-glass .form-select {
+                border: none;
+                background-color: transparent;
             }
 
-        .file-upload-card {
+            .input-group-glass .input-group-text {
+                border: none;
+                background-color: #f8f9fa;
+            }
+
+        .file-upload-wrapper {
+            position: relative;
+        }
+
+        .file-upload-container {
+            display: block;
             border: 2px dashed #dee2e6;
-            border-radius: 0.5rem;
-            background-color: #f8f9fa;
+            border-radius: 0.75rem;
+            background-color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
             overflow: hidden;
         }
 
-        .file-upload-label {
-            display: block;
-            cursor: pointer;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-            .file-upload-label:hover {
-                background-color: rgba(25, 135, 84, 0.05);
-                border-color: #198754;
+            .file-upload-container:hover {
+                border-color: var(--success-color);
+                background-color: rgba(40, 167, 69, 0.05);
             }
 
         .file-upload-content {
-            pointer-events: none;
+            padding: 2rem;
         }
 
-        .flatpickr-input {
-            background-color: white !important;
+        .file-preview {
+            display: none;
         }
 
-        .input-group-text {
-            min-width: 40px;
-            justify-content: center;
+            .file-preview.active {
+                display: block;
+            }
+
+        .preview-card {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-icon {
+            font-size: 1.5rem;
+            color: var(--success-color);
+            margin-right: 1rem;
+        }
+
+        .preview-info {
+            flex: 1;
+        }
+
+        .preview-remove {
+            color: #dc3545;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
+        .bg-gradient-success {
+            background: linear-gradient(135deg, var(--success-color), #218838);
+        }
+
+        .rounded-2 {
+            border-radius: 0.75rem !important;
+        }
+
+        .btn-lg {
+            padding: 0.5rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .form-control, .form-select {
+            padding: 0.75rem 1rem;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+        }
+
+        /* Sayfa sonundaki işaretleri kaldırma */
+        body::after {
+            display: none !important;
         }
     </style>
 }
@@ -160,7 +268,7 @@
 
     <script>
         // Tarih seçici ayarı
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             flatpickr(".flatpickr", {
                 dateFormat: "Y-m-d",
                 locale: "tr",
@@ -168,50 +276,22 @@
             });
 
             // Para formatı
-            document.querySelector('input[asp-for="Amount"]').addEventListener('blur', function() {
-                if(this.value) {
+            document.querySelector('input[asp-for="Amount"]').addEventListener('blur', function () {
+                if (this.value) {
                     this.value = parseFloat(this.value).toFixed(2);
                 }
             });
 
             // Dosya yükleme önizleme
-            document.getElementById('receiptFile').addEventListener('change', function(e) {
-                const filePreview = document.getElementById('filePreview');
-                filePreview.innerHTML = '';
+            const fileInput = document.getElementById('receiptFile');
+            const filePreview = document.getElementById('filePreview');
 
-                if(this.files && this.files[0]) {
-                    const file = this.files[0];
-
-                    // Dosya boyutu kontrolü (5MB)
-                    if(file.size > 5 * 1024 * 1024) {
-                        alert('Dosya boyutu 5MB\'dan büyük olamaz!');
-                        this.value = '';
-                        return;
-                    }
-
-                    const fileInfo = document.createElement('div');
-                    fileInfo.className = 'alert alert-success py-2 px-3 d-inline-flex align-items-center';
-
-                    const icon = document.createElement('i');
-                    icon.className = 'bi bi-file-earmark-text me-2';
-
-                    const fileName = document.createElement('span');
-                    fileName.textContent = file.name;
-
-                    const fileSize = document.createElement('small');
-                    fileSize.className = 'text-muted ms-2';
-                    fileSize.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-
-                    fileInfo.appendChild(icon);
-                    fileInfo.appendChild(fileName);
-                    fileInfo.appendChild(fileSize);
-
-                    filePreview.appendChild(fileInfo);
-                }
+            fileInput.addEventListener('change', function (e) {
+                handleFiles(this.files);
             });
 
             // Drag and drop özelliği
-            const dropArea = document.querySelector('.file-upload-label');
+            const dropArea = document.querySelector('.file-upload-container');
 
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 dropArea.addEventListener(eventName, preventDefaults, false);
@@ -231,27 +311,99 @@
             });
 
             function highlight() {
-                dropArea.style.borderColor = '#198754';
-                dropArea.style.backgroundColor = 'rgba(25, 135, 84, 0.05)';
+                dropArea.style.borderColor = 'var(--success-color)';
+                dropArea.style.backgroundColor = 'rgba(40, 167, 69, 0.05)';
             }
 
             function unhighlight() {
                 dropArea.style.borderColor = '#dee2e6';
-                dropArea.style.backgroundColor = '#f8f9fa';
+                dropArea.style.backgroundColor = 'white';
             }
 
-            dropArea.addEventListener('drop', handleDrop, false);
-
-            function handleDrop(e) {
+            dropArea.addEventListener('drop', function (e) {
                 const dt = e.dataTransfer;
                 const files = dt.files;
 
-                if(files.length) {
-                    document.getElementById('receiptFile').files = files;
-                    const event = new Event('change');
-                    document.getElementById('receiptFile').dispatchEvent(event);
+                if (files.length) {
+                    fileInput.files = files;
+                    handleFiles(files);
+                }
+            });
+
+            function handleFiles(files) {
+                filePreview.innerHTML = '';
+
+                if (files && files[0]) {
+                    const file = files[0];
+
+                    // Dosya boyutu kontrolü (5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        showAlert('Dosya boyutu 5MB\'dan büyük olamaz!', 'danger');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    const previewCard = document.createElement('div');
+                    previewCard.className = 'preview-card';
+
+                    const icon = document.createElement('div');
+                    icon.className = 'preview-icon';
+                    icon.innerHTML = '<i class="fas fa-file-alt"></i>';
+
+                    const info = document.createElement('div');
+                    info.className = 'preview-info';
+
+                    const fileName = document.createElement('div');
+                    fileName.className = 'fw-medium';
+                    fileName.textContent = file.name;
+
+                    const fileSize = document.createElement('div');
+                    fileSize.className = 'text-muted small';
+                    fileSize.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+
+                    const removeBtn = document.createElement('div');
+                    removeBtn.className = 'preview-remove';
+                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    removeBtn.addEventListener('click', function () {
+                        fileInput.value = '';
+                        filePreview.innerHTML = '';
+                    });
+
+                    info.appendChild(fileName);
+                    info.appendChild(fileSize);
+
+                    previewCard.appendChild(icon);
+                    previewCard.appendChild(info);
+                    previewCard.appendChild(removeBtn);
+
+                    filePreview.appendChild(previewCard);
+                    filePreview.classList.add('active');
                 }
             }
+
+            function showAlert(message, type) {
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type} alert-dismissible fade show`;
+                alert.role = 'alert';
+                alert.innerHTML = `
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+
+                const container = document.querySelector('.card-body');
+                container.insertBefore(alert, container.firstChild);
+
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    setTimeout(() => alert.remove(), 150);
+                }, 5000);
+            }
         });
+        /* Sayfa sonundaki işaretleri tamamen kaldırma */
+        body:: after,
+            body::before {
+            content: none!important;
+            display: none!important;
+        }
     </script>
 }
