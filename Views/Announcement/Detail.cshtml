@@ -4,48 +4,176 @@
     ViewData["Title"] = "Duyuru Detayı";
 }
 
-<h2 class="mb-4">@Model.Title</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <!-- Başlık Bölümü -->
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h3 mb-0">@Model.Title</h1>
+                        @if (Model.IsImportant)
+                        {
+                        <span class="badge bg-danger rounded-pill px-3 py-2">
+                            <i class="fas fa-exclamation-circle me-1"></i> ÖNEMLİ
+                        </span>
+                        }
+                    </div>
+                </div>
 
-<div class="mb-3">
-    <strong>Bina:</strong> @Model.Building?.Name ?? "—"
-</div>
+                <!-- İçerik Bölümü -->
+                <div class="card-body p-4 p-md-5">
+                    <!-- Meta Bilgiler -->
+                    <div class="d-flex flex-wrap gap-4 mb-4 pb-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-building me-2 text-primary"></i>
+                            <span><strong>Bina:</strong> @Model.Building?.Name ?? "—"</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="far fa-calendar-plus me-2 text-primary"></i>
+                            <span><strong>Oluşturulma:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                        @if (Model.ExpireDate.HasValue)
+                        {
+                        <div class="d-flex align-items-center">
+                            <i class="far fa-calendar-times me-2 text-primary"></i>
+                            <span><strong>Geçerlilik:</strong> @Model.ExpireDate.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                        }
+                    </div>
 
-<div class="mb-3">
-    <strong>Oluşturulma:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")
-</div>
+                    <!-- Duyuru İçeriği -->
+                    <div class="mb-4">
+                        <div class="content-box p-3 bg-light rounded-3">
+                            @Html.Raw(Model.Content.Replace("\n", "<br />"))
+                        </div>
+                    </div>
 
-@if (Model.ExpireDate.HasValue)
-{
-    <div class="mb-3">
-        <strong>Geçerlilik:</strong> @Model.ExpireDate.Value.ToString("dd.MM.yyyy")
-    </div>
-}
+                    <!-- Görseller Bölümü -->
+                    @if (Model.Images != null && Model.Images.Any())
+                    {
+                    <div class="mt-5">
+                        <h5 class="mb-4 d-flex align-items-center">
+                            <i class="fas fa-images me-2 text-primary"></i>
+                            <span>Duyuru Görselleri</span>
+                        </h5>
 
-<div class="mb-3">
-    <strong>Önemli:</strong> @(Model.IsImportant ? "Evet" : "Hayır")
-</div>
+                        <div class="row g-3 gallery">
+                            @foreach (var img in Model.Images)
+                                {
+                            <div class="col-6 col-md-4 col-lg-3">
+                                <a href="@img.ImageUrl" data-fancybox="gallery" class="d-block card h-100 border-0 shadow-sm overflow-hidden">
+                                    <div class="ratio ratio-1x1">
+                                        <img src="@img.ImageUrl" class="object-fit-cover" alt="Duyuru Görseli" loading="lazy">
+                                    </div>
+                                    <div class="card-img-overlay d-flex align-items-center justify-content-center bg-dark bg-opacity-25 opacity-0 hover-opacity-100 transition-all">
+                                        <i class="fas fa-search-plus text-white fs-4"></i>
+                                    </div>
+                                </a>
+                            </div>
+                                }
+                        </div>
+                    </div>
+                    }
+                    else
+                    {
+                    <div class="text-center py-4 my-3 bg-light rounded-3">
+                        <i class="far fa-images fs-1 text-muted mb-3"></i>
+                        <p class="text-muted mb-0">Duyuruya ait görsel bulunmuyor</p>
+                    </div>
+                    }
 
-<p>@Model.Content</p>
-
-@if (Model.Images != null && Model.Images.Any())
-{
-    <h5 class="mt-4 mb-3">Duyuru Görselleri</h5>
-    <div class="row g-3">
-        @foreach (var img in Model.Images)
-        {
-            <div class="col-6 col-md-3">
-                <div class="card">
-                    <img src="@img.ImageUrl" class="card-img-top img-fluid" style="object-fit: cover; height: 150px;" alt="Duyuru Görseli">
+                    <!-- Geri Dön Butonu -->
+                    <div class="d-flex justify-content-end mt-5">
+                        <a asp-action="Index" asp-route-buildingId="@Model.Building.Id" class="btn btn-outline-primary px-4">
+                            <i class="fas fa-arrow-left me-2"></i> Duyuru Listesine Dön
+                        </a>
+                    </div>
                 </div>
             </div>
-        }
+        </div>
     </div>
-}
-else
-{
-    <p class="text-muted mt-3">Duyuruya ait görsel bulunmuyor.</p>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ui@5.0/dist/fancybox/fancybox.css" />
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .content-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--accent-color);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .gallery .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .gallery .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+
+        .object-fit-cover {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hover-opacity-100:hover {
+            opacity: 1 !important;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .ratio {
+            overflow: hidden;
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+    </style>
 }
 
-<a asp-action="Index" asp-route-buildingId="@Model.Building.Id" class="btn btn-outline-secondary mt-4">
-    <i class="fas fa-arrow-left me-1"></i> Geri Dön
-</a>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fancybox galeri başlatma
+            Fancybox.bind("[data-fancybox]", {
+                Thumbs: {
+                    autoStart: false,
+                },
+                Toolbar: {
+                    display: {
+                        left: ["infobar"],
+                        middle: ["zoomIn", "zoomOut", "toggle1to1", "rotateCCW", "rotateCW", "flipX", "flipY"],
+                        right: ["slideshow", "thumbs", "close"],
+                    },
+                },
+            });
+
+            // Satır sonlarını <br> ile değiştirme
+            const contentBox = document.querySelector('.content-box');
+            if (contentBox) {
+                contentBox.innerHTML = contentBox.innerHTML.replace(/\n/g, '<br>');
+            }
+        });
+    </script>
+}

@@ -4,45 +4,205 @@
     ViewData["Title"] = "Yeni Duyuru Ekle";
 }
 
-<h2 class="mb-4">@ViewData["Title"]</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h4 mb-0"><i class="fas fa-bullhorn me-2"></i>@ViewData["Title"]</h2>
+                </div>
 
-<form asp-action="Create" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="BuildingId" />
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="BuildingId" />
 
-    <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold"></label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="Duyuru başlığını giriniz" required />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                            <div class="invalid-feedback">
+                                Lütfen bir başlık giriniz.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Content" class="form-label fw-bold"></label>
+                            <textarea asp-for="Content" class="form-control" rows="6" placeholder="Duyuru içeriğini detaylı şekilde yazınız" required></textarea>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                            <div class="invalid-feedback">
+                                Lütfen duyuru içeriğini giriniz.
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="ExpireDate" class="form-label fw-bold">Son Geçerlilik Tarihi</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                    <input asp-for="ExpireDate" type="date" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsImportant" class="form-check-input" type="checkbox" role="switch" id="importantSwitch">
+                                    <label class="form-check-label fw-bold" asp-for="IsImportant">Önemli Duyuru</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Duyuru Görselleri</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" name="images" class="form-control" multiple
+                                       data-max-file-size="5MB"
+                                       data-allowed-file-extensions="jpg jpeg png gif" />
+                                <small class="text-muted">Maksimum 5MB boyutunda JPG, PNG veya GIF formatında dosyalar yükleyebilirsiniz.</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="#" class="btn btn-outline-secondary me-md-2 px-4">
+                                <i class="fas fa-times me-1"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-1"></i> Duyuruyu Yayınla
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label asp-for="Content" class="form-label"></label>
-        <textarea asp-for="Content" class="form-control" rows="4"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
-    </div>
+@section Styles {
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+        }
 
-    <div class="mb-3">
-        <label asp-for="ExpireDate" class="form-label">Son Geçerlilik Tarihi</label>
-        <input asp-for="ExpireDate" type="date" class="form-control" />
-    </div>
+        body {
+            background-color: #f8f9fa;
+        }
 
-    <div class="form-check mb-3">
-        <input asp-for="IsImportant" class="form-check-input" />
-        <label asp-for="IsImportant" class="form-check-label">Önemli Duyuru</label>
-    </div>
+        .card {
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
 
-    <div class="mb-3">
-        <label class="form-label">Duyuru Görselleri</label>
-        <input type="file" name="images" class="form-control" multiple />
-    </div>
+        .card-header {
+            border-bottom: 3px solid rgba(255,255,255,0.1);
+        }
 
-    <button type="submit" class="btn btn-primary">
-        <i class="fas fa-plus me-1"></i> Kaydet
-    </button>
-</form>
+        .form-control, .form-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--accent-color);
+                box-shadow: 0 0 0 0.25rem rgba(72, 149, 239, 0.25);
+            }
+
+        .form-control-lg {
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+        }
+
+            .btn-primary:hover {
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+            }
+
+        .file-upload-wrapper {
+            position: relative;
+        }
+
+            .file-upload-wrapper input[type=file] {
+                padding: 0.5rem;
+                border: 2px dashed #dee2e6;
+                border-radius: 0.375rem;
+                background-color: #f8f9fa;
+            }
+
+                .file-upload-wrapper input[type=file]:hover {
+                    border-color: var(--accent-color);
+                    background-color: rgba(72, 149, 239, 0.05);
+                }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+        }
+    </style>
+}
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Client-side validation
+        (function () {
+            'use strict'
+
+            var forms = document.querySelectorAll('.needs-validation')
+
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // Date picker enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const expireDateField = document.getElementById('ExpireDate');
+            if (expireDateField) {
+                // Set min date to today
+                const today = new Date().toISOString().split('T')[0];
+                expireDateField.min = today;
+
+                // If no value set, default to 7 days from now
+                if (!expireDateField.value) {
+                    const nextWeek = new Date();
+                    nextWeek.setDate(nextWeek.getDate() + 7);
+                    expireDateField.value = nextWeek.toISOString().split('T')[0];
+                }
+            }
+
+            // File upload styling
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const label = this.nextElementSibling;
+                    if (this.files.length > 0) {
+                        label.textContent = `${this.files.length} dosya seçildi`;
+                    }
+                });
+            });
+        });
+    </script>
 }

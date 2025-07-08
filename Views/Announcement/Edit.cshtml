@@ -4,61 +4,215 @@
     ViewData["Title"] = "Duyuru Düzenle";
 }
 
-<h2 class="mb-4">@ViewData["Title"]</h2>
-
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="BuildingId" />
-
-    <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Content" class="form-label"></label>
-        <textarea asp-for="Content" class="form-control" rows="4"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="ExpireDate" class="form-label">Son Geçerlilik Tarihi</label>
-        <input asp-for="ExpireDate" type="date" class="form-control" />
-    </div>
-
-    <div class="form-check mb-3">
-        <input asp-for="IsImportant" class="form-check-input" />
-        <label asp-for="IsImportant" class="form-check-label">Önemli Duyuru</label>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Yeni Görseller Ekle</label>
-        <input type="file" name="newImages" class="form-control" multiple />
-    </div>
-
-    @if (Model.Images != null && Model.Images.Any())
-    {
-        <h5 class="mt-4 mb-2">Mevcut Görseller</h5>
-        <div class="row g-3">
-            @foreach (var img in Model.Images)
-            {
-                <div class="col-6 col-md-3">
-                    <div class="card">
-                        <img src="@img.ImageUrl" class="card-img-top img-fluid" style="object-fit: cover; height: 150px;" alt="Duyuru Görseli">
-                    </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <!-- Başlık Bölümü -->
+                <div class="card-header bg-gradient-warning text-white py-3">
+                    <h2 class="h4 mb-0"><i class="fas fa-edit me-2"></i>@ViewData["Title"]</h2>
                 </div>
-            }
-        </div>
-    }
 
-    <button type="submit" class="btn btn-success mt-4">
-        <i class="fas fa-save me-1"></i> Güncelle
-    </button>
-</form>
+                <!-- Form Bölümü -->
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="BuildingId" />
+
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">Duyuru Başlığı</label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="Duyuru başlığını giriniz" required />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                            <div class="invalid-feedback">
+                                Lütfen bir başlık giriniz.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Content" class="form-label fw-bold">Duyuru İçeriği</label>
+                            <textarea asp-for="Content" class="form-control" rows="6" placeholder="Duyuru içeriğini detaylı şekilde yazınız" required></textarea>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                            <div class="invalid-feedback">
+                                Lütfen duyuru içeriğini giriniz.
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="ExpireDate" class="form-label fw-bold">Son Geçerlilik Tarihi</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                    <input asp-for="ExpireDate" type="date" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsImportant" class="form-check-input" type="checkbox" role="switch" id="importantSwitch">
+                                    <label class="form-check-label fw-bold" asp-for="IsImportant">Önemli Duyuru</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Yeni Görseller Ekle</label>
+                            <div class="file-upload-wrapper border rounded-3 p-3 bg-light">
+                                <input type="file" name="newImages" class="form-control" multiple
+                                       data-max-file-size="5MB"
+                                       data-allowed-file-extensions="jpg jpeg png gif" />
+                                <small class="text-muted d-block mt-2">Maksimum 5MB boyutunda JPG, PNG veya GIF formatında dosyalar yükleyebilirsiniz.</small>
+                            </div>
+                        </div>
+
+                        @if (Model.Images != null && Model.Images.Any())
+                        {
+                        <div class="mb-4">
+                            <h5 class="mb-3 d-flex align-items-center">
+                                <i class="fas fa-images me-2 text-warning"></i>
+                                <span class="fw-bold">Mevcut Görseller</span>
+                            </h5>
+
+                            <div class="row g-3">
+                                @foreach (var img in Model.Images)
+                                    {
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="ratio ratio-1x1">
+                                            <img src="@img.ImageUrl" class="object-fit-cover" alt="Duyuru Görseli" loading="lazy">
+                                        </div>
+                                        <div class="card-footer bg-transparent border-0 p-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="deleteImages" value="@img.Id" id="delete-@img.Id">
+                                                <label class="form-check-label small" for="delete-@img.Id">
+                                                    Sil
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                    }
+                            </div>
+                        </div>
+                        }
+
+                        <div class="d-flex justify-content-between mt-5">
+                            <a asp-action="Index" asp-route-buildingId="@Model.BuildingId" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-arrow-left me-2"></i> Vazgeç
+                            </a>
+                            <button type="submit" class="btn btn-warning px-4 text-white">
+                                <i class="fas fa-save me-2"></i> Duyuruyu Güncelle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --warning-color: #f8961e;
+            --warning-dark: #f3722c;
+        }
+
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, var(--warning-color), var(--warning-dark));
+        }
+
+        .file-upload-wrapper {
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+            .file-upload-wrapper:hover {
+                border-color: var(--warning-color);
+                background-color: rgba(248, 150, 30, 0.05);
+            }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            font-weight: 500;
+        }
+
+            .btn-warning:hover {
+                background-color: var(--warning-dark);
+                border-color: var(--warning-dark);
+            }
+
+        .object-fit-cover {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ratio {
+            overflow: hidden;
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+        }
+
+        .card {
+            transition: transform 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-3px);
+            }
+    </style>
+}
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Client-side validation
+        (function () {
+            'use strict'
+
+            var forms = document.querySelectorAll('.needs-validation')
+
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // Date picker enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const expireDateField = document.getElementById('ExpireDate');
+            if (expireDateField) {
+                // Set min date to today
+                const today = new Date().toISOString().split('T')[0];
+                expireDateField.min = today;
+            }
+
+            // File upload feedback
+            const fileInput = document.querySelector('input[name="newImages"]');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    const feedback = this.nextElementSibling;
+                    if (this.files.length > 0) {
+                        feedback.textContent = `${this.files.length} dosya seçildi - Maksimum 5MB boyutunda JPG, PNG veya GIF formatında dosyalar yükleyebilirsiniz.`;
+                    }
+                });
+            }
+        });
+    </script>
 }
