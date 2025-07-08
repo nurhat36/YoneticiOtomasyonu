@@ -88,7 +88,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.12/signalr.min.js"></script>
 
 <script>
-    $(document).ready(function () {
+    // Tüm fonksiyonlar ve değişkenler window nesnesine atanıyor
+    (function (window, $) {
         let isChatOpen = localStorage.getItem('chatOpen') === 'true';
         const $chatBox = $("#chatBox");
 
@@ -96,112 +97,56 @@
             $chatBox.addClass("open");
         }
 
-        $("#chatToggleBtn").click(function () {
+        window.toggleChat = function () {
             $chatBox.toggleClass("open");
             isChatOpen = $chatBox.hasClass("open");
             localStorage.setItem('chatOpen', isChatOpen);
-        });
+        };
 
-        $("#chatClose").click(function () {
+        window.closeChat = function () {
             $chatBox.removeClass("open");
             localStorage.setItem('chatOpen', false);
-        });
+        };
 
-        let currentReceiverId = null;
-        let currentReceiverName = null;
-        let currentReceiverImage = null;
+        // Chat ile ilgili global değişkenler
+        window.currentReceiverId = null;
+        window.currentReceiverName = null;
+        window.currentReceiverImage = null;
 
-        const connection = new signalR.HubConnectionBuilder()
+        // SignalR bağlantısı oluşturuluyor
+        window.connection = new signalR.HubConnectionBuilder()
             .withUrl("/chathub")
             .withAutomaticReconnect()
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
-        // Kişi listesinden birini seçme
-        $(document).on('click', '.contact-item', function (e) {
-            e.preventDefault();
-            currentReceiverId = $(this).data('userid');
-            currentReceiverName = $(this).data('username');
-            currentReceiverImage = $(this).data('userimage');
-
-            // UI güncelleme
-            $("#recentContacts").hide();
-            $("#chatMessages").show();
-            $("#chatHeader").show();
-            $("#currentChatUserName").text(currentReceiverName);
-            $("#currentChatUserImage").attr("src", currentReceiverImage);
-            $("#chatControls").show();
-            $("#receiverSelect").hide();
-            $("#messagesContainer").html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
-
-            // Mesajları yükle
-            loadMessages(currentReceiverId);
-
-            // Okunmamış mesajları işaretle
-            markMessagesAsRead(currentReceiverId);
-        });
-
-        // Geri butonu
-        $("#backToContacts").click(function () {
-            $("#chatMessages").hide();
-            $("#chatHeader").hide();
-            $("#recentContacts").show();
-            $("#chatControls").hide();
-            $("#receiverSelect").show();
-            currentReceiverId = null;
-            currentReceiverName = null;
-            currentReceiverImage = null;
-        });
-
-        // Yeni kişi seçimi
-        $("#receiverSelect").change(function () {
-            const receiverId = $(this).val();
-            if (receiverId) {
-                const receiverName = $(this).find("option:selected").text();
-                currentReceiverId = receiverId;
-                currentReceiverName = receiverName;
-                currentReceiverImage = "/images/default-profile.png"; // Varsayılan resim
-
-                // UI güncelleme
-                $("#recentContacts").hide();
-                $("#chatMessages").show();
-                $("#chatHeader").show();
-                $("#currentChatUserName").text(currentReceiverName);
-                $("#currentChatUserImage").attr("src", currentReceiverImage);
-                $("#chatControls").show();
-                $("#receiverSelect").val('').hide();
-                $("#messagesContainer").html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
-
-                // Mesajları yükle
-                loadMessages(currentReceiverId);
-            }
-        });
-
-        async function loadMessages(userId) {
+        // Mesajları yükleme fonksiyonu
+        window.loadMessages = async function (userId) {
             try {
                 const response = await fetch(`/Message/GetMessages?userId=${userId}`);
                 if (!response.ok) throw new Error("Mesajlar alınamadı");
 
                 const messages = await response.json();
-                renderMessages(messages, "@UserManager.GetUserId(User)");
+                window.renderMessages(messages, "@UserManager.GetUserId(User)");
             } catch (err) {
                 console.error("Mesajlar yüklenirken hata:", err);
                 $("#messagesContainer").html('<div class="alert alert-danger">Mesajlar yüklenirken hata oluştu</div>');
             }
-        }
+        };
 
-        function renderMessages(messages, currentUserId) {
+        // Mesajları render etme fonksiyonu
+        window.renderMessages = function (messages, currentUserId) {
             const messagesContainer = $("#messagesContainer");
             messagesContainer.empty();
 
             if (!messages || messages.length === 0) {
                 messagesContainer.html(`
-                    <div class="text-center py-5 text-muted">
-                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
-                        <p>Henüz mesaj yok</p>
-                        <small>İlk mesajı göndererek sohbeti başlatın</small>
-                    </div>
-                `);
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                            <p>Henüz mesaj yok</p>
+                            <small>İlk mesajı göndererek sohbeti başlatın</small>
+                        </div>
+                    `);
                 return;
             }
 
@@ -212,20 +157,21 @@
                 const unreadClass = isUnread ? "unread-message" : "";
 
                 messagesContainer.append(`
-                    <div class="message-container ${messageClass} ${unreadClass}">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
-                            <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                        <div class="message-container ${messageClass} ${unreadClass}">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="fw-bold">${isSender ? 'Siz' : message.senderName}</small>
+                                <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                            </div>
+                            <p class="mb-0">${message.content}</p>
                         </div>
-                        <p class="mb-0">${message.content}</p>
-                    </div>
-                `);
+                    `);
             });
 
             messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
-        }
+        };
 
-        async function markMessagesAsRead(senderId) {
+        // Okunmamış mesajları işaretleme fonksiyonu
+        window.markMessagesAsRead = async function (senderId) {
             try {
                 await fetch(`/Message/MarkAsRead?senderId=${senderId}`, {
                     method: 'POST',
@@ -234,20 +180,19 @@
                     }
                 });
 
-                // UI'daki okunmamış mesaj göstergelerini güncelle
                 $(`.contact-item[data-userid="${senderId}"] .badge`).remove();
-                updateUnreadCount();
+                window.updateUnreadCount();
             } catch (err) {
                 console.error("Mesajlar okundu olarak işaretlenirken hata:", err);
             }
-        }
+        };
 
-        async function updateUnreadCount() {
+        // Okunmamış mesaj sayılarını güncelleme fonksiyonu
+        window.updateUnreadCount = async function () {
             try {
                 const response = await fetch('/Message/GetUnreadCounts');
                 const unreadCounts = await response.json();
 
-                // Her kişi için okunmamış mesaj sayısını güncelle
                 unreadCounts.forEach(item => {
                     const badge = $(`.contact-item[data-userid="${item.senderId}"] .badge`);
                     if (item.count > 0) {
@@ -263,7 +208,6 @@
                     }
                 });
 
-                // Toplam okunmamış mesaj sayısını güncelle
                 const totalUnread = unreadCounts.reduce((sum, item) => sum + item.count, 0);
                 const totalBadge = $("#unreadCount");
                 if (totalUnread > 0) {
@@ -274,11 +218,12 @@
             } catch (err) {
                 console.error("Okunmamış mesaj sayısı alınırken hata:", err);
             }
-        }
+        };
 
-        async function sendMessage() {
+        // Mesaj gönderme fonksiyonu
+        window.sendMessage = async function () {
             const content = $("#chatInput").val().trim();
-            if (!currentReceiverId || !content) return;
+            if (!window.currentReceiverId || !content) return;
 
             try {
                 $("#sendButton").prop("disabled", true);
@@ -289,7 +234,7 @@
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                     },
                     body: JSON.stringify({
-                        ReceiverId: currentReceiverId,
+                        ReceiverId: window.currentReceiverId,
                         Content: content
                     })
                 });
@@ -306,22 +251,21 @@
                         sentAt: new Date().toISOString(),
                         isRead: true
                     };
-                    
-                    // Eğer "Henüz mesaj yok" görünüyorsa kaldır
+
                     if ($("#messagesContainer").text().includes("Henüz mesaj yok")) {
                         $("#messagesContainer").empty();
                     }
-                    
+
                     $("#messagesContainer").append(`
-                        <div class="message-container message-sender">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <small class="fw-bold">Siz</small>
-                                <small class="text-muted">${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                            <div class="message-container message-sender">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-bold">Siz</small>
+                                    <small class="text-muted">${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                                </div>
+                                <p class="mb-0">${content}</p>
                             </div>
-                            <p class="mb-0">${content}</p>
-                        </div>
-                    `);
-                    
+                        `);
+
                     $("#messagesContainer").scrollTop($("#messagesContainer")[0].scrollHeight);
                 } else {
                     throw new Error(result.message || "Mesaj gönderilemedi");
@@ -332,38 +276,48 @@
             } finally {
                 $("#sendButton").prop("disabled", false);
             }
-        }
+        };
 
-        $("#sendButton").click(sendMessage);
-        $("#chatInput").keypress(function (e) {
-            if (e.which === 13) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+        // Chat başlatma fonksiyonu (bir kişiyle sohbet açmak için)
+        window.openChatWithUser = function (userId, userName, userImage) {
+            window.currentReceiverId = userId;
+            window.currentReceiverName = userName;
+            window.currentReceiverImage = userImage;
 
-        connection.on("ReceiveMessage", (message) => {
-            if (currentReceiverId === message.senderId) {
-                // Aktif sohbete yeni mesaj geldi
+            $("#recentContacts").hide();
+            $("#chatMessages").show();
+            $("#chatHeader").show();
+            $("#currentChatUserName").text(userName);
+            $("#currentChatUserImage").attr("src", userImage);
+            $("#chatControls").show();
+            $("#receiverSelect").hide();
+            $("#messagesContainer").html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
+
+            window.loadMessages(userId);
+            window.markMessagesAsRead(userId);
+        };
+
+        // SignalR Mesaj alma event'i
+        window.connection.on("ReceiveMessage", (message) => {
+            if (window.currentReceiverId === message.senderId) {
                 const messagesContainer = $("#messagesContainer");
                 if (messagesContainer.text().includes("Henüz mesaj yok")) {
                     messagesContainer.empty();
                 }
 
                 messagesContainer.append(`
-                    <div class="message-container message-receiver">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <small class="fw-bold">${message.senderName}</small>
-                            <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                        <div class="message-container message-receiver">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="fw-bold">${message.senderName}</small>
+                                <small class="text-muted">${new Date(message.sentAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</small>
+                            </div>
+                            <p class="mb-0">${message.content}</p>
                         </div>
-                        <p class="mb-0">${message.content}</p>
-                    </div>
-                `);
+                    `);
 
                 messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
             } else {
-                // Başka birinden mesaj geldi
-                updateUnreadCount();
+                window.updateUnreadCount();
                 toastr.info(`Yeni mesaj: ${message.content}`, `${message.senderName}`, {
                     positionClass: "toast-bottom-right",
                     timeOut: 5000,
@@ -372,31 +326,87 @@
             }
         });
 
-        async function startConnection() {
+        // SignalR bağlantısı başlatma fonksiyonu
+        window.startConnection = async function () {
             try {
-                if (connection.state !== signalR.HubConnectionState.Disconnected) {
-                    await connection.stop();
+                if (window.connection.state !== signalR.HubConnectionState.Disconnected) {
+                    await window.connection.stop();
                 }
 
-                await connection.start();
+                await window.connection.start();
                 console.log("SignalR bağlantısı kuruldu");
 
-                await connection.invoke("JoinChatGroup", "@UserManager.GetUserId(User)")
+                await window.connection.invoke("JoinChatGroup", "@UserManager.GetUserId(User)")
                     .catch(err => console.error("JoinChatGroup hatası:", err));
 
-                connection.onclose(async () => {
+                window.connection.onclose(async () => {
                     console.log("SignalR bağlantısı kesildi. Yeniden bağlanıyor...");
-                    await startConnection();
+                    await window.startConnection();
                 });
             } catch (err) {
                 console.error("SignalR bağlantı hatası:", err);
-                setTimeout(startConnection, 5000);
+                setTimeout(window.startConnection, 5000);
             }
-        }
+        };
 
-        startConnection();
-    });
+        // Document hazır olduğunda event bindleri
+        $(document).ready(function () {
+            // Toggle chat butonu
+            $("#chatToggleBtn").click(window.toggleChat);
+
+            // Kapatma butonu
+            $("#chatClose").click(window.closeChat);
+
+            // Kişi seçme
+            $(document).on('click', '.contact-item', function (e) {
+                e.preventDefault();
+                window.openChatWithUser(
+                    $(this).data('userid'),
+                    $(this).data('username'),
+                    $(this).data('userimage')
+                );
+            });
+
+            // Geri butonu
+            $("#backToContacts").click(function () {
+                $("#chatMessages").hide();
+                $("#chatHeader").hide();
+                $("#recentContacts").show();
+                $("#chatControls").hide();
+                $("#receiverSelect").show();
+                window.currentReceiverId = null;
+                window.currentReceiverName = null;
+                window.currentReceiverImage = null;
+            });
+
+            // Yeni kişi seçimi dropdown
+            $("#receiverSelect").change(function () {
+                const receiverId = $(this).val();
+                if (receiverId) {
+                    const receiverName = $(this).find("option:selected").text();
+                    window.openChatWithUser(receiverId, receiverName, "/images/default-profile.png");
+                    $("#receiverSelect").val('').hide();
+                }
+            });
+
+            // Mesaj gönderme butonu
+            $("#sendButton").click(window.sendMessage);
+            $("#chatInput").keypress(function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    window.sendMessage();
+                }
+            });
+
+            // SignalR bağlantısını başlat
+            window.startConnection();
+            // Okunmamış mesajları yükle
+            window.updateUnreadCount();
+        });
+
+    })(window, jQuery);
 </script>
+
 
 <style>
     #chatToggleBtn {

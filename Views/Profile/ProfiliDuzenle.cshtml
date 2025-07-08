@@ -211,7 +211,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var role in Model.BuildingRoles)
+                                        @if (Model.BuildingRoles == null || !Model.BuildingRoles.Any())
+                                        {
+                                            <tr>
+                                                <td colspan="3" class="text-center">Henüz bir bina rolü eklenmemiş.</td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                             @foreach (var role in Model.BuildingRoles)
                                         {
                                         <tr>
                                             <td>@role.BuildingName</td>
@@ -233,7 +241,9 @@
                                                 }
                                             </td>
                                         </tr>
+                                        }                                            
                                         }
+
                                     </tbody>
                                 </table>
                             </div>

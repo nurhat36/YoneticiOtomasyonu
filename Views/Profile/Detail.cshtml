@@ -1,32 +1,256 @@
-﻿@using YoneticiOtomasyonu.Models.ViewModels
+﻿@using Microsoft.AspNetCore.Identity
+@using YoneticiOtomasyonu.Models.ViewModels
+@inject UserManager<ApplicationUser> UserManager
 @model UserProfileViewModel
 
-<div class="card shadow rounded-3" style="max-width: 400px;">
-    <img src="@Model.ProfileImageUrl" class="card-img-top" alt="@Model.FullName" style="height: 250px; object-fit: cover;" />
-    <div class="card-body">
-        <h5 class="card-title">@Model.FullName</h5>
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow rounded-3">
+                <div class="position-relative">
+                    <img src="@Model.ProfileImageUrl" class="card-img-top profile-header-img" alt="@Model.FullName">
+                    @if (Model.IsOnline)
+                    {
+                        <span class="position-absolute top-0 end-0 m-2 badge bg-success">🟢 Çevrimiçi</span>
+                    }
+                    <div class="profile-status-overlay @(Model.IsOnline ? "bg-success" : "bg-secondary")">
+                        @if (Model.IsOnline)
+                        {
+                            <span>Aktif</span>
+                        }
+                        else if (Model.LastActiveAt.HasValue)
+                        {
+                            <span>Son Görülme: @Model.LastActiveAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                        }
+                        else
+                        {
+                            <span>Hiç aktif olmadı</span>
+                        }
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h4 class="card-title mb-1">@Model.FullName</h4>
 
-        @if (Model.IsOnline)
-        {
-        <span class="badge bg-success mb-2">🟢 Şu anda aktif</span>
-        }
-        else if (Model.LastActiveAt.HasValue)
-        {
-        <span class="badge bg-secondary mb-2">
-            En son aktif: @Model.LastActiveAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
-        </span>
-        }
-        else
-        {
-        <span class="badge bg-secondary mb-2">Hiç aktif olmadı</span>
-        }
+                    @if (!string.IsNullOrEmpty(Model.RoleInBuilding))
+                    {
+                        <p class="text-muted mb-3">
+                            <i class="bi bi-person-badge me-1"></i> @Model.RoleInBuilding
+                        </p>
+                    }
 
-        <hr />
+                    <button id="sendMessageBtn" class="btn btn-primary w-100 mb-3"
+                            onclick="openChatWithUser('@Model.UserId', '@Model.FullName', '@Model.ProfileImageUrl')">
+                        <i class="bi bi-envelope me-2"></i>Mesaj Gönder
+                    </button>
 
-        <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-buildings fs-4 text-primary"></i>
-            <span class="fw-bold">Yönetici olduğu bina sayısı:</span>
-            <span class="badge bg-primary">@Model.ManagerBuildingCount</span>
+
+                    <hr class="my-3" />
+
+                    <div class="profile-info-section">
+                        @if (!string.IsNullOrEmpty(Model.PhoneNumber2))
+                        {
+                            <div class="info-item">
+                                <i class="bi bi-telephone text-primary"></i>
+                                <div>
+                                    <span class="info-label">Telefon</span>
+                                    <span class="info-value">@Model.PhoneNumber2</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.EmergencyContact))
+                        {
+                            <div class="info-item">
+                                <i class="bi bi-exclamation-triangle text-danger"></i>
+                                <div>
+                                    <span class="info-label">Acil Durum</span>
+                                    <span class="info-value">@Model.EmergencyContact</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.BloodType))
+                        {
+                            <div class="info-item">
+                                <i class="bi bi-droplet text-danger"></i>
+                                <div>
+                                    <span class="info-label">Kan Grubu</span>
+                                    <span class="info-value">@Model.BloodType</span>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="info-item">
+                            <i class="bi bi-buildings text-primary"></i>
+                            <div>
+                                <span class="info-label">Yönetici Olduğu Bina</span>
+                                <span class="info-value badge bg-primary">@Model.ManagerBuildingCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow rounded-3 h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Profil Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Address))
+                    {
+                        <div class="mb-4">
+                            <h6 class="section-title"><i class="bi bi-geo-alt me-2"></i>Adres Bilgisi</h6>
+                            <p class="text-muted">@Model.Address</p>
+                        </div>
+                    }
+
+                    <div class="mb-4">
+                        <h6 class="section-title"><i class="bi bi-building me-2"></i>Yönettiği Binalar</h6>
+                        @if (Model.ManagerBuildingCount > 0)
+                        {
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i> @Model.FullName, @Model.ManagerBuildingCount binada yönetici olarak görev yapmaktadır.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-secondary">
+                                <i class="bi bi-info-circle me-2"></i> @Model.FullName henüz herhangi bir binada yönetici olarak atanmamıştır.
+                            </div>
+                        }
+                    </div>
+
+                    <div class="additional-info">
+                        <h6 class="section-title"><i class="bi bi-card-checklist me-2"></i>Ek Bilgiler</h6>
+                        <div class="row">
+                            @if (!string.IsNullOrEmpty(Model.BloodType))
+                            {
+                                <div class="col-md-6">
+                                    <div class="additional-info-item">
+                                        <span class="info-label">Kan Grubu:</span>
+                                        <span class="info-value">@Model.BloodType</span>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.EmergencyContact))
+                            {
+                                <div class="col-md-6">
+                                    <div class="additional-info-item">
+                                        <span class="info-label">Acil Durum:</span>
+                                        <span class="info-value">@Model.EmergencyContact</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+<script>
+    function openChatWithUser(userId, userName, userImage) {
+        const chatBox = document.getElementById('chatBox');
+        chatBox.classList.add('open');
+        localStorage.setItem('chatOpen', true);
+
+        window.currentReceiverId = userId;
+        window.currentReceiverName = userName;
+        window.currentReceiverImage = userImage;
+
+        $("#recentContacts").hide();
+        $("#chatMessages").show();
+        $("#chatHeader").show();
+        $("#currentChatUserName").text(userName);
+        $("#currentChatUserImage").attr("src", userImage);
+        $("#chatControls").show();
+        $("#receiverSelect").hide();
+        $("#messagesContainer").html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>');
+
+        loadMessages(userId);
+        markMessagesAsRead(userId);
+    }
+</script>
+
+<style>
+    .profile-header-img {
+        height: 300px;
+        object-fit: cover;
+        width: 100%;
+        border-radius: 3px 3px 0 0;
+    }
+
+    .profile-status-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        color: white;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        text-align: center;
+        border-radius: 0 0 3px 3px;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .profile-info-section {
+        text-align: left;
+        margin-top: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+        .info-item i {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            width: 24px;
+            text-align: center;
+        }
+
+    .info-label {
+        display: block;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .info-value {
+        font-weight: 500;
+        color: #343a40;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        color: #495057;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .additional-info {
+        margin-top: 2rem;
+    }
+
+    .additional-info-item {
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+
+    a.btn-primary {
+        transition: all 0.3s;
+    }
+
+        a.btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+</style>

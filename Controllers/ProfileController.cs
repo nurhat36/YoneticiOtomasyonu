@@ -36,35 +36,51 @@ namespace YoneticiOtomasyonu.Controllers
                .Include(up => up.BuildingRoles)
                .ThenInclude(br => br.Building)
                .FirstOrDefaultAsync(up => up.IdentityUserId == user.Id);
-
-            var model = new ProfileEditViewModel
+            if (userProfile != null)
             {
-                // Identity bilgileri
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                UserName = user.UserName,
-                CurrentProfileImageUrl = user.ProfileImageUrl ?? "/images/default-profile.png",
-
-                // UserProfile bilgileri
-                FullName = userProfile?.FullName,
-                TCKN = userProfile?.TCKN,
-                PhoneNumber2 = userProfile?.PhoneNumber2,
-                Address = userProfile?.Address,
-                EmergencyContact = userProfile?.EmergencyContact,
-                RoleInBuilding = userProfile?.RoleInBuilding,
-                BirthDate = userProfile?.BirthDate,
-                BloodType = userProfile?.BloodType,
-                Notes = userProfile?.Notes,
-                BuildingRoles = userProfile.BuildingRoles.Select(br => new BuildingRoleViewModel
+                var model = new ProfileEditViewModel
                 {
-                    BuildingId = br.BuildingId,
-                    BuildingName = br.Building.Name,
-                    Role = br.Role,
-                    IsPrimary = br.IsPrimary
-                }).ToList()
-            };
+                    // Identity bilgileri
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    UserName = user.UserName,
+                    CurrentProfileImageUrl = user.ProfileImageUrl ?? "/images/default-profile.png",
 
-            return View(model);
+                    // UserProfile bilgileri
+                    FullName = userProfile?.FullName,
+                    TCKN = userProfile?.TCKN,
+                    PhoneNumber2 = userProfile?.PhoneNumber2,
+                    Address = userProfile?.Address,
+                    EmergencyContact = userProfile?.EmergencyContact,
+                    RoleInBuilding = userProfile?.RoleInBuilding,
+                    BirthDate = userProfile?.BirthDate,
+                    BloodType = userProfile?.BloodType,
+                    Notes = userProfile?.Notes,
+                    BuildingRoles = userProfile.BuildingRoles.Select(br => new BuildingRoleViewModel
+                    {
+                        BuildingId = br.BuildingId,
+                        BuildingName = br.Building.Name,
+                        Role = br.Role,
+                        IsPrimary = br.IsPrimary
+                    }).ToList()
+                };
+                return View(model);
+            }
+            else
+            {
+                // Eğer UserProfile yoksa yeni bir model oluştur
+                var model = new ProfileEditViewModel
+                {
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    UserName = user.UserName,
+                    CurrentProfileImageUrl = user.ProfileImageUrl ?? "/images/default-profile.png"
+                };
+                return View(model);
+            }
+            
+
+            
         }
 
         [HttpPost]
@@ -210,6 +226,7 @@ namespace YoneticiOtomasyonu.Controllers
 
             return View(notifications);
         }
+        // Controller
         [Route("profile/detail/{slug}")]
         public async Task<IActionResult> Detail(string slug)
         {
@@ -217,22 +234,31 @@ namespace YoneticiOtomasyonu.Controllers
             if (user == null)
                 return NotFound();
 
-            // Kullanıcının kaç binada yönetici olduğunu al
-            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.IdentityUserId == user.Id);
+            var userProfile = await _context.UserProfiles
+                .Include(x => x.BuildingRoles)
+                .FirstOrDefaultAsync(x => x.IdentityUserId == user.Id);
+
             if (userProfile == null)
                 return NotFound();
 
-            // Artık userProfile.Id üzerinden sorgu yapabiliriz
-            var managerCount = await _context.UserBuildingRoles
-                .CountAsync(x => x.UserProfileId == userProfile.Id && x.Role == "Yönetici");
+            var managerCount = userProfile.BuildingRoles
+                .Count(x => x.Role == "Yönetici");
 
             var vm = new UserProfileViewModel
             {
-                FullName = user.UserName,
+                UserId = user.Id,
+                FullName = userProfile.FullName ?? user.UserName,
                 ProfileImageUrl = user.ProfileImageUrl,
                 Slug = user.Slug,
                 LastActiveAt = user.LastActiveAt,
-                ManagerBuildingCount = managerCount // burada viewmodel'e verdik 👈
+                ManagerBuildingCount = managerCount,
+
+                // UserProfile bilgileri
+                PhoneNumber2 = userProfile.PhoneNumber2,
+                Address = userProfile.Address,
+                EmergencyContact = userProfile.EmergencyContact,
+                RoleInBuilding = userProfile.RoleInBuilding,
+                BloodType = userProfile.BloodType
             };
 
             return View(vm);
