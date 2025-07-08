@@ -8,6 +8,7 @@
         public DateTime? LastActiveAt { get; set; }
 
         public bool IsOnline => LastActiveAt.HasValue && LastActiveAt.Value > DateTime.UtcNow.AddMinutes(-5);
+        public int ManagerBuildingCount { get; set; }
     }
 
 }

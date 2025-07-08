@@ -217,16 +217,27 @@ namespace YoneticiOtomasyonu.Controllers
             if (user == null)
                 return NotFound();
 
+            // Kullanıcının kaç binada yönetici olduğunu al
+            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.IdentityUserId == user.Id);
+            if (userProfile == null)
+                return NotFound();
+
+            // Artık userProfile.Id üzerinden sorgu yapabiliriz
+            var managerCount = await _context.UserBuildingRoles
+                .CountAsync(x => x.UserProfileId == userProfile.Id && x.Role == "Yönetici");
+
             var vm = new UserProfileViewModel
             {
                 FullName = user.UserName,
                 ProfileImageUrl = user.ProfileImageUrl,
                 Slug = user.Slug,
-                LastActiveAt = user.LastActiveAt
+                LastActiveAt = user.LastActiveAt,
+                ManagerBuildingCount = managerCount // burada viewmodel'e verdik 👈
             };
 
             return View(vm);
         }
+
 
     }
 }
