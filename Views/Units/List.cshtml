@@ -43,14 +43,15 @@
                             <i class="fas fa-filter me-1"></i>Filtrele
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                            <li><a class="dropdown-item" href="#">Tümü</a></li>
-                            <li><a class="dropdown-item" href="#">Dolu Birimler</a></li>
-                            <li><a class="dropdown-item" href="#">Boş Birimler</a></li>
+                            <li><a class="dropdown-item" asp-action="List" asp-route-buildingId="@ViewBag.BuildingId" asp-route-status="all" asp-route-unitType="all">Tümü</a></li>
+                            <li><a class="dropdown-item" asp-action="List" asp-route-buildingId="@ViewBag.BuildingId" asp-route-status="occupied" asp-route-unitType="all">Dolu Birimler</a></li>
+                            <li><a class="dropdown-item" asp-action="List" asp-route-buildingId="@ViewBag.BuildingId" asp-route-status="empty" asp-route-unitType="all">Boş Birimler</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Daireler</a></li>
-                            <li><a class="dropdown-item" href="#">Ofisler</a></li>
-                            <li><a class="dropdown-item" href="#">Depolar</a></li>
+                            <li><a class="dropdown-item" asp-action="List" asp-route-buildingId="@ViewBag.BuildingId" asp-route-status="all" asp-route-unitType="Daire">Daireler</a></li>
+                            <li><a class="dropdown-item" asp-action="List" asp-route-buildingId="@ViewBag.BuildingId" asp-route-status="all" asp-route-unitType="Ofis">Ofisler</a></li>
+                            <li><a class="dropdown-item" asp-action="List" asp-route-buildingId="@ViewBag.BuildingId" asp-route-status="all" asp-route-unitType="Depo">Depolar</a></li>
                         </ul>
+
                     </div>
                 </div>
             </div>

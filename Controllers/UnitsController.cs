@@ -118,7 +118,7 @@ namespace YoneticiOtomasyonu.Controllers
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IActionResult> List(int buildingId)
+        public async Task<IActionResult> List(int buildingId, string status = "all", string unitType = "all")
         {
             var building = await _context.Buildings
                 .Include(b => b.Units)
@@ -126,13 +126,24 @@ namespace YoneticiOtomasyonu.Controllers
 
             if (building == null) return NotFound();
 
-            // Unit'leri resident (ApplicationUser) bilgisiyle al
-            var units = await _context.Units
+            // Unit'leri Resident ile al ve filtre uygula
+            var unitsQuery = _context.Units
                 .Include(u => u.Resident)
-                .Where(u => u.BuildingId == buildingId)
-                .ToListAsync();
+                .Where(u => u.BuildingId == buildingId);
 
-            // Her resident için UserProfile ve UserBuildingRole al
+            // 🔹 Dolu/boş filtreleme
+            if (status == "occupied")
+                unitsQuery = unitsQuery.Where(u => u.Resident != null);
+            else if (status == "empty")
+                unitsQuery = unitsQuery.Where(u => u.Resident == null);
+
+            // 🔹 Birim türü filtreleme (örneğin: Daire, Ofis, Depo)
+            if (unitType != "all")
+                unitsQuery = unitsQuery.Where(u => u.Type.ToLower() == unitType.ToLower());
+
+            var units = await unitsQuery.ToListAsync();
+
+            // Kullanıcının rol bilgisi ekleniyor
             foreach (var unit in units.Where(u => u.Resident != null))
             {
                 var userProfile = await _context.UserProfiles
@@ -145,20 +156,18 @@ namespace YoneticiOtomasyonu.Controllers
                         .Select(r => r.Role)
                         .FirstOrDefaultAsync();
 
-                    // Sonuç olarak role'ü Resident nesnesine (örneğin Temp alan) ekleyebilirsin
-                    // Veya ViewBag üzerinden gönderebilirsin, ya da ViewModel oluşturabilirsin
-                    // Hızlı çözüm için Resident nesnesinin Tag property’sini kullanabilirsin (dynamic property yok, ama geçici hack olarak ViewBag kullanırız)
-
-                    // Burada geçici bir çözüm: unit'e CustomRole property ekleyelim
-                    unit.Description += $" [Rol: {role}]"; // örnek
+                    unit.Description += $" [Rol: {role}]";
                 }
             }
 
             ViewBag.BuildingName = building.Name;
             ViewBag.BuildingId = buildingId;
+            ViewBag.Status = status;
+            ViewBag.UnitType = unitType;
 
             return View(units);
         }
+
 
         public async Task<IActionResult> Details(int id)
         {
