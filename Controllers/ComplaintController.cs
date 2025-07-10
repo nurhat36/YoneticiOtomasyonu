@@ -7,8 +7,11 @@ using YoneticiOtomasyonu.Data;
 using YoneticiOtomasyonu.Models;
 namespace YoneticiOtomasyonu.Controllers { 
 [Authorize]
-public class ComplaintController : Controller
+
+    [Route("Buildings/{buildingId:int}/[controller]/[action]")]
+    public class ComplaintController : Controller
 {
+
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
@@ -19,7 +22,7 @@ public class ComplaintController : Controller
     }
 
     // Listeleme
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int buildingId)
     {
         var complaints = await _context.Complaints
             .Include(c => c.Unit)
@@ -27,7 +30,7 @@ public class ComplaintController : Controller
             .Include(c => c.AssignedTo)
             .Include(c => c.Images)  // Resimler burada yüklenmeli
             .ToListAsync();
-
+        ViewBag.BuildingId = buildingId; // Binaya göre filtreleme için BuildingId'yi ViewBag'e ekle
         return View(complaints);
     }
 

@@ -354,7 +354,7 @@
 
             <ul class="sidebar-menu">
                 <li class="@(ViewContext.RouteData.Values["action"].ToString() == "Dashboard" ? "active" : "")">
-                    <a asp-action="Dashboard" asp-route-buildingId="@ViewBag.BuildingId">
+                    <a asp-action="Dashboard" asp-controller="Buildings" asp-route-buildingId="@ViewBag.BuildingId">
                         <i class="bi bi-speedometer2"></i>
                         <span>Dashboard</span>
                     </a>

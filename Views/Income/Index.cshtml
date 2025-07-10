@@ -2,7 +2,6 @@
 
 @{
     Layout = "_ManagementLayout";
-
     ViewData["Title"] = "Gelir Listesi";
 }
 
@@ -74,11 +73,10 @@
                                     <div class="d-flex align-items-center">
                                         @if (!string.IsNullOrEmpty(item.Payer?.ProfileImageUrl))
                                         {
-                                            <a  asp-controller="Profile" asp-action="Detail" asp-route-slug="@item.Payer.Slug">
+                                            <a asp-controller="Profile" asp-action="Detail" asp-route-slug="@item.Payer.Slug">
                                                 <img src="@item.Payer.ProfileImageUrl" class="rounded-circle mr-2"
                                                      width="30" height="30" alt="Profil Resmi">
                                             </a>
-
                                         }
                                         else
                                         {
@@ -92,15 +90,15 @@
                                 </td>
                                 <td class="text-right">
                                     <div class="btn-group" role="group">
-                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                        <a asp-action="Details" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@item.Id"
                                            class="btn btn-sm btn-info" title="Detay">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                        <a asp-action="Edit" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@item.Id"
                                            class="btn btn-sm btn-warning" title="Düzenle">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                        <a asp-action="Delete" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@item.Id"
                                            class="btn btn-sm btn-danger" title="Sil">
                                             <i class="fas fa-trash"></i>
                                         </a>
@@ -134,7 +132,6 @@
             font-weight: 500;
         }
 
-        /* Badge metin renkleri */
         .badge-info.text-white,
         .badge-primary.text-white,
         .badge-success.text-white {
@@ -156,9 +153,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Satırlara tıklanınca detay sayfasına git
             $('tbody tr').click(function (e) {
-                // Eğer tıklanan element bir buton değilse
                 if (!$(e.target).closest('a, button').length) {
                     window.location = $(this).find('a[title="Detay"]').attr('href');
                 }

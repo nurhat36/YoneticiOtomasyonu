@@ -7,6 +7,7 @@ using YoneticiOtomasyonu.Models;
 using YoneticiOtomasyonu.Models.ViewModels;
 namespace YoneticiOtomasyonu.Controllers
 {
+    [Route("Buildings/{buildingId:int}/[controller]/[action]")]
     public class DuesSettingsController : Controller
     {
         private readonly ApplicationDbContext _context;

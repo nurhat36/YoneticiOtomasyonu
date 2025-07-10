@@ -9,6 +9,7 @@ using YoneticiOtomasyonu.Models.ViewModels;
 
 namespace YoneticiOtomasyonu.Controllers
 {
+    [Route("Buildings/{buildingId:int}/[controller]/[action]")]
     [Authorize]
     public class UnitsController : Controller
     {

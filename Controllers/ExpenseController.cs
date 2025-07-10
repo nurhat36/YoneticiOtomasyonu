@@ -6,6 +6,7 @@ using YoneticiOtomasyonu.Data;
 using YoneticiOtomasyonu.Models;
 
 [Authorize]
+[Route("Buildings/{buildingId:int}/[controller]/[action]")]
 public class ExpenseController : Controller
 {
     private readonly ApplicationDbContext _context;

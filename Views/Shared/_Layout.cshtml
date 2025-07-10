@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using YoneticiOtomasyonu.Models  <!-- Kendi projenin namespace'ine göre düzenle -->
+@using YoneticiOtomasyonu.Models
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @{
@@ -11,37 +11,554 @@
 <html lang="tr">
 <head>
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - YoneticiOtomasyonu</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/YoneticiOtomasyonu.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css" />
     @RenderSection("Styles", required: false)
 
     <style>
-        /* Mesaj kutusu içi mesaj stilleri */
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #5a75f1;
+            --primary-dark: #3a56d4;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --success-color: #4cc9f0;
+            --warning-color: #f8961e;
+            --danger-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --transition-fast: all 0.2s ease;
+            --transition-medium: all 0.3s ease;
+            --transition-slow: all 0.5s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark-color);
+            padding-top: 70px; /* Adjusted for fixed header */
+        }
+
+        /* Fixed Navbar */
+        .navbar {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border) !important;
+            
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Particle.js background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            background: transparent;
+        }
+
+        /* Floating gradient circles */
+        .gradient-circles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .gradient-circles li {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(67, 97, 238, 0.2);
+            animation: float 25s linear infinite;
+            bottom: -150px;
+            border-radius: 50%;
+            filter: blur(15px);
+        }
+
+        .gradient-circles li:nth-child(1) {
+            left: 25%;
+            width: 80px;
+            height: 80px;
+            animation-delay: 0s;
+            background: rgba(67, 97, 238, 0.15);
+        }
+
+        .gradient-circles li:nth-child(2) {
+            left: 10%;
+            width: 20px;
+            height: 20px;
+            animation-delay: 2s;
+            animation-duration: 12s;
+            background: rgba(72, 149, 239, 0.2);
+        }
+
+        .gradient-circles li:nth-child(3) {
+            left: 70%;
+            width: 20px;
+            height: 20px;
+            animation-delay: 4s;
+            background: rgba(247, 37, 133, 0.1);
+        }
+
+        .gradient-circles li:nth-child(4) {
+            left: 40%;
+            width: 60px;
+            height: 60px;
+            animation-delay: 0s;
+            animation-duration: 18s;
+            background: rgba(76, 201, 240, 0.15);
+        }
+
+        .gradient-circles li:nth-child(5) {
+            left: 65%;
+            width: 20px;
+            height: 20px;
+            animation-delay: 0s;
+        }
+
+        .gradient-circles li:nth-child(6) {
+            left: 75%;
+            width: 110px;
+            height: 110px;
+            animation-delay: 3s;
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .gradient-circles li:nth-child(7) {
+            left: 35%;
+            width: 150px;
+            height: 150px;
+            animation-delay: 7s;
+            background: rgba(248, 150, 30, 0.1);
+        }
+
+        .gradient-circles li:nth-child(8) {
+            left: 50%;
+            width: 25px;
+            height: 25px;
+            animation-delay: 15s;
+            animation-duration: 45s;
+            background: rgba(63, 55, 201, 0.2);
+        }
+
+        .gradient-circles li:nth-child(9) {
+            left: 20%;
+            width: 15px;
+            height: 15px;
+            animation-delay: 2s;
+            animation-duration: 35s;
+            background: rgba(67, 97, 238, 0.2);
+        }
+
+        .gradient-circles li:nth-child(10) {
+            left: 85%;
+            width: 150px;
+            height: 150px;
+            animation-delay: 0s;
+            animation-duration: 11s;
+            background: rgba(72, 149, 239, 0.15);
+        }
+
+        @@keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+                border-radius: 50%;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+                border-radius: 20%;
+            }
+        }
+
+        /* Main container styling */
+        .main-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            margin: 2rem auto;
+            animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: var(--transition-medium);
+        }
+
+        @@keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Navbar elements */
+        .nav-link {
+            transition: var(--transition-fast);
+            position: relative;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            margin: 0 0.25rem;
+            color: var(--dark-color) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            transition: var(--transition-fast);
+        }
+
+        .nav-link:hover::before {
+            width: 70%;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Dropdown styling */
+        .dropdown-menu {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            animation: fadeInDown 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            padding: 0.5rem 0;
+            border-radius: 10px !important;
+            overflow: hidden;
+        }
+
+        @@keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            transition: var(--transition-fast);
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+            transform: translateX(5px);
+        }
+
+        .dropdown-item:hover i {
+            color: white !important;
+        }
+
+        .dropdown-item i {
+            transition: var(--transition-fast);
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+            color: var(--gray-color);
+        }
+
+        /* Button effects */
+        .btn {
+            transition: var(--transition-medium);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 25%, rgba(255,255,255,0.3) 50%, transparent 75%);
+            background-size: 400% 400%;
+            transition: var(--transition-medium);
+            opacity: 0;
+        }
+
+        .btn-primary:hover::after {
+            opacity: 1;
+            animation: shine 1.5s infinite;
+        }
+
+        @@keyframes shine {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Profile image styling */
+        .profile-img {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transition-medium);
+        }
+
+        .profile-img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Chat box styling */
+        .chat-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            transform-origin: bottom right;
+            transition: var(--transition-medium);
+        }
+
+        .chat-box {
+            width: 350px;
+            max-width: 90vw;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            transform: translateY(0);
+            transition: var(--transition-medium);
+            animation: fadeInRight 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @@keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .chat-box:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Message styling */
         .message-container {
-            border-radius: 8px;
-            padding: 10px 15px;
-            margin-bottom: 10px;
+            border-radius: 15px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
             max-width: 80%;
             word-wrap: break-word;
+            animation: messageIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+            transition: var(--transition-fast);
+        }
+
+        @@keyframes messageIn {
+            from { opacity: 0; transform: translateY(15px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .message-sender {
-            background-color: #e3f2fd;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
             margin-left: auto;
+            border-bottom-right-radius: 5px;
         }
 
         .message-receiver {
-            background-color: #f1f1f1;
+            background: white;
             margin-right: auto;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Footer styling */
+        .footer {
+          position: fixed;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid var(--glass-border) !important;
+            transition: var(--transition-medium);
+            padding: 1rem 0;
+        }
+
+        /* Responsive adjustments */
+        @@media (max-width: 992px) {
+            body {
+                padding-top: 60px;
+            }
+
+            .main-container {
+                border-radius: 0;
+                margin: 1rem 0;
+            }
+            
+            .navbar-collapse {
+                background: var(--glass-bg);
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+                border: 1px solid var(--glass-border);
+                border-radius: 10px;
+                margin-top: 0.5rem;
+                padding: 1rem;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .chat-box {
+                width: 300px;
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            body {
+                padding-top: 56px;
+            }
+
+            .main-container {
+                padding: 1.5rem;
+            }
+            
+            .chat-box {
+                width: 280px;
+                right: 10px;
+                bottom: 10px;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(67, 97, 238, 0.4);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(67, 97, 238, 0.6);
         }
     </style>
 </head>
 <body>
+    <!-- Particle.js background -->
+    <div id="particles-js"></div>
+    
+    <!-- Floating gradient circles -->
+    <ul class="gradient-circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+
+    <!-- Fixed Header -->
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -50,62 +567,67 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark hvr-underline-from-center" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark hvr-underline-from-center" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Buildings" asp-action="Create">Kendi binanı oluştur</a>
+                            <a class="nav-link text-dark hvr-underline-from-center" asp-area="" asp-controller="Buildings" asp-action="Create">Kendi binanı oluştur</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav align-items-center">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item me-2 position-relative">
+                            <li class="nav-item me-3 position-relative">
                                 @await Component.InvokeAsync("Notification")
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img src="@profilePic" alt="Profil Resmi" class="rounded-circle" style="width:32px; height:32px; object-fit:cover;" />
+                                <a class="nav-link dropdown-toggle d-flex align-items-center animate__animated animate__fadeIn" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="@profilePic" alt="Profil Resmi" class="profile-img me-2" />
+                                    <span class="d-none d-lg-inline fw-medium">@UserManager.GetUserName(User)</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <ul class="dropdown-menu dropdown-menu-end animate__animated animate__fadeIn" aria-labelledby="navbarDropdown">
                                     <li>
-                                        <div class="px-3 py-2">
-                                            <span class="fw-bold">@UserManager.GetUserName(User)</span>
+                                        <div class="px-3 py-2 d-flex align-items-center">
+                                            <img src="@profilePic" alt="Profil Resmi" class="profile-img me-3" style="width: 50px; height: 50px;" />
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">@UserManager.GetUserName(User)</h6>
+                                                <small class="text-muted">Yönetici</small>
+                                            </div>
                                         </div>
                                     </li>
-                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><hr class="dropdown-divider my-1" /></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Profile" asp-action="ProfiliDuzenle" >
+                                        <a class="dropdown-item hvr-forward" asp-controller="Profile" asp-action="ProfiliDuzenle">
                                             <i class="fas fa-user me-2"></i>Profil Bilgilerim
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Profile" asp-action="MyDebts" >
+                                        <a class="dropdown-item hvr-forward" asp-controller="Profile" asp-action="MyDebts">
                                             <i class="fas fa-money-check-alt me-2"></i>Borçlarım
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Buildings" asp-action="Index">
+                                        <a class="dropdown-item hvr-forward" asp-controller="Buildings" asp-action="Index">
                                             <i class="fas fa-building me-2"></i>Binalarım
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="WorkTask" asp-action="MyTasks">
+                                        <a class="dropdown-item hvr-forward" asp-controller="WorkTask" asp-action="MyTasks">
                                             <i class="fas fa-tasks me-2"></i> Görevlerim
                                             @await Component.InvokeAsync("TaskCounter")
                                         </a>
                                     </li>
-                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><hr class="dropdown-divider my-1" /></li>
                                     <li>
                                         <form method="post" asp-area="Identity" asp-page="/Account/Logout" id="logoutForm" class="d-inline">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="dropdown-item bg-transparent border-0 w-100 text-start" style="cursor:pointer;">
-                                                <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                                            <button type="submit" class="dropdown-item bg-transparent border-0 w-100 text-start hvr-icon-wobble-horizontal" style="cursor:pointer;">
+                                                <i class="fas fa-sign-out-alt me-2 hvr-icon"></i>Çıkış Yap
                                             </button>
                                         </form>
                                     </li>
@@ -115,10 +637,10 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Giriş Yap</a>
+                                <a class="nav-link text-dark hvr-underline-from-center" asp-area="Identity" asp-page="/Account/Login">Giriş Yap</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Kayıt Ol</a>
+                                <a class="nav-link text-dark hvr-underline-from-center" asp-area="Identity" asp-page="/Account/Register">Kayıt Ol</a>
                             </li>
                         }
                     </ul>
@@ -127,32 +649,180 @@
         </nav>
     </header>
 
-    <!-- Chat Toggle Butonu -->
-      
-
- 
-    
-    <!-- Chat Kutusu -->
-    @await Component.InvokeAsync("ChatBox")
-
-    <div class="container">
+    <!-- Main Content -->
+    <div class="container main-container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - YoneticiOtomasyonu - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Chat Box Container -->
+    <div class="chat-container">
+        @await Component.InvokeAsync("ChatBox")
+    </div>
+
+    <footer class="border-top footer text-muted py-3">
+        <div class="container text-center">
+            &copy; 2025 - YoneticiOtomasyonu - <a class="hvr-underline-from-center" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
-   
+    <script>
+        // Initialize particles.js
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof particlesJS !== 'undefined') {
+                particlesJS('particles-js', {
+                    particles: {
+                        number: { value: 80, density: { enable: true, value_area: 800 } },
+                        color: { value: "#4361ee" },
+                        shape: { type: "circle" },
+                        opacity: { value: 0.5, random: true },
+                        size: { value: 3, random: true },
+                        line_linked: { enable: true, distance: 150, color: "#4361ee", opacity: 0.3, width: 1 },
+                        move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+                    },
+                    interactivity: {
+                        detect_on: "canvas",
+                        events: {
+                            onhover: { enable: true, mode: "repulse" },
+                            onclick: { enable: true, mode: "push" }
+                        }
+                    }
+                });
+            }
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 10) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // GSAP animations
+            gsap.from(".navbar", { 
+                duration: 0.8, 
+                y: -50, 
+                opacity: 0, 
+                ease: "power2.out",
+                delay: 0.2
+            });
+
+            gsap.from(".main-container", {
+                duration: 0.8,
+                y: 30,
+                opacity: 0,
+                ease: "back.out(1.2)",
+                delay: 0.4
+            });
+
+            // Card hover effects
+            $(".card").hover(
+                function() {
+                    gsap.to($(this), {
+                        duration: 0.3,
+                        y: -5,
+                        boxShadow: "0 15px 30px rgba(0,0,0,0.12)",
+                        ease: "power1.out"
+                    });
+                },
+                function() {
+                    gsap.to($(this), {
+                        duration: 0.3,
+                        y: 0,
+                        boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
+                        ease: "power1.out"
+                    });
+                }
+            );
+
+            // Button shine effect
+            $(".btn-primary").hover(
+                function() {
+                    gsap.to($(this), {
+                        duration: 0.3,
+                        y: -3,
+                        boxShadow: "0 8px 25px rgba(67, 97, 238, 0.5)",
+                        ease: "power1.out"
+                    });
+                },
+                function() {
+                    gsap.to($(this), {
+                        duration: 0.3,
+                        y: 0,
+                        boxShadow: "0 4px 15px rgba(67, 97, 238, 0.4)",
+                        ease: "power1.out"
+                    });
+                }
+            );
+
+            // Chat box toggle animation
+            $("#chatToggle").click(function() {
+                const chatBox = $("#chatBox");
+                if (chatBox.hasClass("animate__fadeInRight")) {
+                    chatBox.removeClass("animate__fadeInRight").addClass("animate__fadeOutRight");
+                    setTimeout(() => chatBox.hide(), 300);
+                } else {
+                    chatBox.removeClass("animate__fadeOutRight").addClass("animate__fadeInRight").show();
+                }
+            });
+
+            // Toastr notification settings
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-bottom-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+
+            // Floating gradient circles animation
+            function animateCircles() {
+                $(".gradient-circles li").each(function(index) {
+                    const duration = Math.random() * 20 + 10;
+                    const delay = Math.random() * 5;
+                    
+                    gsap.to($(this), {
+                        duration: duration,
+                        y: -1000,
+                        x: Math.random() * 200 - 100,
+                        rotation: Math.random() * 360,
+                        opacity: 0,
+                        delay: delay,
+                        ease: "none",
+                        onComplete: function() {
+                            $(this).css({
+                                y: 0,
+                                x: 0,
+                                opacity: 1,
+                                rotation: 0
+                            });
+                            animateCircles();
+                        }
+                    });
+                });
+            }
+
+            animateCircles();
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
