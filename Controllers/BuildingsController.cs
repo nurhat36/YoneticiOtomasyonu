@@ -15,6 +15,7 @@ using YoneticiOtomasyonu.Services.Interfaces;
 namespace YoneticiOtomasyonu.Controllers
 {
     [Authorize]
+    [Route("Buildings/{buildingId:int}/[action]")]
     public class BuildingsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -34,7 +35,7 @@ namespace YoneticiOtomasyonu.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        // GET: Buildings
+        [Route("/Buildings")]
         public async Task<IActionResult> Index()
         {
             var currentUserId = _userManager.GetUserId(User);
@@ -42,9 +43,7 @@ namespace YoneticiOtomasyonu.Controllers
                 .FirstOrDefaultAsync(up => up.IdentityUserId == currentUserId);
 
             if (userProfile == null)
-            {
                 return NotFound();
-            }
 
             var buildingsWithRoles = await _context.UserBuildingRoles
                 .Where(ubr => ubr.UserProfileId == userProfile.Id)
@@ -59,12 +58,9 @@ namespace YoneticiOtomasyonu.Controllers
             return View(buildingsWithRoles);
         }
 
-        // GET: Buildings/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int buildingId)
         {
-            if (id == null) return NotFound();
-
-            var building = await _buildingService.GetBuildingByIdAsync(id.Value);
+            var building = await _buildingService.GetBuildingByIdAsync(buildingId);
             if (building == null) return NotFound();
 
             var currentUserId = _userManager.GetUserId(User);
@@ -74,17 +70,40 @@ namespace YoneticiOtomasyonu.Controllers
             if (userProfile == null) return NotFound();
 
             ViewBag.UserRole = await _buildingService.GetUserRoleInBuildingAsync(userProfile.Id, building.Id);
-
-            // Yöneticileri getir
             ViewBag.Managers = await _buildingService.GetBuildingManagersAsync(building.Id);
+
+            ViewBag.BuildingId = building.Id;
+            ViewBag.BuildingName = building.Name;
 
             return View(building);
         }
 
-        // GET: Buildings/DetailsPartial/5 (AJAX için)
+        public async Task<IActionResult> Dashboard(int buildingId)
+        {
+            var building = await _buildingService.GetBuildingByIdAsync(buildingId);
+            if (building == null) return NotFound();
 
+            ViewBag.BuildingId = building.Id;
+            ViewBag.BuildingName = building.Name;
+
+            return View();
+        }
+
+       
+
+        public async Task<IActionResult> Settings(int buildingId)
+        {
+            var building = await _buildingService.GetBuildingByIdAsync(buildingId);
+            if (building == null) return NotFound();
+
+            ViewBag.BuildingId = building.Id;
+            ViewBag.BuildingName = building.Name;
+
+            return View();
+        }
 
         // GET: Buildings/Create
+        [Route("/Buildings/Create")]
         public IActionResult Create()
         {
             return View(new BuildingViewModel());
@@ -93,75 +112,74 @@ namespace YoneticiOtomasyonu.Controllers
         // POST: Buildings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("/Buildings/Create")]
         public async Task<IActionResult> Create(BuildingViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                // Check if building with same name and address already exists
-                if (await _buildingService.IsBuildingExistsAsync(model.Name, model.Address))
+                return View(model);
+            }
+
+            if (await _buildingService.IsBuildingExistsAsync(model.Name, model.Address))
+            {
+                ModelState.AddModelError("", "Bu isim ve adreste zaten bir bina kayýtlý");
+                return View(model);
+            }
+
+            string imageUrl = null;
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "BuildsImage");
+                if (!Directory.Exists(uploadsFolder))
                 {
-                    ModelState.AddModelError("", "Bu isim ve adreste zaten bir bina kayýtlý");
-                    return View(model);
+                    Directory.CreateDirectory(uploadsFolder);
                 }
 
-                // Handle image upload
-                string imageUrl = null;
-                if (model.ImageFile != null && model.ImageFile.Length > 0)
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    var uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "BuildsImage");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
-
-                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await model.ImageFile.CopyToAsync(fileStream);
-                    }
-
-                    imageUrl = $"/BuildsImage/{uniqueFileName}";
+                    await model.ImageFile.CopyToAsync(fileStream);
                 }
 
-                var currentUserId = _userManager.GetUserId(User);
-                var building = new Building
-                {
-                    Name = model.Name,
-                    Address = model.Address,
-                    Type = model.Type,
-                    Block = model.Block,
-                    FloorCount = model.FloorCount,
-                    UnitCount = model.UnitCount,
-                    Description = model.Description,
-                    ImageUrl = imageUrl,
-                    CreatedAt = DateTime.Now
-                };
+                imageUrl = $"/BuildsImage/{uniqueFileName}";
+            }
 
-                var (success, message) = await _buildingService.CreateBuildingAsync(building, currentUserId);
+            var currentUserId = _userManager.GetUserId(User);
+            var building = new Building
+            {
+                Name = model.Name,
+                Address = model.Address,
+                Type = model.Type,
+                Block = model.Block,
+                FloorCount = model.FloorCount,
+                UnitCount = model.UnitCount,
+                Description = model.Description,
+                ImageUrl = imageUrl,
+                CreatedAt = DateTime.Now
+            };
 
-                if (success)
-                {
-                    TempData["Success"] = message;
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    TempData["Error"] = message;
-                }
+            var (success, message) = await _buildingService.CreateBuildingAsync(building, currentUserId);
+
+            if (success)
+            {
+                TempData["Success"] = message;
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                TempData["Error"] = message;
             }
 
             return View(model);
         }
 
         // GET: Buildings/Edit/5
-        [Authorize(Policy = "BuildingAdmin")]
-        public async Task<IActionResult> Edit(int? id)
+        
+        public async Task<IActionResult> Edit(int buildingId)
         {
-            if (id == null) return NotFound();
-
-            var building = await _buildingService.GetBuildingByIdAsync(id.Value);
+            var building = await _buildingService.GetBuildingByIdAsync(buildingId);
             if (building == null) return NotFound();
 
             var model = new BuildingViewModel
@@ -177,92 +195,80 @@ namespace YoneticiOtomasyonu.Controllers
                 CurrentImageUrl = building.ImageUrl
             };
 
+            ViewBag.BuildingId = building.Id;
+            ViewBag.BuildingName = building.Name;
+
             return View(model);
         }
 
         // POST: Buildings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Policy = "BuildingAdmin")]
-        public async Task<IActionResult> Edit(int id, BuildingViewModel model)
+        
+        public async Task<IActionResult> Edit(int buildingId, BuildingViewModel model)
         {
-            if (id != model.Id) return NotFound();
+            if (buildingId != model.Id) return NotFound();
 
             if (!ModelState.IsValid)
             {
-                try
-                {
-                    var building = await _buildingService.GetBuildingByIdAsync(id);
-                    if (building == null) return NotFound();
-
-                    // Handle image upload
-                    if (model.ImageFile != null && model.ImageFile.Length > 0)
-                    {
-                        var uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "BuildsImage");
-                        if (!Directory.Exists(uploadsFolder))
-                        {
-                            Directory.CreateDirectory(uploadsFolder);
-                        }
-
-                        // Delete old image if exists
-                        if (!string.IsNullOrEmpty(building.ImageUrl))
-                        {
-                            var oldImagePath = Path.Combine(_hostingEnvironment.WebRootPath, building.ImageUrl.TrimStart('/'));
-                            if (System.IO.File.Exists(oldImagePath))
-                            {
-                                System.IO.File.Delete(oldImagePath);
-                            }
-                        }
-
-                        var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
-                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await model.ImageFile.CopyToAsync(fileStream);
-                        }
-
-                        building.ImageUrl = $"/BuildsImage/{uniqueFileName}";
-                    }
-
-                    // Update other properties
-                    building.Name = model.Name;
-                    building.Address = model.Address;
-                    building.Type = model.Type;
-                    building.Block = model.Block;
-                    building.FloorCount = model.FloorCount;
-                    building.UnitCount = model.UnitCount;
-                    building.Description = model.Description;
-
-                    _context.Update(building);
-                    await _context.SaveChangesAsync();
-
-                    TempData["Success"] = "Bina bilgileri baþarýyla güncellendi";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await BuildingExists(model.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                return View(model);
             }
-            return View(model);
+
+            var building = await _buildingService.GetBuildingByIdAsync(buildingId);
+            if (building == null) return NotFound();
+
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "BuildsImage");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                if (!string.IsNullOrEmpty(building.ImageUrl))
+                {
+                    var oldImagePath = Path.Combine(_hostingEnvironment.WebRootPath, building.ImageUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(fileStream);
+                }
+
+                building.ImageUrl = $"/BuildsImage/{uniqueFileName}";
+            }
+
+            building.Name = model.Name;
+            building.Address = model.Address;
+            building.Type = model.Type;
+            building.Block = model.Block;
+            building.FloorCount = model.FloorCount;
+            building.UnitCount = model.UnitCount;
+            building.Description = model.Description;
+
+            _context.Update(building);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Bina bilgileri baþarýyla güncellendi";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Buildings/Delete/5
         [Authorize(Policy = "BuildingAdmin")]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int buildingId)
         {
-            if (id == null) return NotFound();
-
-            var building = await _buildingService.GetBuildingByIdAsync(id.Value);
+            var building = await _buildingService.GetBuildingByIdAsync(buildingId);
             if (building == null) return NotFound();
+
+            ViewBag.BuildingId = building.Id;
+            ViewBag.BuildingName = building.Name;
 
             return View(building);
         }
@@ -271,34 +277,25 @@ namespace YoneticiOtomasyonu.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "BuildingAdmin")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int buildingId)
         {
-            var building = await _buildingService.GetBuildingByIdAsync(id);
+            var building = await _buildingService.GetBuildingByIdAsync(buildingId);
             if (building == null) return NotFound();
 
-            try
+            if (!string.IsNullOrEmpty(building.ImageUrl))
             {
-                // Delete image file if exists
-                if (!string.IsNullOrEmpty(building.ImageUrl))
+                var imagePath = Path.Combine(_hostingEnvironment.WebRootPath, building.ImageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
                 {
-                    var imagePath = Path.Combine(_hostingEnvironment.WebRootPath, building.ImageUrl.TrimStart('/'));
-                    if (System.IO.File.Exists(imagePath))
-                    {
-                        System.IO.File.Delete(imagePath);
-                    }
+                    System.IO.File.Delete(imagePath);
                 }
-
-                _context.Buildings.Remove(building);
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = "Bina baþarýyla silindi";
-                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
-                TempData["Error"] = $"Bina silinirken hata oluþtu: {ex.Message}";
-                return RedirectToAction(nameof(Delete), new { id });
-            }
+
+            _context.Buildings.Remove(building);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Bina baþarýyla silindi";
+            return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> BuildingExists(int id)

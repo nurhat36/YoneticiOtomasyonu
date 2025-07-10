@@ -1,0 +1,522 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using YoneticiOtomasyonu.Models  <!-- Kendi projenin namespace'ine göre düzenle -->
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var profilePic = user?.ProfileImageUrl ?? "/images/default-profile.png";
+    var slug = user?.Slug ?? "default-slug";
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Bina Yönetim Paneli</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    @RenderSection("Styles", required: false)
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --sidebar-width: 280px;
+            --transition: all 0.3s ease;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7ff;
+            color: #4a4a4a;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: white;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            transition: var(--transition);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .sidebar-brand i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-right: 0.75rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            position: relative;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1.5rem;
+            color: #5f6a7d;
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-menu li.active a {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 250px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+        }
+
+        .search-bar input {
+            padding-left: 2.5rem;
+            border-radius: 50px;
+            border: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+            transition: var(--transition);
+        }
+
+        .search-bar input:focus {
+            background-color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            position: relative;
+            color: #5f6a7d;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .notification-btn:hover {
+            color: var(--primary);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 0.6rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-btn {
+            background: none;
+            border: none;
+            color: #5f6a7d;
+            font-size: 1.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-btn:hover {
+            color: var(--primary);
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: var(--shadow-lg);
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .dropdown-item {
+            padding: 0.65rem 1.5rem;
+            transition: var(--transition);
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .dropdown-item i {
+            margin-right: 0.5rem;
+            width: 18px;
+            text-align: center;
+        }
+
+        /* Content Area */
+        .container-fluid {
+            padding: 1.5rem;
+        }
+
+        /* Responsive Adjustments */
+        @@media (max-width: 992px) {
+        .sidebar {
+            transform: translateX(-100%);
+            position: fixed;
+            z-index: 1050;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .sidebar.active + .main-content {
+            position: relative;
+            left: var(--sidebar-width);
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Add overlay for better mobile experience */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1040;
+        }
+
+        .sidebar.active ~ .sidebar-overlay {
+            display: block;
+        }
+    }
+
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a asp-action="Index" asp-controller="Buildings" class="sidebar-brand">
+                    <i class="bi bi-building"></i>
+                    <span>BinaYönet</span>
+                </a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="@(ViewContext.RouteData.Values["action"].ToString() == "Dashboard" ? "active" : "")">
+                    <a asp-action="Dashboard" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "Units" ? "active" : "")">
+                    <a asp-action="List" asp-controller="Units" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-people"></i>
+                        <span>Birimler</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "Income" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Income" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-cash-stack"></i>
+                        <span>Gelirler</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "Expense" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Expense" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Giderler</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "Complaint" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Complaint" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Şikayetler</span>
+                    </a>
+                </li>
+
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "DuesSettings" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="DuesSettings" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-receipt"></i>
+                        <span>Aidat Ayarları</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "DuesSettings" ? "active" : "")">
+                    <a asp-action="BuildingDues" asp-controller="DuesSettings" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-receipt"></i>
+                        <span>Aidat Ödemeleri</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "Announcement" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="Announcement" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Duyurular</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "Edit" ? "active" : "")">
+                    <a asp-action="Edit" asp-controller="Buildings" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-sliders"></i>
+                        <span>Ayarlar</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Top Navigation -->
+            <div class="top-nav">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-outline-secondary d-lg-none me-3" id="sidebarToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <h5 class="mb-0">@ViewBag.BuildingName</h5>
+                </div>
+
+                <div class="user-actions">
+                    
+
+                    
+                        <li class="nav-item me-2 position-relative">
+                            @await Component.InvokeAsync("Notification")
+                        </li>
+                    
+
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="@profilePic" alt="Profil Resmi" class="rounded-circle" style="width:32px; height:32px; object-fit:cover;" />
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+                            <li>
+                                <div class="d-flex align-items-center p-3 border-bottom">
+                                    <img src="@profilePic" alt="Profil Resmi" class="rounded-circle" style="width:32px; height:32px; object-fit:cover;" />
+                                    <div>
+                                        <h6 class="mb-0">@User.Identity.Name</h6>
+                                        <small class="text-muted">Yönetici</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-controller="Profile" asp-action="ProfiliDuzenle">
+                                    <i class="fas fa-user me-2"></i>Profil Bilgilerim
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-controller="Profile" asp-action="MyDebts">
+                                    <i class="fas fa-money-check-alt me-2"></i>Borçlarım
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-controller="Buildings" asp-action="Index">
+                                    <i class="fas fa-building me-2"></i>Binalarım
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-controller="WorkTask" asp-action="MyTasks">
+                                     <i class="fas fa-tasks me-2"></i> Görevlerim
+                                     @await Component.InvokeAsync("TaskCounter")
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <form method="post" asp-area="Identity" asp-page="/Account/Logout" id="logoutForm" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item bg-transparent border-0 w-100 text-start" style="cursor:pointer;">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container-fluid py-3 animate__animated animate__fadeIn">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    @await Component.InvokeAsync("ChatBox")
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar toggle functionality
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('mainContent').classList.toggle('sidebar-active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            
+            if (window.innerWidth < 992 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Active menu item highlight
+        document.querySelectorAll('.sidebar-menu li a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.parentElement.classList.add('active');
+            }
+        });
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

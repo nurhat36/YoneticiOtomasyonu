@@ -1,6 +1,7 @@
 ﻿@model YoneticiOtomasyonu.Models.Complaint
 
 @{
+    Layout = "_ManagementLayout";
     ViewData["Title"] = "Şikayet Detayı";
     var statusOptions = ViewBag.StatusOptions as List<string>;
     var userList = ViewBag.Users as IEnumerable<YoneticiOtomasyonu.Models.ApplicationUser>;

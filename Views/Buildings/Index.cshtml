@@ -113,79 +113,78 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a asp-action="Details" asp-route-id="@item.Building.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                Detaylarý Gör
-                            </a>
+                        <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a asp-action="Details" asp-route-buildingId="@item.Building.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    Detaylarý Gör
+                                </a>
 
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-icon rounded-circle" type="button" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-icon rounded-circle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                        @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
                                         {
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Edit" asp-route-id="@item.Building.Id">
-                                            <i class="bi bi-pencil"></i> Düzenle
-                                        </a>
-                                    </li>
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Edit" asp-route-buildingId="@item.Building.Id">
+                                                    <i class="bi bi-pencil"></i> Düzenle
+                                                </a>
+                                            </li>
                                         }
 
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" asp-action="List" asp-controller="Units" asp-route-buildingId="@item.Building.Id">
-                                            <i class="bi bi-door-open"></i> Birimler
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Index" asp-controller="Income" asp-route-buildingId="@item.Building.Id">
-                                            <i class="bi bi-cash-stack"></i> Gelirler
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Index" asp-controller="Expense" asp-route-buildingId="@item.Building.Id">
-                                            <i class="bi bi-cash-coin"></i> Giderler
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Index" asp-controller="Complaint" asp-route-buildingId="@item.Building.Id">
-                                            <i class="bi bi-exclamation-triangle"></i> Þikayetler
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Index" asp-controller="DuesSettings" asp-route-buildingId="@item.Building.Id">
-                                            <i class="bi bi-receipt"></i> Aidat Ayarlarý
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" asp-action="BuildingDues" asp-controller="DuesSettings" asp-route-buildingId="@item.Building.Id">
-                                            <i class="bi bi-wallet2"></i> Aidat Ödemeleri
-                                        </a>
-                                    </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Units" asp-route-buildingId="@item.Building.Id">
+                                                <i class="bi bi-door-open"></i> Birimler
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Income" asp-route-buildingId="@item.Building.Id">
+                                                <i class="bi bi-cash-stack"></i> Gelirler
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Expense" asp-route-buildingId="@item.Building.Id">
+                                                <i class="bi bi-cash-coin"></i> Giderler
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" asp-action="Complaint" asp-route-buildingId="@item.Building.Id">
+                                                <i class="bi bi-exclamation-triangle"></i> Þikayetler
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" asp-action="DuesSettings" asp-route-buildingId="@item.Building.Id">
+                                                <i class="bi bi-receipt"></i> Aidat Ayarlarý
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2" asp-action="BuildingDues" asp-controller="DuesSettings" asp-route-buildingId="@item.Building.Id">
+                                                <i class="bi bi-wallet2"></i> Aidat Ödemeleri
+                                            </a>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item d-flex align-items-center gap-2"
-                                               asp-action="Index"
-                                               asp-controller="Announcement"
+                                               asp-action="Announcement"
                                                asp-route-buildingId="@item.Building.Id">
                                                 <i class="bi bi-megaphone"></i> Bina Duyurularý
                                             </a>
                                         </li>
 
-
-                                    @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
+                                        @if (item.Role == "Yönetici" || User.IsInRole("SuperAdmin"))
                                         {
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2 text-danger" asp-action="Delete" asp-route-id="@item.Building.Id">
-                                            <i class="bi bi-trash"></i> Sil
-                                        </a>
-                                    </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center gap-2 text-danger" asp-action="Delete" asp-route-buildingId="@item.Building.Id">
+                                                    <i class="bi bi-trash"></i> Sil
+                                                </a>
+                                            </li>
                                         }
-                                </ul>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
+
                 </div>
             </div>
             }
