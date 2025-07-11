@@ -224,5 +224,12 @@ namespace YoneticiOtomasyonu.Services.Implementations
                     Role = buildingRole.Role
                 };
         }
+        public async Task<bool> UserHasAccessToBuildingAsync(string userId, int buildingId)
+        {
+            return await _context.UserBuildingRoles
+                .AnyAsync(r => r.UserProfile.IdentityUserId == userId && r.BuildingId == buildingId);
+        }
+
+
     }
 }

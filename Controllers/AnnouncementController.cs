@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using YoneticiOtomasyonu.Data;
 using YoneticiOtomasyonu.Models;
 
 namespace YoneticiOtomasyonu.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "BuildingAccess")]
+    [Route("Buildings/{buildingId:int}/[controller]")]
     public class AnnouncementController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,6 +24,7 @@ namespace YoneticiOtomasyonu.Controllers
         }
 
         // 📄 Liste
+        [HttpGet("Index")]
         public async Task<IActionResult> Index(int? buildingId)
         {
             var query = _context.Announcements
@@ -42,7 +45,8 @@ namespace YoneticiOtomasyonu.Controllers
 
 
         // 📄 Detay
-        public async Task<IActionResult> Detail(int id)
+        [HttpGet("{id:int}/Detail")]
+        public async Task<IActionResult> Detail(int buildingId, int id)
         {
             var announcement = await _context.Announcements
                 .Include(a => a.Images)
@@ -52,25 +56,26 @@ namespace YoneticiOtomasyonu.Controllers
 
             if (announcement == null)
                 return NotFound();
-
+            ViewBag.BuildingId = buildingId; // Binaya göre filtreleme için BuildingId'yi ViewBag'e ekle
             return View(announcement);
         }
 
         // 📄 Yeni duyuru (GET)
+        [HttpGet("Create")]
         public IActionResult Create(int buildingId)
         {
             var announcement = new Announcement
             {
                 BuildingId = buildingId
             };
-
+            ViewBag.BuildingId = buildingId; // Binaya göre filtreleme için BuildingId'yi ViewBag'e ekle
             return View(announcement);
         }
 
         // 📄 Yeni duyuru (POST)
-        [HttpPost]
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Announcement announcement, List<IFormFile> images)
+        public async Task<IActionResult> Create(int buildingId,Announcement announcement, List<IFormFile> images)
         {
             if (ModelState.IsValid)
                 return View(announcement);
@@ -122,7 +127,13 @@ namespace YoneticiOtomasyonu.Controllers
                     var message = $"Sayın kullanıcı, {announcement.BuildingId} numaralı binanızda yeni bir duyuru var: \"{announcement.Title}\".";
 
                     // İlgili linki hazırla (ör: Bina detay sayfasına veya duyuru detayına yönlendirebilirsin)
-                    var link = Url.Action("Detail", "Announcement", new { id = announcement.Id }, protocol: Request.Scheme);
+                    var link = Url.Action(
+                         "Detail",          // Action adı
+                         "Announcement",    // Controller adı
+                         new { buildingId = announcement.BuildingId, id = announcement.Id },
+                         protocol: Request.Scheme
+                     );
+
 
                     // UserProfile üzerinden ApplicationUser ID'ye ulaş (ör: UserProfile içinde ApplicationUserId varsa)
                     // Eğer UserProfile doğrudan ApplicationUser ile ilişkiliyse:
@@ -135,7 +146,7 @@ namespace YoneticiOtomasyonu.Controllers
             }
 
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { buildingId });
         }
         private async Task AddNotification(string userId, string message, string? link = null)
         {
@@ -153,9 +164,9 @@ namespace YoneticiOtomasyonu.Controllers
         }
 
         // 📄 Sil
-        [HttpPost]
+        [HttpGet("{id}/Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int buildingId, int id)
         {
             var announcement = await _context.Announcements
                 .Include(a => a.Images)
@@ -176,13 +187,16 @@ namespace YoneticiOtomasyonu.Controllers
                     }
                 }
             }
+            ViewBag.BuildingId = buildingId; // Binaya göre filtreleme için BuildingId'yi ViewBag'e ekle
 
             _context.Announcements.Remove(announcement);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+
         }
-        public async Task<IActionResult> Edit(int id)
+        [HttpGet("{id}/Edit")]
+        public async Task<IActionResult> Edit(int buildingId, int id)
         {
             var announcement = await _context.Announcements
                 .Include(a => a.Images)
@@ -191,14 +205,18 @@ namespace YoneticiOtomasyonu.Controllers
             if (announcement == null)
                 return NotFound();
 
+            ViewBag.BuildingId = buildingId;
             return View(announcement);
         }
-        [HttpPost]
+        [HttpPost("{id}/Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Announcement announcement, List<IFormFile> newImages)
+        public async Task<IActionResult> Edit(int buildingId, int id, Announcement announcement, List<IFormFile> newImages)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
+            {
+                ViewBag.BuildingId = buildingId;
                 return View(announcement);
+            }
 
             var existingAnnouncement = await _context.Announcements
                 .Include(a => a.Images)
@@ -241,11 +259,13 @@ namespace YoneticiOtomasyonu.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { buildingId });
         }
-        [HttpPost]
+
+
+        [HttpPost("{id}/Delete"), ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int buildingId, int id)
         {
             var announcement = await _context.Announcements
                 .Include(a => a.Images)
@@ -268,7 +288,7 @@ namespace YoneticiOtomasyonu.Controllers
             _context.Announcements.Remove(announcement);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { buildingId });
         }
 
     }

@@ -13,7 +13,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Buildings">Binalar</a></li>
-                        <li class="breadcrumb-item"><a asp-action="Details" asp-controller="Buildings" asp-route-id="@ViewBag.BuildingId">@ViewBag.BuildingName</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-controller="Buildings" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@ViewBag.BuildingId">@ViewBag.BuildingName</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Birimler</li>
                     </ol>
                 </nav>
@@ -22,10 +22,11 @@
                 <a asp-action="Details" asp-controller="Buildings" asp-route-id="@ViewBag.BuildingId" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Binaya Dön
                 </a>
-                
-                    <a asp-controller="Units" asp-action="Add" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-success">
-                        <i class="fas fa-plus me-2"></i>Yeni Birim Ekle
-                    </a>
+
+            <a asp-controller="Units" asp-action="Add" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Yeni Birim Ekle
+            </a>
+
                 
             </div>
         </div>
@@ -131,15 +132,18 @@
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a asp-action="Details" asp-route-id="@unit.Id" class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Detay">
+                                        <a asp-action="Details" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@unit.Id" class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Detay">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@unit.Id" class="btn btn-outline-warning" data-bs-toggle="tooltip" title="Düzenle">
+
+                                        <a asp-action="Edit" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@unit.Id" class="btn btn-outline-warning" data-bs-toggle="tooltip" title="Düzenle">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a asp-action="Delete" asp-route-id="@unit.Id" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Sil">
+
+                                        <a asp-action="Delete" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@unit.Id" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Sil">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
+
                                     </div>
                                 </td>
                             </tr>

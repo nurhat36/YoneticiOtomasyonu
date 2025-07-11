@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using YoneticiOtomasyonu.Data;
 using YoneticiOtomasyonu.Models;
-
-[Authorize]
-[Route("Buildings/{buildingId:int}/[controller]/[action]")]
+namespace YoneticiOtomasyonu.Controllers { 
+[Authorize(Policy = "BuildingAccess")]
+[Route("Buildings/{buildingId:int}/Expense")]
 public class ExpenseController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -16,6 +16,7 @@ public class ExpenseController : Controller
         _context = context;
     }
 
+    [HttpGet("")]
     public async Task<IActionResult> Index(int buildingId)
     {
         var expenses = await _context.Expenses
@@ -28,27 +29,26 @@ public class ExpenseController : Controller
         return View(expenses);
     }
 
+    [HttpGet("Create")]
     public IActionResult Create(int buildingId)
     {
-        var expenseTypes = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "Temizlik", Text = "Temizlik" },
-        new SelectListItem { Value = "Bakım", Text = "Bakım" },
-        new SelectListItem { Value = "Elektrik", Text = "Elektrik" },
-        new SelectListItem { Value = "Su", Text = "Su" },
-        new SelectListItem { Value = "Diğer", Text = "Diğer" }
-    };
+        ViewBag.ExpenseTypes = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Temizlik", Text = "Temizlik" },
+            new SelectListItem { Value = "Bakım", Text = "Bakım" },
+            new SelectListItem { Value = "Elektrik", Text = "Elektrik" },
+            new SelectListItem { Value = "Su", Text = "Su" },
+            new SelectListItem { Value = "Diğer", Text = "Diğer" }
+        };
 
-        var paymentMethods = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "Nakit", Text = "Nakit" },
-        new SelectListItem { Value = "Kredi Kartı", Text = "Kredi Kartı" },
-        new SelectListItem { Value = "Havale", Text = "Havale" },
-        new SelectListItem { Value = "Diğer", Text = "Diğer" }
-    };
-
-        ViewBag.ExpenseTypes = expenseTypes;
-        ViewBag.PaymentMethods = paymentMethods;
+        ViewBag.PaymentMethods = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Nakit", Text = "Nakit" },
+            new SelectListItem { Value = "Kredi Kartı", Text = "Kredi Kartı" },
+            new SelectListItem { Value = "Havale", Text = "Havale" },
+            new SelectListItem { Value = "Diğer", Text = "Diğer" }
+        };
+        ViewBag.BuildingId = buildingId;
 
         var expense = new Expense
         {
@@ -59,189 +59,163 @@ public class ExpenseController : Controller
         return View(expense);
     }
 
-
-    [HttpPost]
+    [HttpPost("Create")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Expense expense, IFormFile receiptFile)
+    public async Task<IActionResult> Create(int buildingId, Expense expense, IFormFile receiptFile)
     {
         if (!ModelState.IsValid)
         {
-            // Kaydeden kullanıcıyı ata
+            expense.BuildingId = buildingId;
             expense.RecordedById = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            // Eğer dosya yüklenmişse kaydet
             if (receiptFile != null && receiptFile.Length > 0)
             {
-                // Dosya yolu (ör: wwwroot/uploads/)
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Document");
                 if (!Directory.Exists(uploadsFolder))
-                {
                     Directory.CreateDirectory(uploadsFolder);
-                }
 
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(receiptFile.FileName);
+                var uniqueFileName = Guid.NewGuid() + Path.GetExtension(receiptFile.FileName);
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    await receiptFile.CopyToAsync(fileStream);
+                    await receiptFile.CopyToAsync(stream);
                 }
 
-                // Veritabanına kaydederken sadece dosya adını veya yolunu kaydediyoruz
                 expense.ReceiptImageUrl = "/Document/" + uniqueFileName;
             }
 
             _context.Add(expense);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", new { buildingId = expense.BuildingId });
+            return RedirectToAction(nameof(Index), new { buildingId });
         }
 
-        // ViewBag doldur
-        var expenseTypes = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "Temizlik", Text = "Temizlik" },
-        new SelectListItem { Value = "Bakım", Text = "Bakım" },
-        new SelectListItem { Value = "Elektrik", Text = "Elektrik" },
-        new SelectListItem { Value = "Su", Text = "Su" },
-        new SelectListItem { Value = "Diğer", Text = "Diğer" }
-    };
+        ViewBag.ExpenseTypes = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Temizlik", Text = "Temizlik" },
+            new SelectListItem { Value = "Bakım", Text = "Bakım" },
+            new SelectListItem { Value = "Elektrik", Text = "Elektrik" },
+            new SelectListItem { Value = "Su", Text = "Su" },
+            new SelectListItem { Value = "Diğer", Text = "Diğer" }
+        };
 
-        var paymentMethods = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "Nakit", Text = "Nakit" },
-        new SelectListItem { Value = "Kredi Kartı", Text = "Kredi Kartı" },
-        new SelectListItem { Value = "Havale", Text = "Havale" },
-        new SelectListItem { Value = "Diğer", Text = "Diğer" }
-    };
-
-        ViewBag.ExpenseTypes = expenseTypes;
-        ViewBag.PaymentMethods = paymentMethods;
+        ViewBag.PaymentMethods = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Nakit", Text = "Nakit" },
+            new SelectListItem { Value = "Kredi Kartı", Text = "Kredi Kartı" },
+            new SelectListItem { Value = "Havale", Text = "Havale" },
+            new SelectListItem { Value = "Diğer", Text = "Diğer" }
+        };
 
         return View(expense);
     }
 
-
-    public async Task<IActionResult> Edit(int? id)
+    [HttpGet("{id}/Edit")]
+    public async Task<IActionResult> Edit(int buildingId, int id)
     {
-        if (id == null) return NotFound();
-
         var expense = await _context.Expenses
-            .Include(e => e.Building)
-            .Include(e => e.RecordedBy)
-            .FirstOrDefaultAsync(e => e.Id == id);
+            .FirstOrDefaultAsync(e => e.Id == id && e.BuildingId == buildingId);
 
-        if (expense == null) return NotFound();
+        if (expense == null)
+            return NotFound();
 
-        // Gider türleri
         ViewBag.ExpenseTypes = new List<string> { "Temizlik", "Bakım", "Elektrik", "Su", "Diğer" };
-
-        // Ödeme yöntemleri
         ViewBag.PaymentMethods = new List<string> { "Nakit", "Kredi Kartı", "Havale", "Çek", "Diğer" };
+        ViewBag.BuildingId = buildingId;
 
         return View(expense);
     }
 
-
-
-    [HttpPost]
+    [HttpPost("{id}/Edit")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,Amount,Date,Type,Description,PaymentMethod,ReceiptNumber,BuildingId")] Expense expense, IFormFile NewReceiptFile)
+    public async Task<IActionResult> Edit(int buildingId, int id, [Bind("Id,Amount,Date,Type,Description,PaymentMethod,ReceiptNumber,BuildingId")] Expense expense, IFormFile NewReceiptFile)
     {
-        if (id != expense.Id) return NotFound();
+        if (id != expense.Id)
+            return NotFound();
 
         if (!ModelState.IsValid)
         {
-            try
+            var existingExpense = await _context.Expenses.FindAsync(id);
+            if (existingExpense == null)
+                return NotFound();
+
+            existingExpense.Amount = expense.Amount;
+            existingExpense.Date = expense.Date;
+            existingExpense.Type = expense.Type;
+            existingExpense.Description = expense.Description;
+            existingExpense.PaymentMethod = expense.PaymentMethod;
+            existingExpense.ReceiptNumber = expense.ReceiptNumber;
+
+            if (NewReceiptFile != null && NewReceiptFile.Length > 0)
             {
-                var existingExpense = await _context.Expenses.FindAsync(id);
-                if (existingExpense == null) return NotFound();
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
 
-                // Güncellenebilir alanlar
-                existingExpense.Amount = expense.Amount;
-                existingExpense.Date = expense.Date;
-                existingExpense.Type = expense.Type;
-                existingExpense.Description = expense.Description;
-                existingExpense.PaymentMethod = expense.PaymentMethod;
-                existingExpense.ReceiptNumber = expense.ReceiptNumber;
+                var fileName = Guid.NewGuid() + Path.GetExtension(NewReceiptFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
 
-                // Dosya yüklenmişse işleme al
-                if (NewReceiptFile != null && NewReceiptFile.Length > 0)
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    // Benzersiz isim oluştur
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(NewReceiptFile.FileName);
-
-                    // wwwroot/uploads klasörüne kaydet
-                    var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-                    if (!Directory.Exists(uploadPath))
-                        Directory.CreateDirectory(uploadPath);
-
-                    var filePath = Path.Combine(uploadPath, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await NewReceiptFile.CopyToAsync(stream);
-                    }
-
-                    // URL'yi kaydet
-                    existingExpense.ReceiptImageUrl = "/uploads/" + fileName;
+                    await NewReceiptFile.CopyToAsync(stream);
                 }
 
-                // Kaydeden kullanıcıyı güncelle (edit yapan kişi)
-                existingExpense.RecordedById = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Expenses.Any(e => e.Id == id))
-                    return NotFound();
-                else
-                    throw;
+                existingExpense.ReceiptImageUrl = "/uploads/" + fileName;
             }
 
-            return RedirectToAction("Index", new { buildingId = expense.BuildingId });
+            existingExpense.RecordedById = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index), new { buildingId });
         }
 
         return View(expense);
     }
 
-
-    public async Task<IActionResult> Delete(int? id)
+    [HttpGet("{id}/Delete")]
+    public async Task<IActionResult> Delete(int buildingId, int id)
     {
-        if (id == null) return NotFound();
-
         var expense = await _context.Expenses
             .Include(e => e.Building)
             .Include(e => e.RecordedBy)
-            .FirstOrDefaultAsync(e => e.Id == id);
-        if (expense == null) return NotFound();
+            .FirstOrDefaultAsync(e => e.Id == id && e.BuildingId == buildingId);
+
+        if (expense == null)
+            return NotFound();
+        ViewBag.BuildingId = buildingId;
 
         return View(expense);
     }
 
-    [HttpPost, ActionName("Delete")]
+    [HttpPost("{id}/Delete"), ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    public async Task<IActionResult> DeleteConfirmed(int buildingId, int id)
     {
         var expense = await _context.Expenses.FindAsync(id);
-        var buildingId = expense.BuildingId;
+        if (expense == null)
+            return NotFound();
 
         _context.Expenses.Remove(expense);
         await _context.SaveChangesAsync();
+
         return RedirectToAction(nameof(Index), new { buildingId });
     }
 
-    public async Task<IActionResult> Details(int? id)
+    [HttpGet("{id}/Details")]
+    public async Task<IActionResult> Details(int buildingId, int id)
     {
-        if (id == null) return NotFound();
-
         var expense = await _context.Expenses
             .Include(e => e.Building)
             .Include(e => e.RecordedBy)
-            .FirstOrDefaultAsync(e => e.Id == id);
-        if (expense == null) return NotFound();
+            .FirstOrDefaultAsync(e => e.Id == id && e.BuildingId == buildingId);
+
+        if (expense == null)
+            return NotFound();
+        ViewBag.BuildingId = buildingId;
 
         return View(expense);
     }
+}
 }

@@ -76,7 +76,7 @@
                         </div>
                     </div>
 
-                    <form asp-action="DeleteConfirmed" method="post" class="mt-4">
+                    <form asp-action="DeleteConfirmed" asp-route-buildingId="@Model.BuildingId" asp-route-id="@Model.Id" method="post" class="mt-4">
                         <input type="hidden" asp-for="Id" />
                         <input type="hidden" asp-for="BuildingId" />
 
@@ -92,6 +92,7 @@
                             </button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>

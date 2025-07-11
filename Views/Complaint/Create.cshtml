@@ -17,7 +17,7 @@
                 </div>
 
                 <div class="card-body p-5">
-                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <form asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <!-- Başlık Alanı -->
                         <div class="mb-4">
                             <label asp-for="Title" class="form-label fw-bold">Şikayet Başlığı</label>

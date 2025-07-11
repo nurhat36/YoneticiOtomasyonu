@@ -1,65 +1,64 @@
 ﻿@model IEnumerable<YoneticiOtomasyonu.Models.Complaint>
 
-    @{
+@{
     Layout = "_ManagementLayout";
     ViewData["Title"] = "Şikayet Listesi";
-    }
+}
 
-    <div class="container-fluid px-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="mt-4">Şikayet Yönetimi</h1>
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="fas fa-plus-circle me-2"></i>Yeni Şikayet
-            </a>
-        </div>
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">Şikayet Yönetimi</h1>
+        <a asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i>Yeni Şikayet
+        </a>
+    </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                <h5 class="mb-0">Şikayet Listesi</h5>
-                <div class="d-flex">
-                    <input type="text" id="searchInput" class="form-control form-control-sm me-2" placeholder="Arama...">
-                    <button class="btn btn-sm btn-outline-secondary" id="filterButton">
-                        <i class="fas fa-filter me-1"></i>Filtrele
-                    </button>
-                </div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">Şikayet Listesi</h5>
+            <div class="d-flex">
+                <input type="text" id="searchInput" class="form-control form-control-sm me-2" placeholder="Arama...">
+                <button class="btn btn-sm btn-outline-secondary" id="filterButton">
+                    <i class="fas fa-filter me-1"></i>Filtrele
+                </button>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover" id="complaintsTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th>
-                                    <a href="#" class="text-dark text-decoration-none sortable" data-sort="title">
-                                        Başlık <i class="fas fa-sort ms-1"></i>
-                                    </a>
-                                </th>
-                                <th>
-                                    <a href="#" class="text-dark text-decoration-none sortable" data-sort="unit">
-                                        Birim <i class="fas fa-sort ms-1"></i>
-                                    </a>
-                                </th>
-                                <th>Kullanıcı</th>
-                                <th>
-                                    <a href="#" class="text-dark text-decoration-none sortable" data-sort="status">
-                                        Durum <i class="fas fa-sort ms-1"></i>
-                                    </a>
-                                </th>
-                                <th>Atanan</th>
-                                <th>
-                                    <a href="#" class="text-dark text-decoration-none sortable" data-sort="date">
-                                        Tarih <i class="fas fa-sort ms-1"></i>
-                                    </a>
-                                </th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model)
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="complaintsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>
+                                <a href="#" class="text-dark text-decoration-none sortable" data-sort="title">
+                                    Başlık <i class="fas fa-sort ms-1"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a href="#" class="text-dark text-decoration-none sortable" data-sort="unit">
+                                    Birim <i class="fas fa-sort ms-1"></i>
+                                </a>
+                            </th>
+                            <th>Kullanıcı</th>
+                            <th>
+                                <a href="#" class="text-dark text-decoration-none sortable" data-sort="status">
+                                    Durum <i class="fas fa-sort ms-1"></i>
+                                </a>
+                            </th>
+                            <th>Atanan</th>
+                            <th>
+                                <a href="#" class="text-dark text-decoration-none sortable" data-sort="date">
+                                    Tarih <i class="fas fa-sort ms-1"></i>
+                                </a>
+                            </th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
                         {
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        @* Priority özelliği kaldırıldı *@
                                         <span>@item.Title</span>
                                     </div>
                                 </td>
@@ -77,27 +76,27 @@
                                 <td>
                                     @{
                                         var statusBadgeClass = "bg-secondary";
-                                        if (item.Status == "Çözüldü"){ statusBadgeClass = "bg-success";}
-                                        else if (item.Status == "İşlemde"){ statusBadgeClass = "bg-primary";}
-                                        else if (item.Status == "Reddedildi"){ statusBadgeClass = "bg-danger";}
+                                        if (item.Status == "Çözüldü") { statusBadgeClass = "bg-success"; }
+                                        else if (item.Status == "Atandı") { statusBadgeClass = "bg-primary"; }
+                                        else if (item.Status == "Reddedildi") { statusBadgeClass = "bg-danger"; }
                                     }
                                     <span class="badge @statusBadgeClass">@item.Status</span>
                                 </td>
                                 <td>
                                     @if (item.AssignedTo != null)
                                     {
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm me-2">
-                                            <div class="avatar-title bg-light rounded-circle text-dark">
-                                                @item.AssignedTo?.UserName?[0]
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-2">
+                                                <div class="avatar-title bg-light rounded-circle text-dark">
+                                                    @item.AssignedTo?.UserName?[0]
+                                                </div>
                                             </div>
+                                            <span>@item.AssignedTo?.UserName</span>
                                         </div>
-                                        <span>@item.AssignedTo?.UserName</span>
-                                    </div>
                                     }
                                     else
                                     {
-                                    <span class="text-muted">Atanmadı</span>
+                                        <span class="text-muted">Atanmadı</span>
                                     }
                                 </td>
                                 <td>
@@ -108,114 +107,112 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"
+                                        <a asp-action="Details" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"
                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Detaylar">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
+                                        
+
                                     </div>
                                 </td>
                             </tr>
                         }
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
+            </div>
 
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <div class="text-muted">
-                        Toplam <strong>@Model.Count()</strong> şikayet listeleniyor
-                    </div>
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Önceki</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Sonraki</a>
-                            </li>
-                        </ul>
-                    </nav>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted">
+                    Toplam <strong>@Model.Count()</strong> şikayet listeleniyor
                 </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Önceki</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Sonraki</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
+</div>
 
-    @section Styles {
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-        <style>
-            .avatar-sm {
-                width: 24px;
-                height: 24px;
-                font-size: 0.75rem;
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .avatar-sm {
+            width: 24px;
+            height: 24px;
+            font-size: 0.75rem;
+        }
+
+        .avatar-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .table-hover tbody tr {
+            transition: all 0.2s ease;
+        }
+
+            .table-hover tbody tr:hover {
+                background-color: rgba(0, 0, 0, 0.02);
+                transform: translateX(2px);
             }
 
-            .avatar-title {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                height: 100%;
+        .sortable {
+            transition: color 0.2s;
+        }
+
+            .sortable:hover {
+                color: var(--bs-primary) !important;
             }
 
-            .table-hover tbody tr {
-                transition: all 0.2s ease;
-            }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+    </style>
+}
 
-                .table-hover tbody tr:hover {
-                    background-color: rgba(0, 0, 0, 0.02);
-                    transform: translateX(2px);
-                }
-
-            .sortable {
-                transition: color 0.2s;
-            }
-
-                .sortable:hover {
-                    color: var(--bs-primary) !important;
-                }
-
-            .card {
-                border: none;
-                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            }
-        </style>
-    }
-
-    @section Scripts {
-        <script>
+@section Scripts {
+    <script>
         // Enable tooltips
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
-            // Search functionality
-            document.getElementById('searchInput').addEventListener('keyup', function() {
+            // Search
+            document.getElementById('searchInput').addEventListener('keyup', function () {
                 var input = this.value.toLowerCase();
                 var rows = document.querySelectorAll('#complaintsTable tbody tr');
 
-                rows.forEach(function(row) {
+                rows.forEach(function (row) {
                     var text = row.textContent.toLowerCase();
                     row.style.display = text.includes(input) ? '' : 'none';
                 });
             });
 
-            // Sort functionality
-            document.querySelectorAll('.sortable').forEach(function(element) {
-                element.addEventListener('click', function(e) {
+            // Sorting
+            document.querySelectorAll('.sortable').forEach(function (element) {
+                element.addEventListener('click', function (e) {
                     e.preventDefault();
                     var sortField = this.getAttribute('data-sort');
                     alert('Sıralama özelliği aktif edilecek: ' + sortField);
-                    // Implement actual sorting logic here
+                    // Buraya JS sıralama kodları eklenebilir
                 });
             });
         });
-        </script>
-    }
+    </script>
+}

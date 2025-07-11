@@ -1,21 +1,22 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Security.Claims;
 using YoneticiOtomasyonu.Data;
 using YoneticiOtomasyonu.Models;
 using YoneticiOtomasyonu.Services;
 using YoneticiOtomasyonu.Services.Interfaces;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using System.Security.Claims;
 using YoneticiOtomasyonu.Services.Implementations;
 using YoneticiOtomasyonu.Hubs;
+
+using YoneticiOtomasyonu.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // DbContext Configuration
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
 
 // Email Configuration
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
@@ -25,7 +26,6 @@ builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
-    // Password settings if needed
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 8;
     options.Password.RequireNonAlphanumeric = false;
@@ -34,31 +34,21 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
-
+builder.Services.AddHttpContextAccessor(); // <-- Eklemeyi unutma
 // Custom Services Registration
 builder.Services.AddScoped<IBuildingService, BuildingService>();
+
+// Authorization Handlers
+builder.Services.AddScoped<IAuthorizationHandler, BuildingAccessHandler>();
 
 // Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("BuildingAdmin", policy =>
-        policy.RequireAssertion(context =>
-        {
-            var httpContext = context.Resource as HttpContext;
-            var routeData = httpContext?.GetRouteData();
-            var buildingId = routeData?.Values["id"]?.ToString();
+    // Bina eriþim politikasý
+    options.AddPolicy("BuildingAccess", policy =>
+        policy.Requirements.Add(new BuildingAccessRequirement()));
 
-            if (!int.TryParse(buildingId, out var id)) return false;
-
-            var userId = httpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId)) return false;
-
-            var buildingService = httpContext.RequestServices.GetRequiredService<IBuildingService>();
-
-            return buildingService.IsBuildingAdminAsync(userId, id).GetAwaiter().GetResult();
-        }));
-
-    // Add other policies as needed
+    // Diðer örnek politika
     options.AddPolicy("RequireSuperAdmin", policy =>
         policy.RequireRole("SuperAdmin"));
 });

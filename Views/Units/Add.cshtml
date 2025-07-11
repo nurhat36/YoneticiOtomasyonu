@@ -11,7 +11,7 @@
             <h2 class="mb-0"><i class="fas fa-building me-2"></i>Birim Ekle</h2>
         </div>
         <div class="card-body">
-            <form asp-action="Add" method="post" class="needs-validation" novalidate>
+            <form asp-action="Add" asp-route-buildingId="@Model.BuildingId" method="post" class="needs-validation" novalidate>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">

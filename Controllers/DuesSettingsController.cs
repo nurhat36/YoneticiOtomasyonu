@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,8 @@ using YoneticiOtomasyonu.Models;
 using YoneticiOtomasyonu.Models.ViewModels;
 namespace YoneticiOtomasyonu.Controllers
 {
-    [Route("Buildings/{buildingId:int}/[controller]/[action]")]
+    [Authorize(Policy = "BuildingAccess")]
+    [Route("Buildings/{buildingId:int}/[controller]")]
     public class DuesSettingsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,7 +20,7 @@ namespace YoneticiOtomasyonu.Controllers
             _context = context;
             _userManager = userManager;
         }
-
+        [HttpGet("Index")]
         public async Task<IActionResult> Index(int buildingId)
         {
             var duesSettings = await _context.DuesSettings
@@ -38,8 +40,8 @@ namespace YoneticiOtomasyonu.Controllers
             ViewBag.BuildingId = buildingId; // View'da kullanmak için
             return View(duesSettings);
         }
-
-        public async Task<IActionResult> Edit(int id)
+        [HttpGet("{id}/Edit")]
+        public async Task<IActionResult> Edit(int buildingId, int id)
         {
             var duesSetting = await _context.DuesSettings.FindAsync(id);
             if (duesSetting == null)
@@ -48,11 +50,11 @@ namespace YoneticiOtomasyonu.Controllers
             }
 
             ViewBag.BuildingSelectList = new SelectList(_context.Buildings, "Id", "Name", duesSetting.BuildingId);
-
+            ViewBag.BuildingId = buildingId; // Binanın ID'sini ViewBag'e ekle
 
             return View(duesSetting);
         }
-        [HttpPost]
+        [HttpPost("{id}/Edit")]
         public async Task<IActionResult> Edit(int id, DuesSetting duesSetting)
         {
             if (id != duesSetting.Id)
@@ -91,7 +93,7 @@ namespace YoneticiOtomasyonu.Controllers
         }
 
 
-
+        [HttpGet("Create")]
         public IActionResult Create(int buildingId)
         {
             var building = _context.Buildings.FirstOrDefault(b => b.Id == buildingId);
@@ -110,7 +112,7 @@ namespace YoneticiOtomasyonu.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("Create")]
         public async Task<IActionResult> Create(DuesSetting duesSetting)
         {
             if (!ModelState.IsValid)
@@ -124,8 +126,8 @@ namespace YoneticiOtomasyonu.Controllers
             ViewBag.BuildingName = building?.Name;
             return View(duesSetting);
         }
-
-        public async Task<IActionResult> Delete(int id)
+        [HttpGet("{id}/Delete")]
+        public async Task<IActionResult> Delete(int buildingId, int id)
         {
             var duesSetting = await _context.DuesSettings
                 .Include(ds => ds.Building)
@@ -134,10 +136,11 @@ namespace YoneticiOtomasyonu.Controllers
             {
                 return NotFound();
             }
+            ViewBag.BuildingId = buildingId; // Binanın ID'sini ViewBag'e ekle
 
             return View(duesSetting);
         }
-        [HttpPost, ActionName("Delete")]
+        [HttpPost("{id}/Delete"), ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var duesSetting = await _context.DuesSettings.FindAsync(id);
@@ -148,7 +151,7 @@ namespace YoneticiOtomasyonu.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-        [HttpPost]
+        [HttpPost("AssignDues")]
         public async Task<IActionResult> AssignDues(int buildingId)
         {
             var duesSetting = await _context.DuesSettings.FirstOrDefaultAsync(d => d.BuildingId == buildingId);
@@ -219,7 +222,7 @@ namespace YoneticiOtomasyonu.Controllers
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
         }
-
+        [HttpGet("BuildingDues")]
         public async Task<IActionResult> BuildingDues(int buildingId)
         {
             var userId = _userManager.GetUserId(User);
@@ -255,7 +258,7 @@ namespace YoneticiOtomasyonu.Controllers
 
             return View(debts);
         }
-        [HttpPost]
+        [HttpPost("{id}/MarkAsPaid")]
         public async Task<IActionResult> MarkAsPaid(int id, int buildingId)
         {
             var userId = _userManager.GetUserId(User);
@@ -315,7 +318,7 @@ namespace YoneticiOtomasyonu.Controllers
                 .Include(d => d.User)
                 .Include(d => d.Unit)
                 .FirstOrDefaultAsync(d => d.Id == debtId);
-
+            ViewBag.BuildingId = buildingId;
             if (debt == null)
             {
                 return NotFound();
@@ -325,7 +328,7 @@ namespace YoneticiOtomasyonu.Controllers
             return View(debt);
         }
 
-        [HttpPost]
+        [HttpGet("{debtId}/ConfirmPayment")]
         public async Task<IActionResult> ConfirmPayment(int debtId, int buildingId, string paymentMethod, string description)
         {
             var userId = _userManager.GetUserId(User);

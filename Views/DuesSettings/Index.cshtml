@@ -64,18 +64,18 @@
                                 </td>
                                 <td class="align-middle">
                                     <div class="d-flex gap-2">
-                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                        <a asp-action="Edit" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@item.Id"
                                            class="btn btn-sm btn-outline-warning"
                                            data-bs-toggle="tooltip" title="Düzenle">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                        <a asp-action="Delete" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@item.Id"
                                            class="btn btn-sm btn-outline-danger"
                                            data-bs-toggle="tooltip" title="Sil">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
-                                        
-                                        <form asp-action="AssignDues" method="post" class="d-inline">
+
+                                        <form asp-action="AssignDues" asp-route-buildingId="@ViewBag.BuildingId" method="post" class="d-inline">
                                             <input type="hidden" name="buildingId" value="@item.BuildingId" />
                                             <button type="submit" class="btn btn-sm btn-success"
                                                     data-bs-toggle="tooltip" title="Aidatları Ata">
@@ -87,7 +87,7 @@
                                                 data-bs-toggle="tooltip" title="Bu ay atandı">
                                             <i class="fas fa-check-circle"></i>
                                         </button>
-                                        }
+                                        
                                     </div>
                                 </td>
                             </tr>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using YoneticiOtomasyonu.Data;
@@ -6,6 +7,7 @@ using YoneticiOtomasyonu.Models;
 
 namespace YoneticiOtomasyonu.Controllers
 {
+    [Authorize(Policy = "BuildingAccess")]
     [Route("Buildings/{buildingId}/Income")]
     public class IncomeController : Controller
     {
@@ -68,7 +70,7 @@ namespace YoneticiOtomasyonu.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int buildingId, [Bind("Amount,Date,Type,Description,PaymentMethod,UnitId")] Income income)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 income.BuildingId = buildingId;
                 income.RecordedById = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -119,7 +121,7 @@ namespace YoneticiOtomasyonu.Controllers
         {
             if (id != income.Id) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 var existingIncome = await _context.Incomes.FindAsync(id);
                 if (existingIncome == null) return NotFound();

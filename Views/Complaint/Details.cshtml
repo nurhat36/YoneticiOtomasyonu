@@ -3,8 +3,6 @@
 @{
     Layout = "_ManagementLayout";
     ViewData["Title"] = "Şikayet Detayı";
-    var statusOptions = ViewBag.StatusOptions as List<string>;
-    var userList = ViewBag.Users as IEnumerable<YoneticiOtomasyonu.Models.ApplicationUser>;
 }
 
 <div class="container-fluid">
@@ -19,31 +17,23 @@
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <div class="info-item mb-3">
-                                <h6 class="text-muted mb-1">Birim</h6>
-                                <p class="mb-0">@Model.Unit?.Number</p>
-                            </div>
+                            <h6 class="text-muted mb-1">Birim</h6>
+                            <p class="mb-0">@Model.Unit?.Number</p>
                         </div>
                         <div class="col-md-6">
-                            <div class="info-item mb-3">
-                                <h6 class="text-muted mb-1">Kullanıcı</h6>
-                                <p class="mb-0">@Model.Complainant?.UserName</p>
-                            </div>
+                            <h6 class="text-muted mb-1">Kullanıcı</h6>
+                            <p class="mb-0">@Model.Complainant?.UserName</p>
                         </div>
                         <div class="col-md-6">
-                            <div class="info-item mb-3">
-                                <h6 class="text-muted mb-1">Oluşturulma Tarihi</h6>
-                                <p class="mb-0">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
-                            </div>
+                            <h6 class="text-muted mb-1">Oluşturulma Tarihi</h6>
+                            <p class="mb-0">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
                         </div>
                         @if (!string.IsNullOrEmpty(Model.Response))
                         {
-                        <div class="col-md-6">
-                            <div class="info-item mb-3">
+                            <div class="col-md-6">
                                 <h6 class="text-muted mb-1">Cevap Tarihi</h6>
                                 <p class="mb-0">@Model.ResponseDate?.ToString("dd.MM.yyyy HH:mm")</p>
                             </div>
-                        </div>
                         }
                     </div>
 
@@ -56,33 +46,34 @@
 
                     @if (Model.Images != null && Model.Images.Any())
                     {
-                    <div class="mb-4">
-                        <h6 class="text-muted mb-2">Eklenen Resimler</h6>
-                        <div class="d-flex flex-wrap gap-3">
-                            @foreach (var img in Model.Images)
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">Eklenen Resimler</h6>
+                            <div class="d-flex flex-wrap gap-3">
+                                @foreach (var img in Model.Images)
                                 {
-                            <a href="@img.ImageUrl" data-lightbox="complaint-images" data-title="@Model.Title">
-                                <img src="@img.ImageUrl" class="img-thumbnail" style="max-height: 150px;" alt="Şikayet resmi" />
-                            </a>
+                                    <a href="@img.ImageUrl" data-lightbox="complaint-images" data-title="@Model.Title">
+                                        <img src="@img.ImageUrl" class="img-thumbnail" style="max-height: 150px;" alt="Şikayet resmi" />
+                                    </a>
                                 }
+                            </div>
                         </div>
-                    </div>
                     }
 
                     @if (!string.IsNullOrEmpty(Model.Response))
                     {
-                    <div class="mb-4">
-                        <h6 class="text-muted mb-2">Yönetici Cevabı</h6>
-                        <div class="p-3 bg-light rounded">
-                            @Model.Response
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">Yönetici Cevabı</h6>
+                            <div class="p-3 bg-light rounded">
+                                @Model.Response
+                            </div>
                         </div>
-                    </div>
                     }
                 </div>
 
                 <div class="card-footer bg-light">
                     <h4 class="mb-4">Yönetici İşlemleri</h4>
-                    <form asp-action="Respond" method="post" class="needs-validation" novalidate>
+                    <form asp-action="Respond" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@Model.Id" method="post" class="needs-validation" novalidate>
+
                         <input type="hidden" name="id" value="@Model.Id" />
 
                         <div class="mb-3">
@@ -104,16 +95,14 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label for="assignedToId" class="form-label">Atanacak Personel</label>
-                                <select name="assignedToId" id="assignedToId" class="form-select">
-                                    <option value="">Seçiniz</option>
-                                    @foreach (var user in ViewBag.Users as List<YoneticiOtomasyonu.Models.ApplicationUser>)
-                                    {
-                                        <option value="@user.Id" selected="@(Model.AssignedToId == user.Id ? "selected" : null)">@user.UserName</option>
-                                    }
-                                </select>
-                            </div>
+                            <select name="assignedToId" id="assignedToId" class="form-select">
+                                <option value="">Seçiniz</option>
+                                @foreach (var user in ViewBag.Users as List<SelectListItem>)
+                                {
+                                    <option value="@user.Value" selected="@(user.Selected ? "selected" : null)">@user.Text</option>
+                                }
+                            </select>
+
 
                             <div class="col-md-4 mb-3">
                                 <label for="priority" class="form-label">Görev Önceliği</label>
@@ -150,15 +139,6 @@
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
 
-        .card-header {
-            border-radius: 0.35rem 0.35rem 0 0 !important;
-        }
-
-        .info-item h6 {
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
         .img-thumbnail {
             transition: transform 0.2s;
         }
@@ -177,20 +157,18 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
     <script>
-        // Form validation
         (function () {
             'use strict'
             var forms = document.querySelectorAll('.needs-validation')
-            Array.prototype.slice.call(forms)
-                .forEach(function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault()
-                            event.stopPropagation()
-                        }
-                        form.classList.add('was-validated')
-                    }, false)
-                })
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
         })()
     </script>
 }

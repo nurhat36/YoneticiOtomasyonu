@@ -57,7 +57,7 @@ namespace YoneticiOtomasyonu.Controllers
 
             return View(buildingsWithRoles);
         }
-
+        [Authorize(Policy = "BuildingAccess")]
         public async Task<IActionResult> Details(int buildingId)
         {
             var building = await _buildingService.GetBuildingByIdAsync(buildingId);
@@ -77,7 +77,7 @@ namespace YoneticiOtomasyonu.Controllers
 
             return View(building);
         }
-
+        [Authorize(Policy = "BuildingAccess")]
         public async Task<IActionResult> Dashboard(int buildingId)
         {
             var building = await _buildingService.GetBuildingByIdAsync(buildingId);
@@ -89,8 +89,8 @@ namespace YoneticiOtomasyonu.Controllers
             return View();
         }
 
-       
 
+        [Authorize(Policy = "BuildingAccess")]
         public async Task<IActionResult> Settings(int buildingId)
         {
             var building = await _buildingService.GetBuildingByIdAsync(buildingId);
@@ -176,7 +176,7 @@ namespace YoneticiOtomasyonu.Controllers
         }
 
         // GET: Buildings/Edit/5
-        
+        [Authorize(Policy = "BuildingAccess")]
         public async Task<IActionResult> Edit(int buildingId)
         {
             var building = await _buildingService.GetBuildingByIdAsync(buildingId);
@@ -204,7 +204,7 @@ namespace YoneticiOtomasyonu.Controllers
         // POST: Buildings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
+        [Authorize(Policy = "BuildingAccess")]
         public async Task<IActionResult> Edit(int buildingId, BuildingViewModel model)
         {
             if (buildingId != model.Id) return NotFound();
@@ -259,7 +259,7 @@ namespace YoneticiOtomasyonu.Controllers
             TempData["Success"] = "Bina bilgileri baþarýyla güncellendi";
             return RedirectToAction(nameof(Index));
         }
-
+        [Authorize(Policy = "BuildingAccess")]
         // GET: Buildings/Delete/5
         [Authorize(Policy = "BuildingAdmin")]
         public async Task<IActionResult> Delete(int buildingId)

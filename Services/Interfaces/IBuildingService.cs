@@ -15,5 +15,7 @@ namespace YoneticiOtomasyonu.Services.Interfaces
         Task<List<Building>> GetAllBuildingsAsync();
         Task<Building> GetBuildingByIdAsync(int id);
         Task<List<UserBuildingRole>> GetBuildingManagersAsync(int buildingId);
+        Task<bool> UserHasAccessToBuildingAsync(string userId, int buildingId);
+
     }
 }

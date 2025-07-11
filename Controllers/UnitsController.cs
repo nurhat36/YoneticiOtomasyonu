@@ -9,8 +9,8 @@ using YoneticiOtomasyonu.Models.ViewModels;
 
 namespace YoneticiOtomasyonu.Controllers
 {
-    [Route("Buildings/{buildingId:int}/[controller]/[action]")]
-    [Authorize]
+    [Route("Buildings/{buildingId:int}/[controller]")]
+    [Authorize(Policy = "BuildingAccess")]
     public class UnitsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,8 +23,9 @@ namespace YoneticiOtomasyonu.Controllers
         }
 
         // GET: Units/Add?buildingId=5
-        public async Task<IActionResult> Add(int buildingId)
-        {
+        [HttpGet]
+        [Route("/Buildings/{buildingId:int}/Units/Add")]
+        public async Task<IActionResult> Add(int buildingId) { 
             var building = await _context.Buildings.FindAsync(buildingId);
             if (building == null) return NotFound();
 
@@ -52,8 +53,9 @@ namespace YoneticiOtomasyonu.Controllers
 
         // POST: Units/Add
         [HttpPost]
+        [Route("/Buildings/{buildingId:int}/Units/Add")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(UnitViewModel model)
+        public async Task<IActionResult> Add(int buildingId, UnitViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -102,7 +104,7 @@ namespace YoneticiOtomasyonu.Controllers
 
 
             TempData["Success"] = "Birim başarıyla eklendi";
-            return RedirectToAction("Details", "Buildings", new { id = model.BuildingId });
+            return RedirectToAction("List", new { buildingId });
         }
         private async Task AddNotification(string userId, string message, string? link = null)
         {
@@ -119,6 +121,8 @@ namespace YoneticiOtomasyonu.Controllers
             await _context.SaveChangesAsync();
         }
 
+        [HttpGet]
+        [Route("/Buildings/{buildingId:int}/Units/List")]
         public async Task<IActionResult> List(int buildingId, string status = "all", string unitType = "all")
         {
             var building = await _context.Buildings
@@ -170,7 +174,9 @@ namespace YoneticiOtomasyonu.Controllers
         }
 
 
-        public async Task<IActionResult> Details(int id)
+        [HttpGet]
+        [Route("/Buildings/{buildingId:int}/Units/{id:int}/Details")]
+        public async Task<IActionResult> Details(int buildingId, int id)
         {
             var unit = await _context.Units
                 .Include(u => u.Building)
@@ -181,7 +187,9 @@ namespace YoneticiOtomasyonu.Controllers
 
             return View(unit);
         }
-        public async Task<IActionResult> Edit(int id)
+        [HttpGet]
+        [Route("/Buildings/{buildingId:int}/Units/{id:int}/Edit")]
+        public async Task<IActionResult> Edit(int buildingId, int id)
         {
             var unit = await _context.Units
                 .Include(u => u.Building)
@@ -227,8 +235,9 @@ namespace YoneticiOtomasyonu.Controllers
         }
 
         [HttpPost]
+        [Route("/Buildings/{buildingId:int}/Units/{id:int}/Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, UnitViewModel model)
+        public async Task<IActionResult> Edit(int buildingId, int id, UnitViewModel model)
         {
             if (id != model.Id) return NotFound();
 
@@ -294,27 +303,30 @@ namespace YoneticiOtomasyonu.Controllers
 
             await _context.SaveChangesAsync();
             TempData["Success"] = "Birim başarıyla güncellendi.";
-            return RedirectToAction("List", new { buildingId = model.BuildingId });
+            return RedirectToAction("List", new { buildingId });
         }
 
-        public async Task<IActionResult> Delete(int id)
+        [HttpGet]
+        [Route("/Buildings/{buildingId:int}/Units/{id:int}/Delete")]
+        public async Task<IActionResult> Delete(int buildingId, int id)
         {
             var unit = await _context.Units
                 .Include(u => u.Building)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (unit == null) return NotFound();
-
+            ViewBag.BuildingId = buildingId;
             return View(unit);
         }
         [HttpPost, ActionName("Delete")]
+        [Route("/Buildings/{buildingId:int}/Units/{id:int}/Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int buildingId, int id)
         {
             var unit = await _context.Units.FindAsync(id);
             if (unit == null) return NotFound();
 
-            var buildingId = unit.BuildingId;
+           
 
             _context.Units.Remove(unit);
             await _context.SaveChangesAsync();

@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="card-body p-4 p-md-5">
-                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <form asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <input type="hidden" asp-for="BuildingId" />
 
                         <div class="mb-4">
