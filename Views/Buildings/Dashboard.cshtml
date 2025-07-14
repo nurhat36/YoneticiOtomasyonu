@@ -1,23 +1,179 @@
-﻿@{
+﻿@model Building
+@{
     ViewData["Title"] = "Bina Yönetim Paneli";
-    Layout = "_ManagementLayout"; // kendi layout'un varsa buraya yaz
+    Layout = "_ManagementLayout";
 }
 
 @section Styles {
     <style>
         .dashboard-card {
             transition: transform 0.2s ease;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 100%;
         }
 
             .dashboard-card:hover {
                 transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             }
+
+        .stat-card {
+            border-left: 4px solid;
+            padding: 15px;
+            height: 100%;
+        }
+
+            .stat-card.income {
+                border-color: #28a745;
+                background-color: rgba(40, 167, 69, 0.1);
+            }
+
+            .stat-card.expense {
+                border-color: #dc3545;
+                background-color: rgba(220, 53, 69, 0.1);
+            }
+
+            .stat-card.balance {
+                border-color: #17a2b8;
+                background-color: rgba(23, 162, 184, 0.1);
+            }
+
+            .stat-card.debt {
+                border-color: #ffc107;
+                background-color: rgba(255, 193, 7, 0.1);
+            }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .building-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .building-info-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
     </style>
 }
 
-<div class="container py-4">
+<div class="container-fluid py-4">
 
-    <h2 class="mb-4">Bina Yönetim Paneli</h2>
+    <div class="building-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">@Model.Name</h2>
+                <p class="mb-0">@Model.Type - @Model.Address</p>
+            </div>
+            <div class="text-end">
+                <p class="mb-0"><strong>Bina Kodu:</strong> @Model.Id</p>
+                <p class="mb-0"><small>Son Güncelleme: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</small></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="building-info-card">
+                <div class="row">
+                    <div class="col-6">
+                        <p class="mb-1"><strong>Birim Sayısı:</strong> @Model.Units.Count</p>
+                        <p class="mb-1"><strong>Kat Sayısı:</strong> @Model.FloorCount</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1"><strong>Blok:</strong> @(Model.Block ?? "Yok")</p>
+                        <p class="mb-1"><strong>Oluşturulma:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <hr>
+                    <p class="mb-0"><strong>Açıklama:</strong> @Model.Description</p>
+                }
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-card income">
+                        <h5 class="text-muted">Toplam Gelir</h5>
+                        <h3>@ViewBag.TotalIncome.ToString("C")</h3>
+                        <p class="text-success mb-0"><i class="bi bi-cash-stack"></i> Son 30 günde @ViewBag.RecentIncomeCount kayıt</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card expense">
+                        <h5 class="text-muted">Toplam Gider</h5>
+                        <h3>@ViewBag.TotalExpense.ToString("C")</h3>
+                        <p class="text-danger mb-0"><i class="bi bi-cash-coin"></i> Son 30 günde @ViewBag.RecentExpenseCount kayıt</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card balance">
+                        <h5 class="text-muted">Bina Bakiyesi</h5>
+                        <h3>@ViewBag.Balance.ToString("C")</h3>
+                        <p class="text-info mb-0"><i class="bi bi-piggy-bank"></i> @Model.Units.Count birim</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card debt">
+                        <h5 class="text-muted">Aidat Borcunuz</h5>
+                        <h3>@ViewBag.UserDebt.ToString("C")</h3>
+                        <p class="text-warning mb-0">
+                            <i class="bi bi-calendar"></i>
+                            Son ödeme: @(ViewBag.LastPaymentDate?.ToString("dd.MM.yyyy") ?? "Yok")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Gelir-Gider Analizi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="incomeExpenseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Aidat Ödeme Durumu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="duesStatusChart"></canvas>
+                    </div>
+                    <div class="text-center mt-3">
+                        <span class="badge bg-success">@ViewBag.PaidDues Ödenmiş</span>
+                        <span class="badge bg-danger ms-2">@ViewBag.UnpaidDues Ödenmemiş</span>
+                        @if (ViewBag.PartiallyPaidDues > 0)
+                        {
+                            <span class="badge bg-warning text-dark ms-2">@ViewBag.PartiallyPaidDues Kısmen</span>
+                        }
+                        <p class="mt-2 mb-0">Toplam: @Model.Units.Count birim (%@ViewBag.PaidDuesPercentage ödeme oranı)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row g-4">
         <div class="col-md-4">
@@ -25,8 +181,8 @@
                 <div class="card-body text-center">
                     <i class="bi bi-people-fill display-4 text-primary"></i>
                     <h5 class="mt-3">Birimler</h5>
-                    <p>Bina birimlerini görüntüle ve yönet.</p>
-                    <a asp-action="List" asp-controller="Units" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-outline-primary">Git</a>
+                    <p><span class="badge bg-primary">@Model.Units.Count</span> aktif birim</p>
+                    <a asp-action="List" asp-controller="Units" asp-route-buildingId="@Model.Id" class="btn btn-outline-primary">Git</a>
                 </div>
             </div>
         </div>
@@ -35,8 +191,8 @@
                 <div class="card-body text-center">
                     <i class="bi bi-cash-stack display-4 text-success"></i>
                     <h5 class="mt-3">Gelirler</h5>
-                    <p>Gelir kayıtlarını takip et.</p>
-                    <a asp-action="Index" asp-controller="Income" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-outline-success">Git</a>
+                    <p><span class="badge bg-success">@ViewBag.RecentIncomeCount</span> son 30 günde</p>
+                    <a asp-action="Index" asp-controller="Income" asp-route-buildingId="@Model.Id" class="btn btn-outline-success">Git</a>
                 </div>
             </div>
         </div>
@@ -45,8 +201,8 @@
                 <div class="card-body text-center">
                     <i class="bi bi-cash-coin display-4 text-danger"></i>
                     <h5 class="mt-3">Giderler</h5>
-                    <p>Gider işlemlerini kontrol et.</p>
-                    <a asp-action="Index" asp-controller="Expense" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-outline-danger">Git</a>
+                    <p><span class="badge bg-danger">@ViewBag.RecentExpenseCount</span> son 30 günde</p>
+                    <a asp-action="Index" asp-controller="Expense" asp-route-buildingId="@Model.Id" class="btn btn-outline-danger">Git</a>
                 </div>
             </div>
         </div>
@@ -55,8 +211,8 @@
                 <div class="card-body text-center">
                     <i class="bi bi-exclamation-triangle display-4 text-warning"></i>
                     <h5 class="mt-3">Şikayetler</h5>
-                    <p>Gelen şikayetleri yönet.</p>
-                    <a asp-action="Index" asp-controller="Complaint" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-outline-warning">Git</a>
+                    <p><span class="badge bg-warning text-dark">@ViewBag.PendingComplaints</span> bekleyen</p>
+                    <a asp-action="Index" asp-controller="Complaint" asp-route-buildingId="@Model.Id" class="btn btn-outline-warning">Git</a>
                 </div>
             </div>
         </div>
@@ -65,8 +221,8 @@
                 <div class="card-body text-center">
                     <i class="bi bi-receipt display-4 text-info"></i>
                     <h5 class="mt-3">Aidatlar</h5>
-                    <p>Aidat ayarlarını düzenle.</p>
-                    <a asp-action="Index" asp-controller="DuesSettings" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-outline-info">Git</a>
+                    <p><span class="badge bg-info">@ViewBag.PaidDuesPercentage%</span> ödeme oranı</p>
+                    <a asp-action="Index" asp-controller="DuesSettings" asp-route-buildingId="@Model.Id" class="btn btn-outline-info">Git</a>
                 </div>
             </div>
         </div>
@@ -75,10 +231,93 @@
                 <div class="card-body text-center">
                     <i class="bi bi-megaphone display-4 text-secondary"></i>
                     <h5 class="mt-3">Duyurular</h5>
-                    <p>Bina duyurularını yönet.</p>
-                    <a asp-action="Index" asp-controller="Announcement" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-outline-secondary">Git</a>
+                    <p><span class="badge bg-secondary">@ViewBag.RecentAnnouncements</span> son 30 günde</p>
+                    <a asp-action="Index" asp-controller="Announcement" asp-route-buildingId="@Model.Id" class="btn btn-outline-secondary">Git</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Gelir-Gider Grafiği
+        const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+        const incomeExpenseChart = new Chart(incomeExpenseCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.LastSixMonths)),
+                datasets: [
+                    {
+                        label: 'Gelir',
+                        data: @Html.Raw(Json.Serialize(ViewBag.IncomeByMonth)),
+                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Gider',
+                        data: @Html.Raw(Json.Serialize(ViewBag.ExpenseByMonth)),
+                        backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₺' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Aidat Durumu Grafiği
+        const duesStatusCtx = document.getElementById('duesStatusChart').getContext('2d');
+        const duesStatusChart = new Chart(duesStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ödenen', 'Ödenmeyen', 'Kısmen Ödenen'],
+                datasets: [{
+                    data: [@ViewBag.PaidDues, @ViewBag.UnpaidDues, @ViewBag.PartiallyPaidDues],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(220, 53, 69, 0.7)',
+                        'rgba(255, 193, 7, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.raw + ' birim';
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

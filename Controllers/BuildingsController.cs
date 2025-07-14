@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -80,13 +81,95 @@ namespace YoneticiOtomasyonu.Controllers
         [Authorize(Policy = "BuildingAccess")]
         public async Task<IActionResult> Dashboard(int buildingId)
         {
-            var building = await _buildingService.GetBuildingByIdAsync(buildingId);
-            if (building == null) return NotFound();
+            // Bina bilgilerini getir
+            var building = await _context.Buildings
+                .Include(b => b.Incomes)
+                .Include(b => b.Expenses)
+                .Include(b => b.Units)
+                .Include(b => b.Announcements)
+                .Include(b => b.UserDebts)
+                .FirstOrDefaultAsync(b => b.Id == buildingId);
 
+            if (building == null)
+            {
+                return NotFound();
+            }
+
+            // Kullanýcý bilgilerini getir
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserDebt = await _context.UserDebts
+                .Where(ud => ud.UserId == userId && ud.BuildingId == buildingId)
+                .SumAsync(ud => ud.Amount);
+
+            // ViewBag verileri
             ViewBag.BuildingId = building.Id;
             ViewBag.BuildingName = building.Name;
+            ViewBag.BuildingType = building.Type;
+            ViewBag.BuildingAddress = building.Address;
+            ViewBag.UnitCount = building.Units.Count;
 
-            return View();
+            // Finansal bilgiler
+            ViewBag.TotalIncome = building.Incomes.Sum(i => i.Amount);
+            ViewBag.TotalExpense = building.Expenses.Sum(e => e.Amount);
+            ViewBag.Balance = ViewBag.TotalIncome - ViewBag.TotalExpense;
+            ViewBag.UserDebt = currentUserDebt;
+
+            // Son ödeme tarihi
+            var lastPayment = await _context.Incomes
+                .Where(i => i.BuildingId == buildingId && i.PayerId==userId)
+                .OrderByDescending(i => i.Date)
+                .FirstOrDefaultAsync();
+            ViewBag.LastPaymentDate = lastPayment?.Date;
+
+            // Son 6 ayýn gelir-gider verileri
+            var sixMonthsAgo = DateTime.Now.AddMonths(-6);
+            ViewBag.LastSixMonths = Enumerable.Range(0, 6)
+                .Select(i => DateTime.Now.AddMonths(-i).ToString("MMM yyyy"))
+                .Reverse()
+                .ToList();
+
+            ViewBag.IncomeByMonth = Enumerable.Range(0, 6)
+                .Select(i => building.Incomes
+                    .Where(inc => inc.Date.Month == DateTime.Now.AddMonths(-i).Month &&
+                           inc.Date.Year == DateTime.Now.AddMonths(-i).Year)
+                    .Sum(inc => inc.Amount))
+                .Reverse()
+                .ToList();
+
+            ViewBag.ExpenseByMonth = Enumerable.Range(0, 6)
+                .Select(i => building.Expenses
+                    .Where(exp => exp.Date.Month == DateTime.Now.AddMonths(-i).Month &&
+                           exp.Date.Year == DateTime.Now.AddMonths(-i).Year)
+                    .Sum(exp => exp.Amount))
+                .Reverse()
+                .ToList();
+
+            // Aidat durumu
+            var totalUnits = building.Units.Count;
+            var paidDues = await _context.UserDebts
+                .Where(ud => ud.BuildingId == buildingId && ud.Amount <= 0)
+                .CountAsync();
+            var unpaidDues = await _context.UserDebts
+                .Where(ud => ud.BuildingId == buildingId && ud.Amount > 0)
+                .CountAsync();
+
+            ViewBag.PaidDues = paidDues;
+            ViewBag.UnpaidDues = unpaidDues;
+            ViewBag.PartiallyPaidDues = 0; // Kýsmi ödeme durumunuza göre güncelleyin
+            ViewBag.PaidDuesPercentage = totalUnits > 0 ? (int)((paidDues * 100) / totalUnits) : 0;
+
+            // Diðer istatistikler
+            ViewBag.PendingComplaints = await _context.Complaints
+     .Include(c => c.Unit) // Unit bilgilerini dahil ediyoruz
+     .Where(c => c.Unit.BuildingId == buildingId && c.Status == "Beklemede")
+     .CountAsync();
+
+            var thirtyDaysAgo = DateTime.Now.AddDays(-30);
+            ViewBag.RecentIncomeCount = building.Incomes.Count(i => i.Date >= thirtyDaysAgo);
+            ViewBag.RecentExpenseCount = building.Expenses.Count(e => e.Date >= thirtyDaysAgo);
+            ViewBag.RecentAnnouncements = building.Announcements.Count(a => a.CreatedAt >= thirtyDaysAgo);
+
+            return View(building);
         }
 
 

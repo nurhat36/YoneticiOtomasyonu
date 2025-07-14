@@ -1,3 +1,15 @@
 ﻿@{
+    var darkMode = "disabled";
+
+    // Cookie kontrol et
+    var request = Context.Request;
+    var cookies = request.Cookies;
+
+    if (cookies["darkMode"] == "enabled")
+    {
+        darkMode = "enabled";
+    }
+
+    ViewBag.DarkMode = darkMode;
     Layout = "_Layout";
 }

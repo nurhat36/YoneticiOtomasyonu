@@ -540,7 +540,8 @@
         }
     </style>
 </head>
-<body>
+<body class="@(ViewBag.DarkMode == "enabled" ? "dark-mode" : "")">
+
     <!-- Particle.js background -->
     <div id="particles-js"></div>
     
@@ -622,6 +623,11 @@
                                             @await Component.InvokeAsync("TaskCounter")
                                         </a>
                                     </li>
+                                    <li>
+                                        <button id="darkModeToggle" class="btn btn-outline-secondary ms-2" style="padding: 5px 10px; font-size: 1.2rem;">
+                                            🌙
+                                        </button>
+                                    </li>
                                     <li><hr class="dropdown-divider my-1" /></li>
                                     <li>
                                         <form method="post" asp-area="Identity" asp-page="/Account/Logout" id="logoutForm" class="d-inline">
@@ -678,6 +684,30 @@
     <script>
         // Initialize particles.js
         document.addEventListener('DOMContentLoaded', function() {
+
+
+            const toggleButton = document.getElementById("darkModeToggle");
+            const body = document.body;
+
+            if (body.classList.contains("dark-mode")) {
+                toggleButton.textContent = "☀️";
+            } else {
+                toggleButton.textContent = "🌙";
+            }
+
+            toggleButton.addEventListener("click", function () {
+                body.classList.toggle("dark-mode");
+
+                if (body.classList.contains("dark-mode")) {
+                    document.cookie = "darkMode=enabled; path=/";
+                    localStorage.setItem("darkMode", "enabled");
+                    toggleButton.textContent = "☀️";
+                } else {
+                    document.cookie = "darkMode=disabled; path=/";
+                    localStorage.setItem("darkMode", "disabled");
+                    toggleButton.textContent = "🌙";
+                }
+            });
             if (typeof particlesJS !== 'undefined') {
                 particlesJS('particles-js', {
                     particles: {
