@@ -98,7 +98,7 @@
                 <input type="hidden" asp-for="BuildingId" />
 
                 <div class="d-flex justify-content-between mt-4">
-                    <a asp-action="Details" asp-controller="Buildings" asp-route-id="@Model.BuildingId" class="btn btn-outline-secondary">
+                    <a  asp-action="List" asp-controller="Units" asp-route-buildingId="@Model.BuildingId" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Geri Dön
                     </a>
                     <button type="submit" class="btn btn-primary">

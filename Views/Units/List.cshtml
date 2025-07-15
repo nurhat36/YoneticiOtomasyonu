@@ -19,7 +19,7 @@
                 </nav>
             </div>
             <div>
-                <a asp-action="Details" asp-controller="Buildings" asp-route-id="@ViewBag.BuildingId" class="btn btn-outline-secondary">
+                <a asp-action="Details" asp-controller="Buildings" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Binaya Dön
                 </a>
 
@@ -190,6 +190,7 @@
             });
         });
         </script>
+
     }
 
     @section Styles {
