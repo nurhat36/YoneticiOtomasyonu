@@ -35,6 +35,6 @@
         <dd class="col-sm-9">@Model.BuildingId</dd>
     </dl>
 
-    
+    <a asp-action="Edit" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
     <a asp-action="Index"  asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary ms-2">Geri</a>
 </div>

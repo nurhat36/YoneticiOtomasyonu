@@ -93,7 +93,7 @@ namespace YoneticiOtomasyonu.Controllers
             return RedirectToAction("Index", new { buildingId = existing.BuildingId });
         }
         [HttpGet("{id}/Detail")]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int buildingId,int id)
         {
             var personnel = await _context.BuildingPersonnel
                 .Include(p => p.ApplicationUser)  // Personelin kullanıcı bilgisi için
@@ -101,6 +101,7 @@ namespace YoneticiOtomasyonu.Controllers
 
             if (personnel == null)
                 return NotFound();
+            ViewBag.BuildingId = buildingId;
 
             return View(personnel);
         }
