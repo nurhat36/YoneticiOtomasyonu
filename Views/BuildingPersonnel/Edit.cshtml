@@ -5,36 +5,139 @@
     Layout = "_ManagementLayout";
 }
 
-<h2>Personel Düzenle</h2>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Personel Bilgilerini Düzenle</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" asp-route-id="@Model.Personnel.Id" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="Personnel.Id" />
+                        <input type="hidden" asp-for="Personnel.BuildingId" />
 
-<form asp-action="Edit" asp-route-id="@Model.Personnel.Id" method="post">
-    <input type="hidden" asp-for="Personnel.Id" />
-    <input type="hidden" asp-for="Personnel.BuildingId" />
+                        <!-- Personel Bilgileri -->
+                        <div class="mb-4">
+                            <h5 class="text-muted mb-3">Personel Bilgileri</h5>
+                            <div class="d-flex align-items-center bg-light p-3 rounded-3">
+                                <img src="@Model.Personnel.ApplicationUser.ProfileImageUrl"
+                                     alt="Profil" width="80" height="80" class="rounded-circle border border-3 border-primary shadow-sm me-3 object-fit-cover" />
+                                <div>
+                                    <h4 class="mb-1 fw-bold">@Model.Personnel.ApplicationUser.UserName</h4>
+                                    <p class="mb-1 text-muted"><i class="fas fa-envelope me-2"></i>@Model.Personnel.ApplicationUser.Email</p>
+                                </div>
+                            </div>
+                        </div>
 
-    <div class="mb-3">
-        <label class="form-label fw-bold">Personel</label>
-        <div class="d-flex align-items-center">
-            <img src="@Model.Personnel.ApplicationUser.ProfileImageUrl"
-                 alt="Profil" width="60" height="60" class="rounded-circle shadow-sm me-2" />
-            <span class="fw-bold">@Model.Personnel.ApplicationUser.UserName (@Model.Personnel.ApplicationUser.Email)</span>
+                        <!-- Görev Bilgileri -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Personnel.DutyType" class="form-label fw-bold">Görev Türü</label>
+                                <select asp-for="Personnel.DutyType" class="form-select">
+                                    <option value="">Görev seçiniz</option>
+                                    <option value="Temizlik">Temizlik</option>
+                                    <option value="Güvenlik">Güvenlik</option>
+                                    <option value="Bakım">Bakım</option>
+                                    <option value="Yönetici">Yönetici</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
+                                <span asp-validation-for="Personnel.DutyType" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Personnel.MonthlySalary" class="form-label fw-bold">Maaş (₺)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-money-bill-wave"></i></span>
+                                    <input asp-for="Personnel.MonthlySalary" class="form-control" placeholder="Örn: 8500" />
+                                </div>
+                                <span asp-validation-for="Personnel.MonthlySalary" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Notlar -->
+                        <div class="mb-4">
+                            <label asp-for="Personnel.Notes" class="form-label fw-bold">Notlar</label>
+                            <textarea asp-for="Personnel.Notes" class="form-control" rows="4" placeholder="Personel hakkında notlar..."></textarea>
+                        </div>
+
+                        <!-- Butonlar -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" asp-route-buildingId="@Model.Personnel.BuildingId" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label asp-for="Personnel.DutyType" class="form-label">Görev</label>
-        <input asp-for="Personnel.DutyType" class="form-control" />
-    </div>
+@section Styles {
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
 
-    <div class="mb-3">
-        <label asp-for="Personnel.MonthlySalary" class="form-label">Maaş</label>
-        <input asp-for="Personnel.MonthlySalary" class="form-control" />
-    </div>
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s;
+        }
 
-    <div class="mb-3">
-        <label asp-for="Personnel.Notes" class="form-label">Notlar</label>
-        <textarea asp-for="Personnel.Notes" class="form-control"></textarea>
-    </div>
+            .form-control:focus, .form-select:focus {
+                border-color: #86b7fe;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            }
 
-    <button type="submit" class="btn btn-primary">Güncelle</button>
-    <a asp-action="Index" asp-route-buildingId="@ViewBag.BuildingId" asp-route-buildingId="@Model.Personnel.BuildingId" class="btn btn-secondary">Geri</a>
-</form>
+        .object-fit-cover {
+            object-fit: cover;
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+            .btn-primary:hover {
+                background-color: #0b5ed7;
+                border-color: #0a58ca;
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Bootstrap 5 validation
+        (function () {
+            'use strict'
+
+            var forms = document.querySelectorAll('.needs-validation')
+
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+}
