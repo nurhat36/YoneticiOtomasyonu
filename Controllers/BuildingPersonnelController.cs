@@ -20,6 +20,7 @@ namespace YoneticiOtomasyonu.Controllers
             _context = context;
             _userManager = userManager;
         }
+
         [HttpGet("Index")]
         public async Task<IActionResult> Index(int buildingId)
         {
