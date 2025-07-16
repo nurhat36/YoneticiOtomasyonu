@@ -1,0 +1,60 @@
+﻿@model YoneticiOtomasyonu.Models.ViewModels.BuildingPersonnelFormViewModel
+
+@{
+    ViewBag.Title = "Yeni Personel Ekle";
+    Layout = "_ManagementLayout";
+}
+
+<h2>Yeni Personel Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="Personnel.BuildingId" />
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Kullanıcı Seç</label>
+        <select asp-for="Personnel.ApplicationUserId" class="form-select" id="userSelect">
+            <option value="">-- Kullanıcı Seçiniz --</option>
+            @foreach (var user in Model.Users)
+            {
+                <option value="@user.Id">@user.UserName (@user.Email)</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Personnel.DutyType" class="form-label">Görev</label>
+        <input asp-for="Personnel.DutyType" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Personnel.MonthlySalary" class="form-label">Maaş</label>
+        <input asp-for="Personnel.MonthlySalary" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Personnel.IsActive" class="form-check-label">
+            <input asp-for="Personnel.IsActive" class="form-check-input" /> Aktif
+        </label>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Personnel.Notes" class="form-label">Notlar</label>
+        <textarea asp-for="Personnel.Notes" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Kaydet</button>
+    <a asp-action="Index" asp-route-buildingId="@Model.Personnel.BuildingId" class="btn btn-secondary">Geri</a>
+</form>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#userSelect').select2({
+                placeholder: "Kullanıcı seçiniz",
+                allowClear: true
+            });
+        });
+    </script>
+}

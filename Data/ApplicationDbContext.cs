@@ -33,6 +33,7 @@ namespace YoneticiOtomasyonu.Data
         public DbSet<UserDebt> UserDebts { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<BuildingPersonnel> BuildingPersonnel { get; set; }
 
 
 

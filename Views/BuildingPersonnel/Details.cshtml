@@ -1,0 +1,40 @@
+﻿@model YoneticiOtomasyonu.Models.BuildingPersonnel
+
+@{
+    ViewBag.Title = "Personel Detayları";
+    Layout = "_ManagementLayout";
+}
+
+<h2>Personel Detayları</h2>
+
+<div class="card shadow p-4">
+    <div class="d-flex align-items-center mb-4">
+        <img src="@Model.ApplicationUser.ProfileImageUrl" alt="Profil" class="rounded-circle me-3" width="100" height="100" />
+        <div>
+            <h3>@Model.ApplicationUser.UserName</h3>
+            <p class="text-muted">@Model.ApplicationUser.Email</p>
+        </div>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Görev</dt>
+        <dd class="col-sm-9">@Model.DutyType</dd>
+
+        <dt class="col-sm-3">Maaş</dt>
+        <dd class="col-sm-9">@Model.MonthlySalary.ToString("C")</dd>
+
+        <dt class="col-sm-3">Durum</dt>
+        <dd class="col-sm-9">
+            @(Model.IsActive ? "Aktif" : "Pasif")
+        </dd>
+
+        <dt class="col-sm-3">Notlar</dt>
+        <dd class="col-sm-9">@Model.Notes</dd>
+
+        <dt class="col-sm-3">Bulunduğu Bina</dt>
+        <dd class="col-sm-9">@Model.BuildingId</dd>
+    </dl>
+
+    
+    <a asp-action="Index"  asp-route-buildingId="@Model.BuildingId" class="btn btn-secondary ms-2">Geri</a>
+</div>

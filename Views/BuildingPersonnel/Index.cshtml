@@ -1,0 +1,44 @@
+﻿@model IEnumerable<YoneticiOtomasyonu.Models.BuildingPersonnel>
+@{
+    ViewBag.Title = "Personel Listesi";
+    Layout = "_ManagementLayout";
+}
+
+<h2>Personel Listesi</h2>
+
+<p>
+    <a asp-action="Create" asp-route-buildingId="@ViewBag.BuildingId" class="btn btn-primary">Yeni Personel Ekle</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Fotoğraf</th>
+            <th>Kullanıcı Adı</th>
+            <th>Görev</th>
+            <th>Maaş</th>
+            <th>Durum</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@p.ApplicationUser?.ProfileImageUrl" alt="Profil" width="50" height="50" />
+                </td>
+                <td>@p.ApplicationUser?.UserName</td>
+                <td>@p.DutyType</td>
+                <td>@p.MonthlySalary ₺</td>
+                <td>@(p.IsActive ? "Aktif" : "Pasif")</td>
+                <td>
+                    <a asp-action="Details" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@p.Id" class="btn btn-info btn-sm">Detay</a>
+
+                    <a asp-action="Edit" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@p.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                    <a asp-action="Deactivate" asp-route-buildingId="@ViewBag.BuildingId" asp-route-id="@p.Id" class="btn btn-sm btn-danger">İşten Çıkar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -365,6 +365,12 @@
                         <span>Birimler</span>
                     </a>
                 </li>
+                <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "BuildingPersonnel" ? "active" : "")">
+                    <a asp-action="Index" asp-controller="BuildingPersonnel" asp-route-buildingId="@ViewBag.BuildingId">
+                        <i class="bi bi-people"></i>
+                        <span>Personeller</span>
+                    </a>
+                </li>
                 <li class="@(ViewContext.RouteData.Values["controller"].ToString() == "Income" ? "active" : "")">
                     <a asp-action="Index" asp-controller="Income" asp-route-buildingId="@ViewBag.BuildingId">
                         <i class="bi bi-cash-stack"></i>
