@@ -1,0 +1,28 @@
+﻿@model List<YoneticiOtomasyonu.Models.Plan>
+
+@{
+    ViewData["Title"] = "Abonelik Planları";
+}
+
+<h2>Planını Seç</h2>
+
+<div class="row">
+    @foreach (var plan in Model)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4 box-shadow">
+                <div class="card-body">
+                    <h4>@plan.Name</h4>
+                    <p>@plan.Description</p>
+                    <p><strong>Aylık:</strong> ₺@plan.MonthlyPrice</p>
+                    <p><strong>Yıllık:</strong> ₺@plan.YearlyPrice</p>
+
+                    <form asp-action="Select" method="post">
+                        <input type="hidden" name="id" value="@plan.Id" />
+                        <button type="submit" class="btn btn-primary">Planı Seç</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

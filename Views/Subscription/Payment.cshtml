@@ -1,0 +1,16 @@
+﻿@model YoneticiOtomasyonu.Models.Plan
+
+@{
+    ViewData["Title"] = "Ödeme Sayfası";
+}
+
+<h2>@Model.Name Planı</h2>
+<p>@Model.Description</p>
+<p><strong>Aylık:</strong> ₺@Model.MonthlyPrice</p>
+<p><strong>Yıllık:</strong> ₺@Model.YearlyPrice</p>
+
+<p>Buraya iyzico ödeme alanı gelecek. (Bir sonraki adım)</p>
+<form method="post" asp-action="ConfirmPayment">
+    <input type="hidden" name="planId" value="@Model.Id" />
+    <button type="submit" class="btn btn-success">Ödeme Yap (Test)</button>
+</form>

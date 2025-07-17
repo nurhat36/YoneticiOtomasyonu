@@ -1,0 +1,75 @@
+﻿@model List<YoneticiOtomasyonu.Models.Plan>
+
+<div class="row mt-4">
+    @foreach (var plan in Model)
+    {
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card plan-card h-100 border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white text-center py-4">
+                    <h3 class="my-0 font-weight-bold">@plan.Name</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <span class="h2 text-primary">₺@plan.MonthlyPrice</span>
+                        <span class="text-muted">/ ay</span>
+                    </div>
+                    <p class="card-text text-muted mb-4 text-center">@plan.Description</p>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Tam Erişim</li>
+                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> 7/24 Destek</li>
+                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Özel Raporlar</li>
+                    </ul>
+                    
+                    <div class="text-center mb-3">
+                        <span class="text-muted">Yıllık ödeme ile</span>
+                        <div class="h4 text-dark">₺@plan.YearlyPrice</div>
+                        <small class="text-success">@((100 - (plan.YearlyPrice / (plan.MonthlyPrice * 12) * 100)).ToString("0"))% tasarruf edin</small>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center pb-4">
+                    <form asp-action="Select" asp-controller="Subscription" method="post">
+                        <input type="hidden" name="id" value="@plan.Id" />
+                        <button type="submit" class="btn btn-primary btn-lg px-5 py-2 rounded-pill shadow-sm">
+                            <i class="fas fa-check mr-2"></i>Planı Seç
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .plan-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .card-header {
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+    }
+    
+    .btn-primary {
+        background-color: #667eea;
+        border-color: #667eea;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+        background-color: #5a6fd1;
+        border-color: #5a6fd1;
+        transform: scale(1.05);
+    }
+</style>

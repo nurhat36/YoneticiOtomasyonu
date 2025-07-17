@@ -107,6 +107,42 @@ namespace YoneticiOtomasyonu.Data
                     }
                 }
             }
+            // Plan verileri ekle (eğer yoksa)
+            if (!context.Plans.Any())
+            {
+                context.Plans.AddRange(
+                    new Plan
+                    {
+                        Name = "Başlangıç",
+                        Description = "1 bina, 5 kullanıcı",
+                        MonthlyPrice = 129,
+                        YearlyPrice = 1200,
+                        MaxBuildings = 1,
+                        MaxUsers = 5
+                    },
+                    new Plan
+                    {
+                        Name = "Standart",
+                        Description = "3 bina, 20 kullanıcı",
+                        MonthlyPrice = 299,
+                        YearlyPrice = 2800,
+                        MaxBuildings = 3,
+                        MaxUsers = 20
+                    },
+                    new Plan
+                    {
+                        Name = "Kurumsal",
+                        Description = "Sınırsız bina ve kullanıcı",
+                        MonthlyPrice = 599,
+                        YearlyPrice = 5400,
+                        MaxBuildings = int.MaxValue,
+                        MaxUsers = int.MaxValue
+                    }
+                );
+
+                await context.SaveChangesAsync();
+            }
+
         }
     }
 }

@@ -34,6 +34,8 @@ namespace YoneticiOtomasyonu.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<BuildingPersonnel> BuildingPersonnel { get; set; }
+        public DbSet<Plan> Plans { get; set; }
+        public DbSet<UserPlan> UserPlans { get; set; }
 
 
 

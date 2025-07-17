@@ -64,8 +64,12 @@
         <a href="/Identity/Account/Register" class="btn btn-primary btn-lg px-4">
             <i class="fas fa-rocket me-2"></i> Ücretsiz Deneyin
         </a>
+       
     </div>
 </div>
+<h2 class="mt-5">Planını Seç</h2>
+@await Html.PartialAsync("PlanListPartial", ViewBag.Plans as List<YoneticiOtomasyonu.Models.Plan>)
+
 
 @section Styles {
     <style>
