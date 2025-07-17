@@ -5,6 +5,7 @@ using YoneticiOtomasyonu.Data;
 using System.Threading.Tasks;
 using YoneticiOtomasyonu.Services;
 using YoneticiOtomasyonu.Models;
+using Iyzipay.Request.V2.Subscription;
 
 namespace YoneticiOtomasyonu.Controllers
 {
@@ -37,32 +38,58 @@ namespace YoneticiOtomasyonu.Controllers
             if (plan == null)
                 return NotFound();
 
-            // Ödeme ekranına yönlendirme yapılacak (henüz entegre etmedik)
-            TempData["SelectedPlanId"] = id;
-            return RedirectToAction("Payment", "Subscription");
+            return RedirectToAction("Payment", "Subscription", new { id = id });
         }
+
 
         // Geçici ödeme ekranı (bir sonraki adımda gerçek iyzico entegrasyonu buraya gelecek)
-        public async Task<IActionResult> Payment()
+        [HttpGet]
+        public async Task<IActionResult> Payment(int id)
         {
-            var planId = TempData["SelectedPlanId"];
-            if (planId == null)
-                return RedirectToAction("Index");
+            var plan = await _context.Plans.FindAsync(id);
+            if (plan == null) return NotFound();
 
-            var plan = await _context.Plans.FindAsync((int)planId);
-            return View(plan);
+            var vm = new PaymentFormViewModel
+            {
+                PlanId = plan.Id,
+                PlanName = plan.Name,
+                PlanDescription = plan.Description,
+                MonthlyPrice = plan.MonthlyPrice,
+                YearlyPrice = plan.YearlyPrice
+            };
+
+            return View(vm);
         }
-        [HttpPost]
-        public async Task<IActionResult> ConfirmPayment(int planId)
-        {
-            var plan = await _context.Plans.FindAsync(planId);
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
 
-            var result = await _paymentService.MakePaymentAsync(user, plan);
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmPayment(PaymentFormViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                return View("Payment", model); // Eğer doğrulama hatası varsa tekrar forma dön
+            }
+
+            var plan = await _context.Plans.FindAsync(model.PlanId);
+            if (plan == null)
+            {
+                TempData["Error"] = "Plan bulunamadı.";
+                return RedirectToAction("Payment", new { id = model.PlanId });
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+            if (user == null)
+            {
+                TempData["Error"] = "Kullanıcı bulunamadı.";
+                return RedirectToAction("Payment", new { id = model.PlanId });
+            }
+
+            // Ödeme işlemini başlat
+            var result = await _paymentService.MakePaymentAsync(user, plan, model); // model = kart bilgilerini içeriyor
 
             if (result.Status == "success")
             {
-                // Ödeme başarılı, UserPlan kaydı yap
+                // Başarılı ödeme kaydı yap
                 var userPlan = new UserPlan
                 {
                     UserId = user.Id,
@@ -78,9 +105,12 @@ namespace YoneticiOtomasyonu.Controllers
                 return RedirectToAction("Success");
             }
 
-            TempData["Error"] = result.ErrorMessage;
-            return RedirectToAction("Payment", new { id = planId });
+            // Hata varsa
+            TempData["Error"] = result.ErrorMessage ?? "Ödeme sırasında bir hata oluştu.";
+            return RedirectToAction("Payment", new { id = model.PlanId });
         }
+
+
         [HttpGet]
         public IActionResult Success()
         {

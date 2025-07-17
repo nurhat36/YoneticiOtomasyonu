@@ -1,16 +1,47 @@
-﻿@model YoneticiOtomasyonu.Models.Plan
+﻿@model YoneticiOtomasyonu.Models.PaymentFormViewModel
 
 @{
-    ViewData["Title"] = "Ödeme Sayfası";
+    ViewData["Title"] = "Kart Bilgileriyle Ödeme";
 }
 
-<h2>@Model.Name Planı</h2>
-<p>@Model.Description</p>
-<p><strong>Aylık:</strong> ₺@Model.MonthlyPrice</p>
-<p><strong>Yıllık:</strong> ₺@Model.YearlyPrice</p>
+<h2>@Model.PlanName</h2>
+<p>@Model.PlanDescription</p>
+<p>Fiyat: @Model.MonthlyPrice ₺ / Aylık</p>
 
-<p>Buraya iyzico ödeme alanı gelecek. (Bir sonraki adım)</p>
-<form method="post" asp-action="ConfirmPayment">
-    <input type="hidden" name="planId" value="@Model.Id" />
-    <button type="submit" class="btn btn-success">Ödeme Yap (Test)</button>
+<form asp-action="ConfirmPayment" method="post">
+    <input type="hidden" asp-for="PlanId" />
+    <div class="form-group">
+        <label asp-for="CardHolderName"></label>
+        <input asp-for="CardHolderName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="CardNumber"></label>
+        <input asp-for="CardNumber" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ExpireMonth"></label>
+        <input asp-for="ExpireMonth" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ExpireYear"></label>
+        <input asp-for="ExpireYear" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Cvc"></label>
+        <input asp-for="Cvc" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Ödemeyi Tamamla</button>
 </form>
+
+
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">
+        @ViewBag.Error
+    </div>
+}
