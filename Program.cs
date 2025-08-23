@@ -75,9 +75,14 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    app.UseExceptionHandler("/Home/Error500"); // 500 gibi büyük hatalarda
+    app.UseStatusCodePagesWithReExecute("/Home/Error{0}"); // 404, 403 vs. için
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
