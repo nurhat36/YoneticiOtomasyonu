@@ -11,8 +11,18 @@ using YoneticiOtomasyonu.Services.Implementations;
 using YoneticiOtomasyonu.Hubs;
 
 using YoneticiOtomasyonu.Security;
+using Serilog;
+using YoneticiOtomasyonu.Attributes;
+using YoneticiOtomasyonu.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug() // Debug, Info, Error seviyelerini yakalar
+    .WriteTo.File("Logs/log-.log",   // Logs klasöründe tut
+        rollingInterval: RollingInterval.Day,  // günlük dosya
+        retainedFileCountLimit: 30,            // son 30 gün sakla
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
 
 // DbContext Configuration
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -40,6 +50,11 @@ builder.Services.AddScoped<IBuildingService, BuildingService>();
 
 // Authorization Handlers
 builder.Services.AddScoped<IAuthorizationHandler, BuildingAccessHandler>();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<LoggingActionFilter>();
+});
+
 
 // Authorization Policies
 builder.Services.AddAuthorization(options =>
@@ -88,6 +103,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

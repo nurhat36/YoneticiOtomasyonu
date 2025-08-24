@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Diagnostics;
 using YoneticiOtomasyonu.Data;
 using YoneticiOtomasyonu.Models;
@@ -19,6 +20,7 @@ namespace YoneticiOtomasyonu.Controllers
 
         public async Task<IActionResult> Index()
         {
+            Log.Information("Index sayfasý açýldý.");
             var plans = await _context.Plans.ToListAsync();
             ViewBag.Plans = plans;
             return View();
